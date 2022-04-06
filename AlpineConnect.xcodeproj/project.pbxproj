@@ -7,14 +7,59 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B114027B27FDF008003C2304 /* Updater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027A27FDF008003C2304 /* Updater.swift */; };
+		B114027D27FDF017003C2304 /* UpdateCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027C27FDF017003C2304 /* UpdateCheck.swift */; };
+		B114027F27FDF027003C2304 /* UpdaterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027E27FDF027003C2304 /* UpdaterViewModel.swift */; };
+		B114028527FDF283003C2304 /* PostgresClientKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114028427FDF283003C2304 /* PostgresClientKit.swift */; };
+		B11402B427FDF629003C2304 /* PostgresClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = B11402B327FDF629003C2304 /* PostgresClientKit */; };
 		B1382CED27FDED4000E49022 /* AlpineConnect.docc in Sources */ = {isa = PBXBuildFile; fileRef = B1382CEC27FDED4000E49022 /* AlpineConnect.docc */; };
 		B1382CEE27FDED4000E49022 /* AlpineConnect.h in Headers */ = {isa = PBXBuildFile; fileRef = B1382CEB27FDED4000E49022 /* AlpineConnect.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B1382CFB27FDEE9300E49022 /* ConnectTestApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1382CFA27FDEE9300E49022 /* ConnectTestApp.swift */; };
+		B1382CFD27FDEE9300E49022 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1382CFC27FDEE9300E49022 /* ContentView.swift */; };
+		B1382CFF27FDEE9400E49022 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B1382CFE27FDEE9400E49022 /* Assets.xcassets */; };
+		B1382D0227FDEE9400E49022 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B1382D0127FDEE9400E49022 /* Preview Assets.xcassets */; };
+		B1382D0827FDEEAC00E49022 /* AlpineConnect.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1382CE827FDED4000E49022 /* AlpineConnect.framework */; platformFilter = ios; };
+		B1382D0927FDEEAC00E49022 /* AlpineConnect.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B1382CE827FDED4000E49022 /* AlpineConnect.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B1382D0A27FDEEAC00E49022 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B1382CDF27FDED4000E49022 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B1382CE727FDED4000E49022;
+			remoteInfo = AlpineConnect;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B1382D0C27FDEEAC00E49022 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B1382D0927FDEEAC00E49022 /* AlpineConnect.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		B114027A27FDF008003C2304 /* Updater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updater.swift; sourceTree = "<group>"; };
+		B114027C27FDF017003C2304 /* UpdateCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheck.swift; sourceTree = "<group>"; };
+		B114027E27FDF027003C2304 /* UpdaterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterViewModel.swift; sourceTree = "<group>"; };
+		B114028427FDF283003C2304 /* PostgresClientKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostgresClientKit.swift; sourceTree = "<group>"; };
 		B1382CE827FDED4000E49022 /* AlpineConnect.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AlpineConnect.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1382CEB27FDED4000E49022 /* AlpineConnect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpineConnect.h; sourceTree = "<group>"; };
 		B1382CEC27FDED4000E49022 /* AlpineConnect.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = AlpineConnect.docc; sourceTree = "<group>"; };
+		B1382CF827FDEE9300E49022 /* ConnectTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ConnectTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1382CFA27FDEE9300E49022 /* ConnectTestApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectTestApp.swift; sourceTree = "<group>"; };
+		B1382CFC27FDEE9300E49022 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B1382CFE27FDEE9400E49022 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B1382D0127FDEE9400E49022 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		B1382D0627FDEEA500E49022 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -22,17 +67,48 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B11402B427FDF629003C2304 /* PostgresClientKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B1382CF527FDEE9300E49022 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1382D0827FDEEAC00E49022 /* AlpineConnect.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B114028027FDF02D003C2304 /* Updater */ = {
+			isa = PBXGroup;
+			children = (
+				B114027C27FDF017003C2304 /* UpdateCheck.swift */,
+				B114027E27FDF027003C2304 /* UpdaterViewModel.swift */,
+				B114027A27FDF008003C2304 /* Updater.swift */,
+			);
+			path = Updater;
+			sourceTree = "<group>";
+		};
+		B11402B527FDFB4B003C2304 /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				B114028427FDF283003C2304 /* PostgresClientKit.swift */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
 		B1382CDE27FDED4000E49022 = {
 			isa = PBXGroup;
 			children = (
+				B11402B527FDFB4B003C2304 /* Database */,
+				B114028027FDF02D003C2304 /* Updater */,
 				B1382CEA27FDED4000E49022 /* AlpineConnect */,
+				B1382CF927FDEE9300E49022 /* ConnectTest */,
 				B1382CE927FDED4000E49022 /* Products */,
+				B1382D0727FDEEAC00E49022 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -40,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				B1382CE827FDED4000E49022 /* AlpineConnect.framework */,
+				B1382CF827FDEE9300E49022 /* ConnectTest.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -51,6 +128,33 @@
 				B1382CEC27FDED4000E49022 /* AlpineConnect.docc */,
 			);
 			path = AlpineConnect;
+			sourceTree = "<group>";
+		};
+		B1382CF927FDEE9300E49022 /* ConnectTest */ = {
+			isa = PBXGroup;
+			children = (
+				B1382D0627FDEEA500E49022 /* Info.plist */,
+				B1382CFA27FDEE9300E49022 /* ConnectTestApp.swift */,
+				B1382CFC27FDEE9300E49022 /* ContentView.swift */,
+				B1382CFE27FDEE9400E49022 /* Assets.xcassets */,
+				B1382D0027FDEE9400E49022 /* Preview Content */,
+			);
+			path = ConnectTest;
+			sourceTree = "<group>";
+		};
+		B1382D0027FDEE9400E49022 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				B1382D0127FDEE9400E49022 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		B1382D0727FDEEAC00E49022 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -81,9 +185,31 @@
 			dependencies = (
 			);
 			name = AlpineConnect;
+			packageProductDependencies = (
+				B11402B327FDF629003C2304 /* PostgresClientKit */,
+			);
 			productName = AlpineConnect;
 			productReference = B1382CE827FDED4000E49022 /* AlpineConnect.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		B1382CF727FDEE9300E49022 /* ConnectTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B1382D0327FDEE9400E49022 /* Build configuration list for PBXNativeTarget "ConnectTest" */;
+			buildPhases = (
+				B1382CF427FDEE9300E49022 /* Sources */,
+				B1382CF527FDEE9300E49022 /* Frameworks */,
+				B1382CF627FDEE9300E49022 /* Resources */,
+				B1382D0C27FDEEAC00E49022 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B1382D0B27FDEEAC00E49022 /* PBXTargetDependency */,
+			);
+			name = ConnectTest;
+			productName = ConnectTest;
+			productReference = B1382CF827FDEE9300E49022 /* ConnectTest.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -92,9 +218,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1320;
 				LastUpgradeCheck = 1320;
 				TargetAttributes = {
 					B1382CE727FDED4000E49022 = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
+					B1382CF727FDEE9300E49022 = {
 						CreatedOnToolsVersion = 13.2.1;
 					};
 				};
@@ -108,11 +238,15 @@
 				Base,
 			);
 			mainGroup = B1382CDE27FDED4000E49022;
+			packageReferences = (
+				B11402AF27FDF56E003C2304 /* XCRemoteSwiftPackageReference "PostgresClientKit" */,
+			);
 			productRefGroup = B1382CE927FDED4000E49022 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				B1382CE727FDED4000E49022 /* AlpineConnect */,
+				B1382CF727FDEE9300E49022 /* ConnectTest */,
 			);
 		};
 /* End PBXProject section */
@@ -125,6 +259,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B1382CF627FDEE9300E49022 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1382D0227FDEE9400E49022 /* Preview Assets.xcassets in Resources */,
+				B1382CFF27FDEE9400E49022 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -132,11 +275,33 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B114027D27FDF017003C2304 /* UpdateCheck.swift in Sources */,
 				B1382CED27FDED4000E49022 /* AlpineConnect.docc in Sources */,
+				B114028527FDF283003C2304 /* PostgresClientKit.swift in Sources */,
+				B114027F27FDF027003C2304 /* UpdaterViewModel.swift in Sources */,
+				B114027B27FDF008003C2304 /* Updater.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B1382CF427FDEE9300E49022 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1382CFD27FDEE9300E49022 /* ContentView.swift in Sources */,
+				B1382CFB27FDEE9300E49022 /* ConnectTestApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B1382D0B27FDEEAC00E49022 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = B1382CE727FDED4000E49022 /* AlpineConnect */;
+			targetProxy = B1382D0A27FDEEAC00E49022 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		B1382CEF27FDED4000E49022 /* Debug */ = {
@@ -191,7 +356,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -249,7 +414,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -274,6 +439,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -283,6 +449,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.alpine-lis.AlpineConnect";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -302,6 +469,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -311,6 +479,71 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.alpine-lis.AlpineConnect";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B1382D0427FDEE9400E49022 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ConnectTest/Preview Content\"";
+				DEVELOPMENT_TEAM = ZC99J57MVR;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ConnectTest/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alpine-lis.ConnectTest";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B1382D0527FDEE9400E49022 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ConnectTest/Preview Content\"";
+				DEVELOPMENT_TEAM = ZC99J57MVR;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ConnectTest/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alpine-lis.ConnectTest";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -338,7 +571,35 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		B1382D0327FDEE9400E49022 /* Build configuration list for PBXNativeTarget "ConnectTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B1382D0427FDEE9400E49022 /* Debug */,
+				B1382D0527FDEE9400E49022 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B11402AF27FDF56E003C2304 /* XCRemoteSwiftPackageReference "PostgresClientKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/codewinsdotcom/PostgresClientKit.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B11402B327FDF629003C2304 /* PostgresClientKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B11402AF27FDF56E003C2304 /* XCRemoteSwiftPackageReference "PostgresClientKit" */;
+			productName = PostgresClientKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B1382CDF27FDED4000E49022 /* Project object */;
 }
