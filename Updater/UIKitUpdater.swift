@@ -40,8 +40,7 @@ public class UIKitUpdater: NSObject {
     
     func presentAlert(automatic: Bool) {
         DispatchQueue.main.async {
-            let vc: UIViewController? = self.viewController
-            vc?.present(self.alert(), animated: true, completion: nil)
+            self.viewController.present(self.alert(), animated: true, completion: nil)
         }
     }
     

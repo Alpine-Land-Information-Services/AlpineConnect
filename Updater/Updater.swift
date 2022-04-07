@@ -22,7 +22,7 @@ public class Updater {
     public var updateStatus = UpdateStatus.error
     
     func checkVersion(name: String, automatic: Bool, showMessage: @escaping ((Bool) -> Void)) {
-        if let currentVersion = self.getBundle(key: "CFBundleShortVersionString") {
+        if let currentVersion = AppInformation.getBundle(key: "CFBundleShortVersionString") {
             getAppInfo(name: name) { (info, error) in
                 if let appStoreAppVersion = info {
                     if let error = error {
@@ -121,16 +121,5 @@ public class Updater {
         catch {
             fatalError("\(error)")
         }
-    }
-    
-    private func getBundle(key: String) -> String? {
-        guard let filePath = Bundle.main.path(forResource: "Info", ofType: "plist") else {
-            fatalError("Couldn't find file 'Info.plist'.")
-        }
-        let plist = NSDictionary(contentsOfFile: filePath)
-        guard let value = plist?.object(forKey: key) as? String else {
-            fatalError("Couldn't find key '\(key)' in 'Info.plist'.")
-        }
-        return value
     }
 }
