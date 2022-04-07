@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		B114027B27FDF008003C2304 /* Updater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027A27FDF008003C2304 /* Updater.swift */; };
-		B114027D27FDF017003C2304 /* UpdateCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027C27FDF017003C2304 /* UpdateCheck.swift */; };
-		B114027F27FDF027003C2304 /* UpdaterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027E27FDF027003C2304 /* UpdaterViewModel.swift */; };
+		B114027D27FDF017003C2304 /* UpdateCheckModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027C27FDF017003C2304 /* UpdateCheckModifier.swift */; };
+		B114027F27FDF027003C2304 /* SwiftUIUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027E27FDF027003C2304 /* SwiftUIUpdater.swift */; };
 		B114028527FDF283003C2304 /* PostgresClientKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114028427FDF283003C2304 /* PostgresClientKit.swift */; };
 		B11402B427FDF629003C2304 /* PostgresClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = B11402B327FDF629003C2304 /* PostgresClientKit */; };
 		B1382CED27FDED4000E49022 /* AlpineConnect.docc in Sources */ = {isa = PBXBuildFile; fileRef = B1382CEC27FDED4000E49022 /* AlpineConnect.docc */; };
@@ -20,10 +20,27 @@
 		B1382D0227FDEE9400E49022 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B1382D0127FDEE9400E49022 /* Preview Assets.xcassets */; };
 		B1382D0827FDEEAC00E49022 /* AlpineConnect.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1382CE827FDED4000E49022 /* AlpineConnect.framework */; platformFilter = ios; };
 		B1382D0927FDEEAC00E49022 /* AlpineConnect.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B1382CE827FDED4000E49022 /* AlpineConnect.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B195272127FF479500217B50 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B195272027FF479500217B50 /* AppDelegate.swift */; };
+		B195272327FF479500217B50 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B195272227FF479500217B50 /* SceneDelegate.swift */; };
+		B195272527FF479500217B50 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B195272427FF479500217B50 /* ViewController.swift */; };
+		B195272827FF479500217B50 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B195272627FF479500217B50 /* Main.storyboard */; };
+		B195272A27FF479700217B50 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B195272927FF479700217B50 /* Assets.xcassets */; };
+		B195272D27FF479700217B50 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B195272B27FF479700217B50 /* LaunchScreen.storyboard */; };
+		B195273227FF47A300217B50 /* AlpineConnect.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B1382CE827FDED4000E49022 /* AlpineConnect.framework */; platformFilter = ios; };
+		B195273327FF47A300217B50 /* AlpineConnect.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B1382CE827FDED4000E49022 /* AlpineConnect.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B195273827FF49B400217B50 /* UpdateButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B195273727FF49B400217B50 /* UpdateButton.swift */; };
+		B195273A27FF51F800217B50 /* UIKitUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B195273927FF51F800217B50 /* UIKitUpdater.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		B1382D0A27FDEEAC00E49022 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B1382CDF27FDED4000E49022 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B1382CE727FDED4000E49022;
+			remoteInfo = AlpineConnect;
+		};
+		B195273427FF47A300217B50 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B1382CDF27FDED4000E49022 /* Project object */;
 			proxyType = 1;
@@ -44,12 +61,23 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B195273627FF47A300217B50 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B195273327FF47A300217B50 /* AlpineConnect.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		B114027A27FDF008003C2304 /* Updater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updater.swift; sourceTree = "<group>"; };
-		B114027C27FDF017003C2304 /* UpdateCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheck.swift; sourceTree = "<group>"; };
-		B114027E27FDF027003C2304 /* UpdaterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterViewModel.swift; sourceTree = "<group>"; };
+		B114027C27FDF017003C2304 /* UpdateCheckModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckModifier.swift; sourceTree = "<group>"; };
+		B114027E27FDF027003C2304 /* SwiftUIUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIUpdater.swift; sourceTree = "<group>"; };
 		B114028427FDF283003C2304 /* PostgresClientKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostgresClientKit.swift; sourceTree = "<group>"; };
 		B1382CE827FDED4000E49022 /* AlpineConnect.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AlpineConnect.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1382CEB27FDED4000E49022 /* AlpineConnect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AlpineConnect.h; sourceTree = "<group>"; };
@@ -60,6 +88,16 @@
 		B1382CFE27FDEE9400E49022 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B1382D0127FDEE9400E49022 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B1382D0627FDEEA500E49022 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B195271E27FF479500217B50 /* ConnectTestUIKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ConnectTestUIKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B195272027FF479500217B50 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B195272227FF479500217B50 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		B195272427FF479500217B50 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		B195272727FF479500217B50 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		B195272927FF479700217B50 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B195272C27FF479700217B50 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		B195272E27FF479700217B50 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B195273727FF49B400217B50 /* UpdateButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateButton.swift; sourceTree = "<group>"; };
+		B195273927FF51F800217B50 /* UIKitUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIKitUpdater.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,15 +117,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B195271B27FF479500217B50 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B195273227FF47A300217B50 /* AlpineConnect.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		B114028027FDF02D003C2304 /* Updater */ = {
 			isa = PBXGroup;
 			children = (
-				B114027C27FDF017003C2304 /* UpdateCheck.swift */,
-				B114027E27FDF027003C2304 /* UpdaterViewModel.swift */,
+				B114027C27FDF017003C2304 /* UpdateCheckModifier.swift */,
+				B114027E27FDF027003C2304 /* SwiftUIUpdater.swift */,
 				B114027A27FDF008003C2304 /* Updater.swift */,
+				B195273727FF49B400217B50 /* UpdateButton.swift */,
+				B195273927FF51F800217B50 /* UIKitUpdater.swift */,
 			);
 			path = Updater;
 			sourceTree = "<group>";
@@ -107,6 +155,7 @@
 				B114028027FDF02D003C2304 /* Updater */,
 				B1382CEA27FDED4000E49022 /* AlpineConnect */,
 				B1382CF927FDEE9300E49022 /* ConnectTest */,
+				B195271F27FF479500217B50 /* ConnectTestUIKit */,
 				B1382CE927FDED4000E49022 /* Products */,
 				B1382D0727FDEEAC00E49022 /* Frameworks */,
 			);
@@ -117,6 +166,7 @@
 			children = (
 				B1382CE827FDED4000E49022 /* AlpineConnect.framework */,
 				B1382CF827FDEE9300E49022 /* ConnectTest.app */,
+				B195271E27FF479500217B50 /* ConnectTestUIKit.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -155,6 +205,20 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B195271F27FF479500217B50 /* ConnectTestUIKit */ = {
+			isa = PBXGroup;
+			children = (
+				B195272027FF479500217B50 /* AppDelegate.swift */,
+				B195272227FF479500217B50 /* SceneDelegate.swift */,
+				B195272427FF479500217B50 /* ViewController.swift */,
+				B195272627FF479500217B50 /* Main.storyboard */,
+				B195272927FF479700217B50 /* Assets.xcassets */,
+				B195272B27FF479700217B50 /* LaunchScreen.storyboard */,
+				B195272E27FF479700217B50 /* Info.plist */,
+			);
+			path = ConnectTestUIKit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -211,6 +275,25 @@
 			productReference = B1382CF827FDEE9300E49022 /* ConnectTest.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B195271D27FF479500217B50 /* ConnectTestUIKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B195273127FF479700217B50 /* Build configuration list for PBXNativeTarget "ConnectTestUIKit" */;
+			buildPhases = (
+				B195271A27FF479500217B50 /* Sources */,
+				B195271B27FF479500217B50 /* Frameworks */,
+				B195271C27FF479500217B50 /* Resources */,
+				B195273627FF47A300217B50 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B195273527FF47A300217B50 /* PBXTargetDependency */,
+			);
+			name = ConnectTestUIKit;
+			productName = ConnectTestUIKit;
+			productReference = B195271E27FF479500217B50 /* ConnectTestUIKit.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -225,6 +308,9 @@
 						CreatedOnToolsVersion = 13.2.1;
 					};
 					B1382CF727FDEE9300E49022 = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
+					B195271D27FF479500217B50 = {
 						CreatedOnToolsVersion = 13.2.1;
 					};
 				};
@@ -247,6 +333,7 @@
 			targets = (
 				B1382CE727FDED4000E49022 /* AlpineConnect */,
 				B1382CF727FDEE9300E49022 /* ConnectTest */,
+				B195271D27FF479500217B50 /* ConnectTestUIKit */,
 			);
 		};
 /* End PBXProject section */
@@ -268,6 +355,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B195271C27FF479500217B50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B195272D27FF479700217B50 /* LaunchScreen.storyboard in Resources */,
+				B195272A27FF479700217B50 /* Assets.xcassets in Resources */,
+				B195272827FF479500217B50 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -275,11 +372,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B114027D27FDF017003C2304 /* UpdateCheck.swift in Sources */,
+				B195273827FF49B400217B50 /* UpdateButton.swift in Sources */,
+				B114027D27FDF017003C2304 /* UpdateCheckModifier.swift in Sources */,
 				B1382CED27FDED4000E49022 /* AlpineConnect.docc in Sources */,
 				B114028527FDF283003C2304 /* PostgresClientKit.swift in Sources */,
-				B114027F27FDF027003C2304 /* UpdaterViewModel.swift in Sources */,
+				B114027F27FDF027003C2304 /* SwiftUIUpdater.swift in Sources */,
 				B114027B27FDF008003C2304 /* Updater.swift in Sources */,
+				B195273A27FF51F800217B50 /* UIKitUpdater.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,6 +391,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B195271A27FF479500217B50 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B195272527FF479500217B50 /* ViewController.swift in Sources */,
+				B195272127FF479500217B50 /* AppDelegate.swift in Sources */,
+				B195272327FF479500217B50 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -301,7 +410,32 @@
 			target = B1382CE727FDED4000E49022 /* AlpineConnect */;
 			targetProxy = B1382D0A27FDEEAC00E49022 /* PBXContainerItemProxy */;
 		};
+		B195273527FF47A300217B50 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = B1382CE727FDED4000E49022 /* AlpineConnect */;
+			targetProxy = B195273427FF47A300217B50 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		B195272627FF479500217B50 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B195272727FF479500217B50 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		B195272B27FF479700217B50 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B195272C27FF479700217B50 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		B1382CEF27FDED4000E49022 /* Debug */ = {
@@ -550,6 +684,64 @@
 			};
 			name = Release;
 		};
+		B195272F27FF479700217B50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZC99J57MVR;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ConnectTestUIKit/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alpine-lis.ConnectTestUIKit";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B195273027FF479700217B50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZC99J57MVR;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ConnectTestUIKit/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alpine-lis.ConnectTestUIKit";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -576,6 +768,15 @@
 			buildConfigurations = (
 				B1382D0427FDEE9400E49022 /* Debug */,
 				B1382D0527FDEE9400E49022 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B195273127FF479700217B50 /* Build configuration list for PBXNativeTarget "ConnectTestUIKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B195272F27FF479700217B50 /* Debug */,
+				B195273027FF479700217B50 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

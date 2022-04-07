@@ -1,5 +1,5 @@
 //
-//  UpdaterViewModel.swift
+//  SwiftUIUpdater.swift
 //  AlpineConnect
 //
 //  Created by Jenya Lebid on 4/6/22.
@@ -8,36 +8,47 @@
 import SwiftUI
 import Network
 
-public class UpdaterViewModel: ObservableObject {
+public class SwiftUIUpdater: ObservableObject {
     
     @Environment(\.openURL) var openURL
-    @Published var status: Updater.UpdateStatus = .error
+    @Published var showAlert = false
 
     let updater = Updater.shared
-    let monitor = NWPathMonitor()
-    let queue = DispatchQueue(label: "UpdaterMonitor")
-    
     var appName: String
 
-    init(appName: String) {
+    public init(appName: String) {
         self.appName = appName
     }
     
-    
-    func checkForUpdate(name: String, automatic: Bool, showMessage: @escaping ((Bool) -> Void)) {
-        monitor.start(queue: queue)
+    public func checkForUpdate(automatic: Bool) {
+        let monitor = NWPathMonitor()
+        monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
         monitor.pathUpdateHandler = { path in
             if path.status == .satisfied {
-                self.updater.checkVersion(name: name, automatic: automatic, showMessage: showMessage)
+                self.updater.checkVersion(name: self.appName, automatic: automatic, showMessage: { result in
+                    if result {
+                        self.alertToggle(automatic: automatic)
+                    }
+                })
             }
             else {
                 self.updater.updateStatus = .notConnected
+                self.alertToggle(automatic: automatic)
             }
         }
+        monitor.cancel()
     }
     
-    func getUpdateStatus() {
-        status = updater.updateStatus
+    
+    func alertToggle(automatic: Bool) {
+        DispatchQueue.main.async {
+            if !automatic {
+                self.showAlert = true
+            }
+            else {
+                self.showAlert = false
+            }
+        }
     }
     
     func callUpdate() {
@@ -51,7 +62,7 @@ public class UpdaterViewModel: ObservableObject {
     }
     
     func alert() -> Alert {
-        switch status {
+        switch updater.updateStatus {
         case .updatedRequired:
             return Alert(title: Text("New Version Avalible"),
                          message: Text("Update to the latest version for best functionality."),
@@ -67,9 +78,8 @@ public class UpdaterViewModel: ObservableObject {
                          dismissButton: .default(Text("Okay")))
         case .notConnected:
             return Alert(title: Text("No Connection"),
-                         message: Text("Connect to network and try again."),
+                         message: Text("Unable to check for update, connect to network and try again."),
                          dismissButton: .default(Text("Okay")))
         }
     }
-    
 }

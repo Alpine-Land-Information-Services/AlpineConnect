@@ -10,8 +10,9 @@ import AlpineConnect
 
 struct ContentView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-            .modifier(UpdateCheck(appName: "WBIS", automatic: false))
+        UpdateButton(appName: "WBIS")
+//        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+//            .modifier(UpdateCheck(appName: "WBIS", automatic: false))
     }
 }
 
