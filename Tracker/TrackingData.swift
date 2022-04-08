@@ -13,19 +13,21 @@ public struct TrackingData {
         var lat: Double
         var long: Double
     }
+
+    public struct AppInfo {
+        var appVersion: String
+        var appName: String
+    }
     
-    public struct Status {
-        var connected: Bool
+    public struct DeviceInfo {
+        var deviceID: UUID?
+        var deviceType: String
+        var deviceName: String
+        var deviceVersion: String
+        var deviceLocation: Coordinates?
         var connectionType: String
     }
     
-    var appVersion: String
-    var appName: String
-    var deviceID: UUID?
-    var deviceType: String
-    var deviceName: String
-    var deviceVersion: String
-    var deviceLocation: Coordinates?
-    var onlineStatus: Status
-    var lastOnline: Date
+    var deviceInfo: DeviceInfo
+    var appInfo: AppInfo
 }

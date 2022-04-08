@@ -11,7 +11,7 @@ public class LocationManager: NSObject, CLLocationManagerDelegate {
     
     private let manager = CLLocationManager()
     
-    public var currentCoordiante: CLLocationCoordinate2D? = nil
+    public var currentCoordiante: CLLocation? = nil
     public static let shared = LocationManager()
     
     public override init() {
@@ -20,7 +20,7 @@ public class LocationManager: NSObject, CLLocationManagerDelegate {
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location: CLLocationCoordinate2D = manager.location?.coordinate {
+        if let location = locations.last {
             currentCoordiante = location
         }
         manager.stopUpdatingLocation()
