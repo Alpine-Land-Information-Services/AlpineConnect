@@ -18,25 +18,37 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         Tracker.start()
-        Notifier.checkForNotification(appName: Tracker.appName(), completion: { notifications in
+        Notifier.checkForNotification(completion: { notifications in
             for notification in notifications {
-                let alert = UIAlertController(title: notification.title, message: notification.body, preferredStyle: .alert)
-                for button in notification.buttons {
-                    alert.addAction(UIAlertAction(title: button.title, style: .default) { (action: UIAlertAction) in
-                        switch button.actionName {
-                        case "ACTION1":
-                            // self.action1()
-                            break
-                        default:
-                            break
-                        }
-                    })
+                
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(title: notification.title, message: notification.body, preferredStyle: .alert)
+                    if notification.buttons.isEmpty {
+                        alert.addAction(UIAlertAction(title: "Okay", style: .default) { (action: UIAlertAction) in
+                            self.dismiss(animated: true, completion: nil)
+                        })
+                    }
+                    for button in notification.buttons {
+                        alert.addAction(UIAlertAction(title: button.title, style: .default) { (action: UIAlertAction) in
+                            self.notificationActions(action: button.actionName)
+                        })
+                    }
+                    self.present(alert, animated: true, completion: nil)
                 }
-                self.present(alert, animated: true, completion: nil)
             }
         })
     }
 
+    func notificationActions(action: String) {
+        switch action {
+        case "UPDATE":
+            print(action)
+        case "CLEARDATA":
+            print(action)
+        default:
+            break
+        }
+    }
 
 }
 

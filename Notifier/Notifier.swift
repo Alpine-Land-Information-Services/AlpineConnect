@@ -23,22 +23,27 @@ public struct acNotification {
 
 public class Notifier {
     
-    public static func checkForNotification(appName: String, completion: @escaping ([acNotification]) -> Void) {
+    public static func checkForNotification(completion: @escaping ([acNotification]) -> Void) {
         guard let devID = Tracker.deviceID() else { return }
+        let appName = Tracker.appName()
         PostgresClientManager.shared.pool?.withConnection { con_from_pool in
             do {
                 let connection = try con_from_pool.get()
                 defer { connection.close() }
                 let text = """
                         SELECT
-                        "title"
-                        ,"body"
-                        ,"buttons"
-                        FROM public."notifications"
-                        WHERE "app_name" = '\(appName)'
-                          AND "device_id" = '\(devID)'
+                          n."title"
+                        , n."body"
+                        , n."buttons"
+                        , p."notification_id"
+                        FROM public."notification_pool" AS p
+                        JOIN public."notifications"     AS n ON p."notification_id" = n."id"
+                        WHERE p."app_name" = '\(appName)'
+                          AND p."device_id" = '\(devID)'
+                          AND p."read" = FALSE
                         """
                 print("---------------->>>Alpine Notification Checking<<<----------------")
+                print(text)
                 let statement = try connection.prepareStatement(text: text)
                 defer { statement.close() }
                 var notifications = [acNotification]()
@@ -70,13 +75,19 @@ public class Notifier {
         }
     }
     
-    public static func clearDBMessages(appName: String) {
+    public static func utilizeMessages() {
         guard let devID = Tracker.deviceID() else { return }
+        let appName = Tracker.appName()
         PostgresClientManager.shared.pool?.withConnection { con_from_pool in
             do {
                 let connection = try con_from_pool.get()
                 defer { connection.close() }
-                let text = "DELETE FROM public.\"notifications\" WHERE app_name = '\(appName)' AND device_id = '\(devID)'"
+                let text = """
+                    INSERT INTO public."notification_pool" (device_id, app_name, read)
+                    VALUES ('\(devID)', '\(appName)', TRUE)
+                    ON CONFLICT (device_id, app_name, notification_id) DO UPDATE SET
+                    read = EXCLUDED.read
+                """
                 let statement = try connection.prepareStatement(text: text)
                 defer { statement.close() }
                 let cursor = try statement.execute()
