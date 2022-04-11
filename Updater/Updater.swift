@@ -28,8 +28,10 @@ public class Updater {
                     if let error = error {
                         print("Error getting app version: ", error)
                         showMessage(true)
-                    } else if appStoreAppVersion <= currentVersion {
-                        print("Already on the latest app version: ", currentVersion)
+                        return
+                    }
+                    if appStoreAppVersion.compare(currentVersion, options: .numeric) != .orderedDescending {
+                        print("Already on the latest app version: ", currentVersion, " (remote version: \(appStoreAppVersion)")
                         self.updateStatus = .latestVersion
                         if automatic {
                             showMessage(false)
@@ -37,11 +39,11 @@ public class Updater {
                         else {
                             showMessage(true)
                         }
-                    } else {
-                        print("Needs update: App Store Version: \(appStoreAppVersion) > Current version: ", currentVersion)
-                        self.updateStatus = .updatedRequired
-                        showMessage(true)
+                        return
                     }
+                    print("Needs update: App Store Version: \(appStoreAppVersion) > Current version: ", currentVersion)
+                    self.updateStatus = .updatedRequired
+                    showMessage(true)
                 }
             }
         }
