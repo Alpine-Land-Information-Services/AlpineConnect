@@ -17,6 +17,7 @@ public struct TrackingData {
     public struct AppInfo {
         var appVersion: String
         var appName: String
+        var connectionType: String
     }
     
     public struct DeviceInfo {
@@ -25,7 +26,6 @@ public struct TrackingData {
         var deviceName: String
         var deviceVersion: String
         var deviceLocation: Coordinates?
-        var connectionType: String
     }
     
     var deviceInfo: DeviceInfo

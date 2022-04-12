@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		199C683C280431B3008F3B6D /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 199C683B280431B3008F3B6D /* Notifier.swift */; };
+		19EB14EC280549EB0059BFC4 /* UIKitNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19EB14EB280549EB0059BFC4 /* UIKitNotifier.swift */; };
+		19EB14F42805A55A0059BFC4 /* NotificationCheckModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19EB14F32805A55A0059BFC4 /* NotificationCheckModifier.swift */; };
+		19EB14F62805B37E0059BFC4 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19EB14F52805B37E0059BFC4 /* AppViewModel.swift */; };
+		19EB14FB2805CECE0059BFC4 /* SwiftUINotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19EB14FA2805CECE0059BFC4 /* SwiftUINotifier.swift */; };
 		B114027B27FDF008003C2304 /* Updater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027A27FDF008003C2304 /* Updater.swift */; };
 		B114027D27FDF017003C2304 /* UpdateCheckModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027C27FDF017003C2304 /* UpdateCheckModifier.swift */; };
 		B114027F27FDF027003C2304 /* SwiftUIUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B114027E27FDF027003C2304 /* SwiftUIUpdater.swift */; };
@@ -82,6 +86,10 @@
 
 /* Begin PBXFileReference section */
 		199C683B280431B3008F3B6D /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Notifier.swift; path = Notifier/Notifier.swift; sourceTree = "<group>"; };
+		19EB14EB280549EB0059BFC4 /* UIKitNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UIKitNotifier.swift; path = Notifier/UIKitNotifier.swift; sourceTree = "<group>"; };
+		19EB14F32805A55A0059BFC4 /* NotificationCheckModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NotificationCheckModifier.swift; path = Notifier/NotificationCheckModifier.swift; sourceTree = "<group>"; };
+		19EB14F52805B37E0059BFC4 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
+		19EB14FA2805CECE0059BFC4 /* SwiftUINotifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftUINotifier.swift; path = Notifier/SwiftUINotifier.swift; sourceTree = "<group>"; };
 		B114027A27FDF008003C2304 /* Updater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updater.swift; sourceTree = "<group>"; };
 		B114027C27FDF017003C2304 /* UpdateCheckModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCheckModifier.swift; sourceTree = "<group>"; };
 		B114027E27FDF027003C2304 /* SwiftUIUpdater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIUpdater.swift; sourceTree = "<group>"; };
@@ -144,6 +152,9 @@
 			isa = PBXGroup;
 			children = (
 				199C683B280431B3008F3B6D /* Notifier.swift */,
+				19EB14EB280549EB0059BFC4 /* UIKitNotifier.swift */,
+				19EB14FA2805CECE0059BFC4 /* SwiftUINotifier.swift */,
+				19EB14F32805A55A0059BFC4 /* NotificationCheckModifier.swift */,
 			);
 			name = Notifier;
 			sourceTree = "<group>";
@@ -209,6 +220,7 @@
 				B1382D0627FDEEA500E49022 /* Info.plist */,
 				B1382CFA27FDEE9300E49022 /* ConnectTestApp.swift */,
 				B1382CFC27FDEE9300E49022 /* ContentView.swift */,
+				19EB14F52805B37E0059BFC4 /* AppViewModel.swift */,
 				B1382CFE27FDEE9400E49022 /* Assets.xcassets */,
 				B1382D0027FDEE9400E49022 /* Preview Content */,
 			);
@@ -418,11 +430,14 @@
 				B114027D27FDF017003C2304 /* UpdateCheckModifier.swift in Sources */,
 				B1382CED27FDED4000E49022 /* AlpineConnect.docc in Sources */,
 				B195274827FF7E5500217B50 /* LocationManager.swift in Sources */,
+				19EB14EC280549EB0059BFC4 /* UIKitNotifier.swift in Sources */,
 				199C683C280431B3008F3B6D /* Notifier.swift in Sources */,
 				B114028527FDF283003C2304 /* PostgresClientKit.swift in Sources */,
 				B195274027FF5CC100217B50 /* AppInformation.swift in Sources */,
+				19EB14F42805A55A0059BFC4 /* NotificationCheckModifier.swift in Sources */,
 				B195274C27FF823A00217B50 /* TrackingData.swift in Sources */,
 				B195273C27FF5BA900217B50 /* Tracker.swift in Sources */,
+				19EB14FB2805CECE0059BFC4 /* SwiftUINotifier.swift in Sources */,
 				B114027F27FDF027003C2304 /* SwiftUIUpdater.swift in Sources */,
 				B114027B27FDF008003C2304 /* Updater.swift in Sources */,
 				B195273A27FF51F800217B50 /* UIKitUpdater.swift in Sources */,
@@ -436,6 +451,7 @@
 			files = (
 				B1382CFD27FDEE9300E49022 /* ContentView.swift in Sources */,
 				B1382CFB27FDEE9300E49022 /* ConnectTestApp.swift in Sources */,
+				19EB14F62805B37E0059BFC4 /* AppViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,46 +9,38 @@ import UIKit
 import AlpineConnect
 
 class ViewController: UIViewController {
+    var notifier: UIKitNotifier?
     
     @IBAction func UpdateCheckAction(_ sender: Any) {
-        let updater = UIKitUpdater(appName: "WBIS", viewController: self)
+        let updater = UIKitUpdater(viewController: self)
         updater.checkForUpdate(automatic: false)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         Tracker.start()
-        Notifier.checkForNotification(completion: { notifications in
-            for notification in notifications {
-                
-                DispatchQueue.main.async {
-                    let alert = UIAlertController(title: notification.title, message: notification.body, preferredStyle: .alert)
-                    if notification.buttons.isEmpty {
-                        alert.addAction(UIAlertAction(title: "Okay", style: .default) { (action: UIAlertAction) in
-                            self.dismiss(animated: true, completion: nil)
-                        })
-                    }
-                    for button in notification.buttons {
-                        alert.addAction(UIAlertAction(title: button.title, style: .default) { (action: UIAlertAction) in
-                            self.notificationActions(action: button.actionName)
-                        })
-                    }
-                    self.present(alert, animated: true, completion: nil)
-                }
-            }
-        })
+        notifier = UIKitNotifier(viewController: self)
+        notifier?.check(timeIntervalInSeconds: 20, actions: notificationActions)
     }
 
     func notificationActions(action: String) {
         switch action {
         case "UPDATE":
-            print(action)
+            updateApp() 
         case "CLEARDATA":
-            print(action)
+            clearData()
         default:
             break
         }
     }
 
+    // ***** EXAMPLE of ACTIONS *****
+    func clearData() {
+        print(#function)
+    }
+    
+    func updateApp() {
+        print(#function)
+    }
 }
 

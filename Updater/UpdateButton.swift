@@ -10,12 +10,9 @@ import SwiftUI
 public struct UpdateButton: View {
     
     @ObservedObject var viewModel: SwiftUIUpdater
-    
-    var appName: String
-    
-    public init(appName: String) {
-        self.appName = appName
-        self.viewModel = SwiftUIUpdater(appName: appName)
+        
+    public init() {
+        self.viewModel = SwiftUIUpdater()
     }
     
     public var body: some View {
@@ -32,6 +29,6 @@ public struct UpdateButton: View {
 
 struct UpdateButton_Previews: PreviewProvider {
     static var previews: some View {
-        UpdateButton(appName: "WBIS")
+        UpdateButton()
     }
 }

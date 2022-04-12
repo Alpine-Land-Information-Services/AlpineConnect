@@ -31,7 +31,7 @@ public class Updater {
                         return
                     }
                     if appStoreAppVersion.compare(currentVersion, options: .numeric) != .orderedDescending {
-                        print("Already on the latest app version: ", currentVersion, " (remote version: \(appStoreAppVersion)")
+                        print("Already on the latest app version: ", currentVersion, " (remote version: \(appStoreAppVersion))")
                         self.updateStatus = .latestVersion
                         if automatic {
                             showMessage(false)
@@ -57,7 +57,7 @@ public class Updater {
                 let text = """
                         SELECT
                         "version"
-                        FROM public."app_version"
+                        FROM public."applications"
                         WHERE "name" = '\(name)'
                         """
                 print("---------------->>>Alpine Updater Running<<<----------------")

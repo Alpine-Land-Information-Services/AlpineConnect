@@ -11,11 +11,11 @@ import Network
 public class UIKitUpdater: NSObject {
     
     let updater = Updater.shared
-    var appName: String
+//    var appName: String
     var viewController: UIViewController
     
-    public init(appName: String, viewController: UIViewController) {
-        self.appName = appName
+    public init(viewController: UIViewController) {
+//        self.appName = Tracker.appName()
         self.viewController = viewController
     }
     
@@ -24,7 +24,7 @@ public class UIKitUpdater: NSObject {
         monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
         monitor.pathUpdateHandler = { path in
             if path.status == .satisfied {
-                self.updater.checkVersion(name: self.appName, automatic: automatic, showMessage: { result in
+                self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result in
                     if result {
                         self.presentAlert(automatic: automatic)
                     }
@@ -45,7 +45,7 @@ public class UIKitUpdater: NSObject {
     }
     
     func callUpdate() {
-        updater.callUpdate(name: appName, result: { (result, url) in
+        updater.callUpdate(name: Tracker.appName(), result: { (result, url) in
             if result {
                 if let url = url {
                     DispatchQueue.main.async {

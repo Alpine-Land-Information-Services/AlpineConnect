@@ -91,7 +91,7 @@ public class Tracker {
                 //                    }
                 //                })
                 connectionType = type
-                let data = TrackingData(deviceInfo: TrackingData.DeviceInfo(deviceID: deviceID(), deviceType: deviceType(), deviceName: deviceName(), deviceVersion: deviceVersion(), deviceLocation: coordinates, connectionType: connectionType), appInfo: TrackingData.AppInfo(appVersion: appVersion(), appName: appName()))
+                let data = TrackingData(deviceInfo: TrackingData.DeviceInfo(deviceID: deviceID(), deviceType: deviceType(), deviceName: deviceName(), deviceVersion: deviceVersion(), deviceLocation: coordinates), appInfo: TrackingData.AppInfo(appVersion: appVersion(), appName: appName(), connectionType: connectionType))
                 
                 sendData(data, handler: { result in
                     if result {
@@ -107,18 +107,18 @@ public class Tracker {
             do {
                 let connection = try pool.get()
                 var text = """
-                INSERT INTO public.devices(id, type, name, ios_version, connection_type) VALUES ($1, $2, $3, $4, $5)
+                INSERT INTO public.devices(id, type, name, ios_version) VALUES ($1, $2, $3, $4)
                 """
                 text = text + """
                 ON CONFLICT (id) DO UPDATE SET
-                type = EXCLUDED.type, name = EXCLUDED.name, ios_version = EXCLUDED.ios_version, connection_type = EXCLUDED.connection_type
+                type = EXCLUDED.type, name = EXCLUDED.name, ios_version = EXCLUDED.ios_version
                 """
                 
                 let statement = try connection.prepareStatement(text: text)
                 defer { statement.close() }
                 
                 if let id = data.deviceInfo.deviceID {
-                    let cursor = try statement.execute(parameterValues: [id.uuidString, data.deviceInfo.deviceType, data.deviceInfo.deviceName, data.deviceInfo.deviceVersion, data.deviceInfo.connectionType])
+                    let cursor = try statement.execute(parameterValues: [id.uuidString, data.deviceInfo.deviceType, data.deviceInfo.deviceName, data.deviceInfo.deviceVersion])
                     defer { cursor.close() }
                     
                     sendAppInfo(data.appInfo, deviceId: id.uuidString, handler: { result in
@@ -140,17 +140,17 @@ public class Tracker {
             do {
                 let connection = try pool.get()
                 var text = """
-                INSERT INTO public.app_info(device_id, app_name, app_version) VALUES ($1, $2, $3)
+                INSERT INTO public.app_info(device_id, app_name, app_version, connection_type) VALUES ($1, $2, $3, $4)
                 """
                 text = text + """
                 ON CONFLICT (device_id, app_name) DO UPDATE SET
-                app_version = EXCLUDED.app_version
+                app_version = EXCLUDED.app_version, connection_type = EXCLUDED.connection_type
                 """
                 
                 let statement = try connection.prepareStatement(text: text)
                 defer { statement.close() }
                 
-                let cursor = try statement.execute(parameterValues: [deviceId, info.appName, info.appVersion])
+                let cursor = try statement.execute(parameterValues: [deviceId, info.appName, info.appVersion, info.connectionType])
                 defer { cursor.close() }
                 
                 handler(true)

@@ -14,18 +14,18 @@ public class SwiftUIUpdater: ObservableObject {
     @Published var showAlert = false
 
     let updater = Updater.shared
-    var appName: String
+//    var appName: String
 
-    public init(appName: String) {
-        self.appName = appName
-    }
+//    public init(appName: String) {
+//        self.appName = appName
+//    }
     
     public func checkForUpdate(automatic: Bool) {
         let monitor = NWPathMonitor()
         monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
         monitor.pathUpdateHandler = { path in
             if path.status == .satisfied {
-                self.updater.checkVersion(name: self.appName, automatic: automatic, showMessage: { result in
+                self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result in
                     if result {
                         self.alertToggle(automatic: automatic)
                     }
@@ -52,7 +52,7 @@ public class SwiftUIUpdater: ObservableObject {
     }
     
     func callUpdate() {
-        updater.callUpdate(name: appName, result: { (result, url) in
+        updater.callUpdate(name: Tracker.appName(), result: { (result, url) in
             if result {
                 if let url = url {
                     self.openURL(url)

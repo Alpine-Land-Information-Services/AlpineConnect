@@ -17,7 +17,7 @@ public struct UpdateCheckModifier: ViewModifier {
     public init(appName: String, automatic: Bool) {
         self.appName = appName
         self.automatic = automatic
-        self.viewModel = SwiftUIUpdater(appName: appName)
+        self.viewModel = SwiftUIUpdater()
     }
     
     public func body(content: Content) -> some View {

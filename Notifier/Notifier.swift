@@ -21,7 +21,22 @@ public struct acNotification {
     }
 }
 
+
 public class Notifier {
+    static let shared = Notifier()
+    var timer: Timer?
+    
+    public func startChecking(timeIntervalInSeconds: TimeInterval = 10.0, completion: @escaping ([acNotification]) -> Void) {
+        Notifier.checkForNotification(completion: completion)
+        timer = Timer.scheduledTimer(withTimeInterval: timeIntervalInSeconds, repeats: true) { timer in
+            Notifier.checkForNotification(completion: completion)
+        }
+    }
+    
+    public func stopChecking() {
+        timer?.invalidate()
+        timer = nil
+    }
     
     public static func checkForNotification(completion: @escaping ([acNotification]) -> Void) {
         guard let devID = Tracker.deviceID() else { return }
@@ -43,7 +58,7 @@ public class Notifier {
                           AND p."read" = FALSE
                         """
                 print("---------------->>>Alpine Notification Checking<<<----------------")
-                print(text)
+//                print(text)
                 let statement = try connection.prepareStatement(text: text)
                 defer { statement.close() }
                 var notifications = [acNotification]()
@@ -67,10 +82,17 @@ public class Notifier {
                         }
                         notifications.append(n)
                     }
+                    if !notifications.isEmpty {
+                        DispatchQueue.main.async {
+                            Notifier.utilizeMessages()
+                        }
+                    }
                 } catch {
+                    print(error)
                 }
                 completion(notifications)
             } catch {
+                print(error)
             }
         }
     }
@@ -83,10 +105,10 @@ public class Notifier {
                 let connection = try con_from_pool.get()
                 defer { connection.close() }
                 let text = """
-                    INSERT INTO public."notification_pool" (device_id, app_name, read)
-                    VALUES ('\(devID)', '\(appName)', TRUE)
-                    ON CONFLICT (device_id, app_name, notification_id) DO UPDATE SET
-                    read = EXCLUDED.read
+                    UPDATE public."notification_pool" SET "read" = TRUE
+                    WHERE "app_name" = '\(appName)'
+                      AND "device_id" = '\(devID)'
+                      AND "read" = FALSE
                 """
                 let statement = try connection.prepareStatement(text: text)
                 defer { statement.close() }
@@ -94,7 +116,7 @@ public class Notifier {
                 cursor.close()
             }
             catch {
-                fatalError("\(error)")
+                print("\(error)")
             }
         }
     }
