@@ -8,8 +8,13 @@
 import UIKit
 import AlpineConnect
 
+//   600 - 10 min
+//  3600 - 1 hour
+// 86400 - 1 day
+
 class ViewController: UIViewController {
     var notifier: UIKitNotifier?
+    var tracker = Tracker.shared
     
     @IBAction func UpdateCheckAction(_ sender: Any) {
         let updater = UIKitUpdater(viewController: self)
@@ -18,9 +23,9 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        Tracker.start()
+        tracker.start(timeIntervalInSeconds: 3600)
         notifier = UIKitNotifier(viewController: self)
-        notifier?.check(timeIntervalInSeconds: 20, actions: notificationActions)
+        notifier?.check(timeIntervalInSeconds: 600, actions: notificationActions)
     }
 
     func notificationActions(action: String) {

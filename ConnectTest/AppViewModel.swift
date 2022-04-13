@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import AlpineConnect
 
 public class AppViewModel {
+    public var tracker = Tracker.shared
     
     public func notificationActions(action: String) -> Void {
         switch action {
@@ -16,7 +18,7 @@ public class AppViewModel {
         case "CLEARDATA":
             print(action)
         default:
-            break
+            print("No action called: \(action)")
         }
     }
 }

@@ -12,6 +12,9 @@ public struct TrackingData {
     public struct Coordinates {
         var lat: Double
         var long: Double
+        public func string() -> String {
+            return "\(long.description) \(lat.description)"
+        }
     }
 
     public struct AppInfo {

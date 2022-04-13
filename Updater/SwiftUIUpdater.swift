@@ -14,11 +14,6 @@ public class SwiftUIUpdater: ObservableObject {
     @Published var showAlert = false
 
     let updater = Updater.shared
-//    var appName: String
-
-//    public init(appName: String) {
-//        self.appName = appName
-//    }
     
     public func checkForUpdate(automatic: Bool) {
         let monitor = NWPathMonitor()

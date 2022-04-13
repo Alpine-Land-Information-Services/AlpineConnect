@@ -11,7 +11,7 @@ public class LocationManager: NSObject, CLLocationManagerDelegate {
     
     private let manager = CLLocationManager()
     
-    public var currentCoordiante: CLLocation? = nil
+    public var lastLocation: CLLocation? = nil
     public static let shared = LocationManager()
     
     public override init() {
@@ -21,9 +21,9 @@ public class LocationManager: NSObject, CLLocationManagerDelegate {
     
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
-            currentCoordiante = location
+            lastLocation = location
         }
-        manager.stopUpdatingLocation()
+//        manager.stopUpdatingLocation()
     }
     
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Swift.Error) {
@@ -32,12 +32,15 @@ public class LocationManager: NSObject, CLLocationManagerDelegate {
     }
     
     private func configure() {
-        if manager.delegate == nil {
-            manager.delegate = self
-        }
         manager.requestAlwaysAuthorization()
         manager.requestWhenInUseAuthorization()
-        manager.startUpdatingLocation()
+        if CLLocationManager.locationServicesEnabled() {
+            manager.delegate = self
+//            manager.distanceFilter = 10
+//            manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+//            manager.startUpdatingLocation()
+            manager.startMonitoringSignificantLocationChanges()
+        }
     }
 
 }

@@ -8,18 +8,21 @@
 import SwiftUI
 import AlpineConnect
 
+//   600 - 10 min
+//  3600 - 1 hour
+// 86400 - 1 day
+
 struct ContentView: View {
     var appViewModel = AppViewModel()
         
     init() {
-        Tracker.start()
+        appViewModel.tracker.start(timeIntervalInSeconds: 3600)
     }
     
     var body: some View {
         UpdateButton()
-//        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
-//            .modifier(UpdateCheck(appName: "WBIS", automatic: false))
-            .modifier(NotificationCheckModifier(timeIntervalInSeconds: 20, actions: appViewModel.notificationActions))
+        Text("")
+            .modifier(NotificationCheckModifier(timeIntervalInSeconds: 600, actions: appViewModel.notificationActions))
     }
 }
 
