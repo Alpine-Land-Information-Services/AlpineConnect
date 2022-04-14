@@ -27,7 +27,7 @@ public class Tracker {
     }
     
     public static func appName() -> String {
-        return Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? "Unknown"
+        return Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "Unknown"
     }
     
     static func deviceID() -> UUID? {
