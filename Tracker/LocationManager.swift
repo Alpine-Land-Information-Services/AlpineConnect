@@ -36,10 +36,10 @@ public class LocationManager: NSObject, CLLocationManagerDelegate {
         manager.requestWhenInUseAuthorization()
         if CLLocationManager.locationServicesEnabled() {
             manager.delegate = self
-//            manager.distanceFilter = 10
-//            manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-//            manager.startUpdatingLocation()
-            manager.startMonitoringSignificantLocationChanges()
+            manager.distanceFilter = 100
+            manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+            manager.startUpdatingLocation()
+//            manager.startMonitoringSignificantLocationChanges()
         }
     }
 
