@@ -31,7 +31,15 @@ public class UIKitNotifier: NSObject {
                             actions(button.actionName)
                         })
                     }
-                    self.viewController.present(alert, animated: true, completion: nil)
+                    
+                    var vc: UIViewController? = self.viewController
+                    if vc?.viewIfLoaded?.window == nil {
+                        vc = UIApplication.shared.windows.last?.rootViewController?.presentedViewController
+                        if vc == nil {
+                            vc = UIApplication.shared.windows.last?.rootViewController
+                        }
+                    }
+                    vc?.present(alert, animated: true, completion: nil)
                 }
             }
         })
