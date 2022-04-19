@@ -32,7 +32,9 @@ public class UIKitUpdater: NSObject {
             }
             else {
                 self.updater.updateStatus = .notConnected
-                self.presentAlert(automatic: automatic)
+                if !automatic {
+                    self.presentAlert(automatic: automatic)
+                }
             }
         }
         monitor.cancel()
@@ -40,7 +42,7 @@ public class UIKitUpdater: NSObject {
     
     func presentAlert(automatic: Bool) {
         DispatchQueue.main.async {
-            self.viewController.present(self.alert(), animated: true, completion: nil)
+                self.viewController.present(self.alert(), animated: true, completion: nil)
         }
     }
     
