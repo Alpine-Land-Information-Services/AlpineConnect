@@ -12,17 +12,20 @@ import AlpineConnect
 //  3600 - 1 hour
 // 86400 - 1 day
 
+
 struct ContentView: View {
+    @ObservedObject var updater = SwiftUIUpdater()
+
     var appViewModel = AppViewModel()
         
     init() {
-        appViewModel.tracker.start(timeIntervalInSeconds: 3600)
+        
     }
     
     var body: some View {
+//        Text("HELLO")
         UpdateButton()
-        Text("")
-            .modifier(NotificationCheckModifier(timeIntervalInSeconds: 600, actions: appViewModel.notificationActions))
+
     }
 }
 

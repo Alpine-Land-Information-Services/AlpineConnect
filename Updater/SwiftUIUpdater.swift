@@ -13,7 +13,11 @@ public class SwiftUIUpdater: ObservableObject {
     @Environment(\.openURL) var openURL
     @Published var showAlert = false
 
-    let updater = Updater.shared
+    public let updater = Updater.shared
+    
+    public init() {
+        
+    }
     
     public func checkForUpdate(automatic: Bool) {
         let monitor = NWPathMonitor()
@@ -22,27 +26,27 @@ public class SwiftUIUpdater: ObservableObject {
             if path.status == .satisfied {
                 self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result in
                     if result {
-                        self.alertToggle(automatic: automatic)
+                        self.alertToggle(show: true)
                     }
                 })
             }
             else {
                 self.updater.updateStatus = .notConnected
-                self.alertToggle(automatic: automatic)
+                if automatic {
+                    self.alertToggle(show: false)
+                }
+                else {
+                    self.alertToggle(show: true)
+                }
             }
         }
         monitor.cancel()
     }
     
     
-    func alertToggle(automatic: Bool) {
+    func alertToggle(show: Bool) {
         DispatchQueue.main.async {
-            if !automatic {
-                self.showAlert = true
-            }
-            else {
-                self.showAlert = false
-            }
+            self.showAlert = show
         }
     }
     

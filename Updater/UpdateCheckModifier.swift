@@ -9,15 +9,12 @@ import SwiftUI
 
 public struct UpdateCheckModifier: ViewModifier {
     
-    @ObservedObject var viewModel: SwiftUIUpdater
+    @StateObject var viewModel = SwiftUIUpdater()
     
-    var appName: String
     var automatic: Bool
     
-    public init(appName: String, automatic: Bool) {
-        self.appName = appName
+    public init(automatic: Bool) {
         self.automatic = automatic
-        self.viewModel = SwiftUIUpdater()
     }
     
     public func body(content: Content) -> some View {

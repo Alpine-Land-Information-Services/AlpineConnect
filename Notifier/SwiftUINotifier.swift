@@ -9,11 +9,17 @@ import SwiftUI
 
 public class SwiftUINotifier: ObservableObject {
     
-    @Published var showAlert = false
-    var notifications = [acNotification]()
+    @Published public var showAlert = false
+    
+    public var notifications = [acNotification]()
+
     public var actions: ((String)->Void)?
     
-    public func check(timeIntervalInSeconds: TimeInterval = 10.0) {
+    public init(actions: ((String) -> Void)?) {
+        self.actions = actions
+    }
+    
+    public func check(timeIntervalInSeconds: TimeInterval) {
         Notifier.shared.startChecking(timeIntervalInSeconds: timeIntervalInSeconds, completion: { notifications in
             self.notifications.append(contentsOf: notifications)
             if !notifications.isEmpty {
@@ -38,29 +44,33 @@ public class SwiftUINotifier: ObservableObject {
         }
     }
     
-    func alert() -> Alert {
+    func removeNotification() {
+        notifications.removeFirst()
+    }
+    
+    public func alert() -> Alert {
         if let notification = notifications.first {
-            notifications.removeFirst()
-            if notification.buttons.count == 1 {
-                return Alert(title: Text(notification.title ?? ""),
-                             message: Text(notification.body ?? ""),
-                             dismissButton: .default(Text(notification.buttons[0].title),
-                                                     action: { self._actions(notification.buttons[0].actionName) })
-                )
-            }
-            if notification.buttons.count >= 2 {
-                return Alert(title: Text(notification.title ?? ""),
-                             message: Text(notification.body ?? ""),
-                             primaryButton: .default(Text(notification.buttons[0].title),
-                                                     action: { self._actions(notification.buttons[0].actionName) }),
-                             secondaryButton: .default(Text(notification.buttons[1].title),
-                                                       action: { self._actions(notification.buttons[1].actionName) })
-                )
-            }
+//            if notification.buttons.count == 1 {
+//                return Alert(title: Text(notification.title ?? ""),
+//                             message: Text(notification.body ?? ""),
+//                             dismissButton: .default(Text(notification.buttons[0].title),
+//                                                     action: { self._actions(notification.buttons[0].actionName) })
+//                )
+//            }
+//            if notification.buttons.count >= 2 {
+//                return Alert(title: Text(notification.title ?? ""),
+//                             message: Text(notification.body ?? ""),
+//                             primaryButton: .default(Text(notification.buttons[0].title),
+//                                                     action: { self._actions(notification.buttons[0].actionName) }),
+//                             secondaryButton: .default(Text(notification.buttons[1].title),
+//                                                       action: { self._actions(notification.buttons[1].actionName) })
+//                )
+//            }
 //        if notification.buttons.isEmpty
             return Alert(title: Text(notification.title ?? ""),
                          message: Text(notification.body ?? ""),
-                         dismissButton: .default(Text("Okay")))
+                         dismissButton: .default(Text(notification.buttons[0].title),
+                                                 action: removeNotification))
         }
         return Alert(title: Text(""),
                      message: Text(""),

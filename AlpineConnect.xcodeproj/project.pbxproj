@@ -697,6 +697,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ConnectTest/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ConnectTest;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Watching you";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Watching you";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -731,6 +732,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ConnectTest/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ConnectTest;
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Watching you";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Watching you";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

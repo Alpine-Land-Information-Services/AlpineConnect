@@ -10,12 +10,11 @@ import SwiftUI
 public struct NotificationCheckModifier: ViewModifier {
     
     @ObservedObject var viewModel: SwiftUINotifier
-    var checkInterval: TimeInterval = 10
+    var checkInterval: TimeInterval
     
-    public init(timeIntervalInSeconds: TimeInterval = 10.0, actions: @escaping(String)->Void) {
-        viewModel = SwiftUINotifier()
-        viewModel.actions = actions
+    public init(timeIntervalInSeconds: TimeInterval, actions: ((String) -> Void)?) {
         checkInterval = timeIntervalInSeconds
+        viewModel = SwiftUINotifier(actions: actions)
     }
     
     public func body(content: Content) -> some View {

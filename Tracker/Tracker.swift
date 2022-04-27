@@ -11,6 +11,7 @@ import CoreLocation
 import PostgresClientKit
 
 public class Tracker {
+    
     public static let shared = Tracker()
     var timer: Timer?
     let locationManager = LocationManager.shared
