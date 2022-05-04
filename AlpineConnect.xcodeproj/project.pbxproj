@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -36,168 +36,19 @@
 		B10740DE2819EA7F0026089F /* NotificationCheckModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10740DA2819EA7F0026089F /* NotificationCheckModifier.swift */; };
 		B10740DF2819EA7F0026089F /* UIKitNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10740DB2819EA7F0026089F /* UIKitNotifier.swift */; };
 		B10740E12819EA860026089F /* PostgresClientKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10740E02819EA860026089F /* PostgresClientKit.swift */; };
-		OBJ_126 /* PostgresClientKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "postgresclientkit::PostgresClientKit::Product" /* PostgresClientKit.framework */; };
-		OBJ_127 /* SSLService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "bluesslservice::SSLService::Product" /* SSLService.framework */; };
-		OBJ_128 /* Socket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "bluesocket::Socket::Product" /* Socket.framework */; };
+		B19283722822EED400824EF2 /* PostgresClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = B19283712822EED400824EF2 /* PostgresClientKit */; };
 		OBJ_140 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
 		OBJ_151 /* AlpineConnectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* AlpineConnectTests.swift */; };
 		OBJ_153 /* AlpineConnect.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "alpineconnect::AlpineConnect::Product" /* AlpineConnect.framework */; };
-		OBJ_154 /* PostgresClientKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "postgresclientkit::PostgresClientKit::Product" /* PostgresClientKit.framework */; };
-		OBJ_155 /* SSLService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "bluesslservice::SSLService::Product" /* SSLService.framework */; };
-		OBJ_156 /* Socket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "bluesocket::Socket::Product" /* Socket.framework */; };
-		OBJ_165 /* ColumnMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* ColumnMetadata.swift */; };
-		OBJ_166 /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_17 /* Connection.swift */; };
-		OBJ_167 /* ConnectionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* ConnectionConfiguration.swift */; };
-		OBJ_168 /* ConnectionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* ConnectionDelegate.swift */; };
-		OBJ_169 /* ConnectionPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* ConnectionPool.swift */; };
-		OBJ_170 /* ConnectionPoolConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* ConnectionPoolConfiguration.swift */; };
-		OBJ_171 /* ConnectionPoolMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* ConnectionPoolMetrics.swift */; };
-		OBJ_172 /* Credential.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* Credential.swift */; };
-		OBJ_173 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* Crypto.swift */; };
-		OBJ_174 /* Cursor.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* Cursor.swift */; };
-		OBJ_175 /* ISO8601.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_26 /* ISO8601.swift */; };
-		OBJ_176 /* LogHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* LogHandler.swift */; };
-		OBJ_177 /* LogLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_29 /* LogLevel.swift */; };
-		OBJ_178 /* LogRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* LogRecord.swift */; };
-		OBJ_179 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_31 /* Logger.swift */; };
-		OBJ_180 /* Notice.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* Notice.swift */; };
-		OBJ_181 /* Parameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_33 /* Parameter.swift */; };
-		OBJ_182 /* Postgres.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_34 /* Postgres.swift */; };
-		OBJ_183 /* PostgresByteA.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_35 /* PostgresByteA.swift */; };
-		OBJ_184 /* PostgresDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_36 /* PostgresDate.swift */; };
-		OBJ_185 /* PostgresError.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* PostgresError.swift */; };
-		OBJ_186 /* PostgresTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_38 /* PostgresTime.swift */; };
-		OBJ_187 /* PostgresTimeWithTimeZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* PostgresTimeWithTimeZone.swift */; };
-		OBJ_188 /* PostgresTimestamp.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_40 /* PostgresTimestamp.swift */; };
-		OBJ_189 /* PostgresTimestampWithTimeZone.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_41 /* PostgresTimestampWithTimeZone.swift */; };
-		OBJ_190 /* PostgresValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_42 /* PostgresValue.swift */; };
-		OBJ_191 /* PostgresValueConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_43 /* PostgresValueConvertible.swift */; };
-		OBJ_192 /* BindRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_45 /* BindRequest.swift */; };
-		OBJ_193 /* ClosePortalRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_46 /* ClosePortalRequest.swift */; };
-		OBJ_194 /* CloseStatementRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_47 /* CloseStatementRequest.swift */; };
-		OBJ_195 /* DescribePortalRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_48 /* DescribePortalRequest.swift */; };
-		OBJ_196 /* ExecuteRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_49 /* ExecuteRequest.swift */; };
-		OBJ_197 /* FlushRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_50 /* FlushRequest.swift */; };
-		OBJ_198 /* ParseRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_51 /* ParseRequest.swift */; };
-		OBJ_199 /* PasswordMessageRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_52 /* PasswordMessageRequest.swift */; };
-		OBJ_200 /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_53 /* Request.swift */; };
-		OBJ_201 /* SASLInitialRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_54 /* SASLInitialRequest.swift */; };
-		OBJ_202 /* SASLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_55 /* SASLRequest.swift */; };
-		OBJ_203 /* SSLRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_56 /* SSLRequest.swift */; };
-		OBJ_204 /* StartupRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_57 /* StartupRequest.swift */; };
-		OBJ_205 /* SyncRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* SyncRequest.swift */; };
-		OBJ_206 /* TerminateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_59 /* TerminateRequest.swift */; };
-		OBJ_207 /* AuthenticationCleartextPasswordResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_61 /* AuthenticationCleartextPasswordResponse.swift */; };
-		OBJ_208 /* AuthenticationMD5PasswordResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_62 /* AuthenticationMD5PasswordResponse.swift */; };
-		OBJ_209 /* AuthenticationOKResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_63 /* AuthenticationOKResponse.swift */; };
-		OBJ_210 /* AuthenticationResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_64 /* AuthenticationResponse.swift */; };
-		OBJ_211 /* AuthenticationSASLContinueResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_65 /* AuthenticationSASLContinueResponse.swift */; };
-		OBJ_212 /* AuthenticationSASLFinalResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_66 /* AuthenticationSASLFinalResponse.swift */; };
-		OBJ_213 /* AuthenticationSASLResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_67 /* AuthenticationSASLResponse.swift */; };
-		OBJ_214 /* BackendKeyDataResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_68 /* BackendKeyDataResponse.swift */; };
-		OBJ_215 /* BindCompleteResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_69 /* BindCompleteResponse.swift */; };
-		OBJ_216 /* CloseCompleteResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_70 /* CloseCompleteResponse.swift */; };
-		OBJ_217 /* CommandCompleteResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_71 /* CommandCompleteResponse.swift */; };
-		OBJ_218 /* DataRowResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_72 /* DataRowResponse.swift */; };
-		OBJ_219 /* EmptyQueryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_73 /* EmptyQueryResponse.swift */; };
-		OBJ_220 /* ErrorResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_74 /* ErrorResponse.swift */; };
-		OBJ_221 /* NoDataResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_75 /* NoDataResponse.swift */; };
-		OBJ_222 /* NoticeResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_76 /* NoticeResponse.swift */; };
-		OBJ_223 /* NotificationResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_77 /* NotificationResponse.swift */; };
-		OBJ_224 /* ParameterStatusResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_78 /* ParameterStatusResponse.swift */; };
-		OBJ_225 /* ParseCompleteResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_79 /* ParseCompleteResponse.swift */; };
-		OBJ_226 /* ReadyForQueryResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_80 /* ReadyForQueryResponse.swift */; };
-		OBJ_227 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_81 /* Response.swift */; };
-		OBJ_228 /* RowDescriptionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_82 /* RowDescriptionResponse.swift */; };
-		OBJ_229 /* Row.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_83 /* Row.swift */; };
-		OBJ_230 /* SASLPrep.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_84 /* SASLPrep.swift */; };
-		OBJ_231 /* SCRAMSHA256Authenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_85 /* SCRAMSHA256Authenticator.swift */; };
-		OBJ_232 /* Statement.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_86 /* Statement.swift */; };
-		OBJ_234 /* SSLService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "bluesslservice::SSLService::Product" /* SSLService.framework */; };
-		OBJ_235 /* Socket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "bluesocket::Socket::Product" /* Socket.framework */; };
-		OBJ_243 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_87 /* Package.swift */; };
-		OBJ_248 /* SSLPointerTricks.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_90 /* SSLPointerTricks.swift */; };
-		OBJ_249 /* SSLService.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_91 /* SSLService.swift */; };
-		OBJ_251 /* Socket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "bluesocket::Socket::Product" /* Socket.framework */; };
-		OBJ_258 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_92 /* Package.swift */; };
-		OBJ_263 /* Socket+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_98 /* Socket+Equatable.swift */; };
-		OBJ_264 /* Socket+Hashable.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_99 /* Socket+Hashable.swift */; };
-		OBJ_265 /* Socket.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_100 /* Socket.swift */; };
-		OBJ_266 /* SocketProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_101 /* SocketProtocols.swift */; };
-		OBJ_267 /* SocketUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_102 /* SocketUtils.swift */; };
-		OBJ_274 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_103 /* Package.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		B10740B32819E9600026089F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "postgresclientkit::PostgresClientKit";
-			remoteInfo = PostgresClientKit;
-		};
-		B10740B42819E9600026089F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "bluesslservice::SSLService";
-			remoteInfo = SSLService;
-		};
-		B10740B52819E9600026089F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "bluesocket::Socket";
-			remoteInfo = Socket;
-		};
-		B10740B62819E9600026089F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "bluesocket::Socket";
-			remoteInfo = Socket;
-		};
-		B10740B72819E9600026089F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "bluesslservice::SSLService";
-			remoteInfo = SSLService;
-		};
-		B10740B82819E9600026089F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "bluesocket::Socket";
-			remoteInfo = Socket;
-		};
 		B10740B92819E9600026089F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = "alpineconnect::AlpineConnect";
 			remoteInfo = AlpineConnect;
-		};
-		B10740BA2819E9600026089F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "postgresclientkit::PostgresClientKit";
-			remoteInfo = PostgresClientKit;
-		};
-		B10740BB2819E9600026089F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "bluesslservice::SSLService";
-			remoteInfo = SSLService;
-		};
-		B10740BC2819E9600026089F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = OBJ_1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = "bluesocket::Socket";
-			remoteInfo = Socket;
 		};
 		B10740BD2819E9690026089F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -224,12 +75,11 @@
 		B10740DA2819EA7F0026089F /* NotificationCheckModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationCheckModifier.swift; sourceTree = "<group>"; };
 		B10740DB2819EA7F0026089F /* UIKitNotifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIKitNotifier.swift; sourceTree = "<group>"; };
 		B10740E02819EA860026089F /* PostgresClientKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostgresClientKit.swift; sourceTree = "<group>"; };
+		B19283A72822F05F00824EF2 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		OBJ_100 /* Socket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Socket.swift; sourceTree = "<group>"; };
 		OBJ_101 /* SocketProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketProtocols.swift; sourceTree = "<group>"; };
 		OBJ_102 /* SocketUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocketUtils.swift; sourceTree = "<group>"; };
 		OBJ_103 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; name = Package.swift; path = /Users/jenya/Desktop/AlpineConnect/.build/checkouts/BlueSocket/Package.swift; sourceTree = "<group>"; };
-		OBJ_111 /* ConnectTest */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ConnectTest; sourceTree = SOURCE_ROOT; };
-		OBJ_117 /* ConnectTestUIKit */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ConnectTestUIKit; sourceTree = SOURCE_ROOT; };
 		OBJ_118 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		OBJ_12 /* AlpineConnectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlpineConnectTests.swift; sourceTree = "<group>"; };
 		OBJ_16 /* ColumnMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColumnMetadata.swift; sourceTree = "<group>"; };
@@ -309,9 +159,6 @@
 		OBJ_99 /* Socket+Hashable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Socket+Hashable.swift"; sourceTree = "<group>"; };
 		"alpineconnect::AlpineConnect::Product" /* AlpineConnect.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AlpineConnect.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		"alpineconnect::AlpineConnectTests::Product" /* AlpineConnectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = AlpineConnectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		"bluesocket::Socket::Product" /* Socket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Socket.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		"bluesslservice::SSLService::Product" /* SSLService.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SSLService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		"postgresclientkit::PostgresClientKit::Product" /* PostgresClientKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PostgresClientKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -319,9 +166,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_126 /* PostgresClientKit.framework in Frameworks */,
-				OBJ_127 /* SSLService.framework in Frameworks */,
-				OBJ_128 /* Socket.framework in Frameworks */,
+				B19283722822EED400824EF2 /* PostgresClientKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,33 +175,6 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_153 /* AlpineConnect.framework in Frameworks */,
-				OBJ_154 /* PostgresClientKit.framework in Frameworks */,
-				OBJ_155 /* SSLService.framework in Frameworks */,
-				OBJ_156 /* Socket.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		OBJ_233 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 0;
-			files = (
-				OBJ_234 /* SSLService.framework in Frameworks */,
-				OBJ_235 /* Socket.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		OBJ_250 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 0;
-			files = (
-				OBJ_251 /* Socket.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		OBJ_268 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 0;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,9 +244,6 @@
 			children = (
 				"alpineconnect::AlpineConnect::Product" /* AlpineConnect.framework */,
 				"alpineconnect::AlpineConnectTests::Product" /* AlpineConnectTests.xctest */,
-				"postgresclientkit::PostgresClientKit::Product" /* PostgresClientKit.framework */,
-				"bluesslservice::SSLService::Product" /* SSLService.framework */,
-				"bluesocket::Socket::Product" /* Socket.framework */,
 			);
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -536,13 +351,12 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
+				B19283A72822F05F00824EF2 /* Info.plist */,
 				OBJ_118 /* README.md */,
 				OBJ_7 /* Sources */,
 				OBJ_10 /* Tests */,
 				OBJ_13 /* Dependencies */,
 				OBJ_104 /* Products */,
-				OBJ_111 /* ConnectTest */,
-				OBJ_117 /* ConnectTestUIKit */,
 			);
 			sourceTree = "<group>";
 		};
@@ -677,11 +491,11 @@
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_129 /* PBXTargetDependency */,
-				OBJ_131 /* PBXTargetDependency */,
-				OBJ_133 /* PBXTargetDependency */,
 			);
 			name = AlpineConnect;
+			packageProductDependencies = (
+				B19283712822EED400824EF2 /* PostgresClientKit */,
+			);
 			productName = AlpineConnect;
 			productReference = "alpineconnect::AlpineConnect::Product" /* AlpineConnect.framework */;
 			productType = "com.apple.product-type.framework";
@@ -697,9 +511,6 @@
 			);
 			dependencies = (
 				OBJ_157 /* PBXTargetDependency */,
-				OBJ_158 /* PBXTargetDependency */,
-				OBJ_159 /* PBXTargetDependency */,
-				OBJ_160 /* PBXTargetDependency */,
 			);
 			name = AlpineConnectTests;
 			productName = AlpineConnectTests;
@@ -718,99 +529,6 @@
 			);
 			name = AlpineConnectPackageDescription;
 			productName = AlpineConnectPackageDescription;
-			productType = "com.apple.product-type.framework";
-		};
-		"bluesocket::Socket" /* Socket */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_259 /* Build configuration list for PBXNativeTarget "Socket" */;
-			buildPhases = (
-				OBJ_262 /* Sources */,
-				OBJ_268 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Socket;
-			productName = Socket;
-			productReference = "bluesocket::Socket::Product" /* Socket.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		"bluesocket::SwiftPMPackageDescription" /* SocketPackageDescription */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_270 /* Build configuration list for PBXNativeTarget "SocketPackageDescription" */;
-			buildPhases = (
-				OBJ_273 /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = SocketPackageDescription;
-			productName = SocketPackageDescription;
-			productType = "com.apple.product-type.framework";
-		};
-		"bluesslservice::SSLService" /* SSLService */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_244 /* Build configuration list for PBXNativeTarget "SSLService" */;
-			buildPhases = (
-				OBJ_247 /* Sources */,
-				OBJ_250 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				OBJ_252 /* PBXTargetDependency */,
-			);
-			name = SSLService;
-			productName = SSLService;
-			productReference = "bluesslservice::SSLService::Product" /* SSLService.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		"bluesslservice::SwiftPMPackageDescription" /* SSLServicePackageDescription */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_254 /* Build configuration list for PBXNativeTarget "SSLServicePackageDescription" */;
-			buildPhases = (
-				OBJ_257 /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = SSLServicePackageDescription;
-			productName = SSLServicePackageDescription;
-			productType = "com.apple.product-type.framework";
-		};
-		"postgresclientkit::PostgresClientKit" /* PostgresClientKit */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_161 /* Build configuration list for PBXNativeTarget "PostgresClientKit" */;
-			buildPhases = (
-				OBJ_164 /* Sources */,
-				OBJ_233 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				OBJ_236 /* PBXTargetDependency */,
-				OBJ_237 /* PBXTargetDependency */,
-			);
-			name = PostgresClientKit;
-			productName = PostgresClientKit;
-			productReference = "postgresclientkit::PostgresClientKit::Product" /* PostgresClientKit.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		"postgresclientkit::SwiftPMPackageDescription" /* PostgresClientKitPackageDescription */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_239 /* Build configuration list for PBXNativeTarget "PostgresClientKitPackageDescription" */;
-			buildPhases = (
-				OBJ_242 /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = PostgresClientKitPackageDescription;
-			productName = PostgresClientKitPackageDescription;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -836,6 +554,9 @@
 				en,
 			);
 			mainGroup = OBJ_5;
+			packageReferences = (
+				B19283702822EED400824EF2 /* XCRemoteSwiftPackageReference "PostgresClientKit" */,
+			);
 			productRefGroup = OBJ_104 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -844,12 +565,6 @@
 				"alpineconnect::SwiftPMPackageDescription" /* AlpineConnectPackageDescription */,
 				"alpineconnect::AlpineConnectPackageTests::ProductTarget" /* AlpineConnectPackageTests */,
 				"alpineconnect::AlpineConnectTests" /* AlpineConnectTests */,
-				"postgresclientkit::PostgresClientKit" /* PostgresClientKit */,
-				"postgresclientkit::SwiftPMPackageDescription" /* PostgresClientKitPackageDescription */,
-				"bluesslservice::SSLService" /* SSLService */,
-				"bluesslservice::SwiftPMPackageDescription" /* SSLServicePackageDescription */,
-				"bluesocket::Socket" /* Socket */,
-				"bluesocket::SwiftPMPackageDescription" /* SocketPackageDescription */,
 			);
 		};
 /* End PBXProject section */
@@ -893,144 +608,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_164 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
-			files = (
-				OBJ_165 /* ColumnMetadata.swift in Sources */,
-				OBJ_166 /* Connection.swift in Sources */,
-				OBJ_167 /* ConnectionConfiguration.swift in Sources */,
-				OBJ_168 /* ConnectionDelegate.swift in Sources */,
-				OBJ_169 /* ConnectionPool.swift in Sources */,
-				OBJ_170 /* ConnectionPoolConfiguration.swift in Sources */,
-				OBJ_171 /* ConnectionPoolMetrics.swift in Sources */,
-				OBJ_172 /* Credential.swift in Sources */,
-				OBJ_173 /* Crypto.swift in Sources */,
-				OBJ_174 /* Cursor.swift in Sources */,
-				OBJ_175 /* ISO8601.swift in Sources */,
-				OBJ_176 /* LogHandler.swift in Sources */,
-				OBJ_177 /* LogLevel.swift in Sources */,
-				OBJ_178 /* LogRecord.swift in Sources */,
-				OBJ_179 /* Logger.swift in Sources */,
-				OBJ_180 /* Notice.swift in Sources */,
-				OBJ_181 /* Parameter.swift in Sources */,
-				OBJ_182 /* Postgres.swift in Sources */,
-				OBJ_183 /* PostgresByteA.swift in Sources */,
-				OBJ_184 /* PostgresDate.swift in Sources */,
-				OBJ_185 /* PostgresError.swift in Sources */,
-				OBJ_186 /* PostgresTime.swift in Sources */,
-				OBJ_187 /* PostgresTimeWithTimeZone.swift in Sources */,
-				OBJ_188 /* PostgresTimestamp.swift in Sources */,
-				OBJ_189 /* PostgresTimestampWithTimeZone.swift in Sources */,
-				OBJ_190 /* PostgresValue.swift in Sources */,
-				OBJ_191 /* PostgresValueConvertible.swift in Sources */,
-				OBJ_192 /* BindRequest.swift in Sources */,
-				OBJ_193 /* ClosePortalRequest.swift in Sources */,
-				OBJ_194 /* CloseStatementRequest.swift in Sources */,
-				OBJ_195 /* DescribePortalRequest.swift in Sources */,
-				OBJ_196 /* ExecuteRequest.swift in Sources */,
-				OBJ_197 /* FlushRequest.swift in Sources */,
-				OBJ_198 /* ParseRequest.swift in Sources */,
-				OBJ_199 /* PasswordMessageRequest.swift in Sources */,
-				OBJ_200 /* Request.swift in Sources */,
-				OBJ_201 /* SASLInitialRequest.swift in Sources */,
-				OBJ_202 /* SASLRequest.swift in Sources */,
-				OBJ_203 /* SSLRequest.swift in Sources */,
-				OBJ_204 /* StartupRequest.swift in Sources */,
-				OBJ_205 /* SyncRequest.swift in Sources */,
-				OBJ_206 /* TerminateRequest.swift in Sources */,
-				OBJ_207 /* AuthenticationCleartextPasswordResponse.swift in Sources */,
-				OBJ_208 /* AuthenticationMD5PasswordResponse.swift in Sources */,
-				OBJ_209 /* AuthenticationOKResponse.swift in Sources */,
-				OBJ_210 /* AuthenticationResponse.swift in Sources */,
-				OBJ_211 /* AuthenticationSASLContinueResponse.swift in Sources */,
-				OBJ_212 /* AuthenticationSASLFinalResponse.swift in Sources */,
-				OBJ_213 /* AuthenticationSASLResponse.swift in Sources */,
-				OBJ_214 /* BackendKeyDataResponse.swift in Sources */,
-				OBJ_215 /* BindCompleteResponse.swift in Sources */,
-				OBJ_216 /* CloseCompleteResponse.swift in Sources */,
-				OBJ_217 /* CommandCompleteResponse.swift in Sources */,
-				OBJ_218 /* DataRowResponse.swift in Sources */,
-				OBJ_219 /* EmptyQueryResponse.swift in Sources */,
-				OBJ_220 /* ErrorResponse.swift in Sources */,
-				OBJ_221 /* NoDataResponse.swift in Sources */,
-				OBJ_222 /* NoticeResponse.swift in Sources */,
-				OBJ_223 /* NotificationResponse.swift in Sources */,
-				OBJ_224 /* ParameterStatusResponse.swift in Sources */,
-				OBJ_225 /* ParseCompleteResponse.swift in Sources */,
-				OBJ_226 /* ReadyForQueryResponse.swift in Sources */,
-				OBJ_227 /* Response.swift in Sources */,
-				OBJ_228 /* RowDescriptionResponse.swift in Sources */,
-				OBJ_229 /* Row.swift in Sources */,
-				OBJ_230 /* SASLPrep.swift in Sources */,
-				OBJ_231 /* SCRAMSHA256Authenticator.swift in Sources */,
-				OBJ_232 /* Statement.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		OBJ_242 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
-			files = (
-				OBJ_243 /* Package.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		OBJ_247 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
-			files = (
-				OBJ_248 /* SSLPointerTricks.swift in Sources */,
-				OBJ_249 /* SSLService.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		OBJ_257 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
-			files = (
-				OBJ_258 /* Package.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		OBJ_262 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
-			files = (
-				OBJ_263 /* Socket+Equatable.swift in Sources */,
-				OBJ_264 /* Socket+Hashable.swift in Sources */,
-				OBJ_265 /* Socket.swift in Sources */,
-				OBJ_266 /* SocketProtocols.swift in Sources */,
-				OBJ_267 /* SocketUtils.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		OBJ_273 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 0;
-			files = (
-				OBJ_274 /* Package.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		OBJ_129 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "postgresclientkit::PostgresClientKit" /* PostgresClientKit */;
-			targetProxy = B10740B32819E9600026089F /* PBXContainerItemProxy */;
-		};
-		OBJ_131 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "bluesslservice::SSLService" /* SSLService */;
-			targetProxy = B10740B72819E9600026089F /* PBXContainerItemProxy */;
-		};
-		OBJ_133 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "bluesocket::Socket" /* Socket */;
-			targetProxy = B10740B82819E9600026089F /* PBXContainerItemProxy */;
-		};
 		OBJ_145 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = "alpineconnect::AlpineConnectTests" /* AlpineConnectTests */;
@@ -1040,36 +620,6 @@
 			isa = PBXTargetDependency;
 			target = "alpineconnect::AlpineConnect" /* AlpineConnect */;
 			targetProxy = B10740B92819E9600026089F /* PBXContainerItemProxy */;
-		};
-		OBJ_158 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "postgresclientkit::PostgresClientKit" /* PostgresClientKit */;
-			targetProxy = B10740BA2819E9600026089F /* PBXContainerItemProxy */;
-		};
-		OBJ_159 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "bluesslservice::SSLService" /* SSLService */;
-			targetProxy = B10740BB2819E9600026089F /* PBXContainerItemProxy */;
-		};
-		OBJ_160 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "bluesocket::Socket" /* Socket */;
-			targetProxy = B10740BC2819E9600026089F /* PBXContainerItemProxy */;
-		};
-		OBJ_236 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "bluesslservice::SSLService" /* SSLService */;
-			targetProxy = B10740B42819E9600026089F /* PBXContainerItemProxy */;
-		};
-		OBJ_237 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "bluesocket::Socket" /* Socket */;
-			targetProxy = B10740B62819E9600026089F /* PBXContainerItemProxy */;
-		};
-		OBJ_252 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = "bluesocket::Socket" /* Socket */;
-			targetProxy = B10740B52819E9600026089F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1087,9 +637,12 @@
 					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = AlpineConnect.xcodeproj/AlpineConnect_Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(TOOLCHAIN_DIR)/usr/lib/swift/macosx",
+				);
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -1120,9 +673,12 @@
 					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = AlpineConnect.xcodeproj/AlpineConnect_Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(TOOLCHAIN_DIR)/usr/lib/swift/macosx",
+				);
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -1189,7 +745,11 @@
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = AlpineConnect.xcodeproj/AlpineConnectTests_Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -1217,7 +777,11 @@
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = AlpineConnect.xcodeproj/AlpineConnectTests_Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@loader_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -1227,240 +791,6 @@
 				TARGET_NAME = AlpineConnectTests;
 				TVOS_DEPLOYMENT_TARGET = 14.0;
 				WATCHOS_DEPLOYMENT_TARGET = 7.0;
-			};
-			name = Release;
-		};
-		OBJ_162 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
-				DRIVERKIT_DEPLOYMENT_TARGET = 19.0;
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = AlpineConnect.xcodeproj/PostgresClientKit_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = PostgresClientKit;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 5.0;
-				TARGET_NAME = PostgresClientKit;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
-			};
-			name = Debug;
-		};
-		OBJ_163 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
-				DRIVERKIT_DEPLOYMENT_TARGET = 19.0;
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = AlpineConnect.xcodeproj/PostgresClientKit_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = PostgresClientKit;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 5.0;
-				TARGET_NAME = PostgresClientKit;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
-			};
-			name = Release;
-		};
-		OBJ_240 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				LD = /usr/bin/true;
-				OTHER_SWIFT_FLAGS = "-swift-version 5 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/ManifestAPI -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk -package-description-version 5.0.0";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		OBJ_241 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				LD = /usr/bin/true;
-				OTHER_SWIFT_FLAGS = "-swift-version 5 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/ManifestAPI -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk -package-description-version 5.0.0";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		OBJ_245 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
-				DRIVERKIT_DEPLOYMENT_TARGET = 19.0;
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = AlpineConnect.xcodeproj/SSLService_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = SSLService;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 5.0;
-				TARGET_NAME = SSLService;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
-			};
-			name = Debug;
-		};
-		OBJ_246 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
-				DRIVERKIT_DEPLOYMENT_TARGET = 19.0;
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = AlpineConnect.xcodeproj/SSLService_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = SSLService;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 5.0;
-				TARGET_NAME = SSLService;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
-			};
-			name = Release;
-		};
-		OBJ_255 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				LD = /usr/bin/true;
-				OTHER_SWIFT_FLAGS = "-swift-version 5 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/ManifestAPI -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk -package-description-version 5.0.0";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		OBJ_256 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				LD = /usr/bin/true;
-				OTHER_SWIFT_FLAGS = "-swift-version 5 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/ManifestAPI -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk -package-description-version 5.0.0";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		OBJ_260 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
-				DRIVERKIT_DEPLOYMENT_TARGET = 19.0;
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = AlpineConnect.xcodeproj/Socket_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = Socket;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 5.0;
-				TARGET_NAME = Socket;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
-			};
-			name = Debug;
-		};
-		OBJ_261 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
-				DRIVERKIT_DEPLOYMENT_TARGET = 19.0;
-				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PLATFORM_DIR)/Developer/Library/Frameworks",
-				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = AlpineConnect.xcodeproj/Socket_Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/macosx";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_CFLAGS = "$(inherited)";
-				OTHER_LDFLAGS = "$(inherited)";
-				OTHER_SWIFT_FLAGS = "$(inherited)";
-				PRODUCT_BUNDLE_IDENTIFIER = Socket;
-				PRODUCT_MODULE_NAME = "$(TARGET_NAME:c99extidentifier)";
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited)";
-				SWIFT_VERSION = 5.0;
-				TARGET_NAME = Socket;
-				TVOS_DEPLOYMENT_TARGET = 9.0;
-				WATCHOS_DEPLOYMENT_TARGET = 2.0;
-			};
-			name = Release;
-		};
-		OBJ_271 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				LD = /usr/bin/true;
-				OTHER_SWIFT_FLAGS = "-swift-version 5 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/ManifestAPI -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk -package-description-version 5.0.0";
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		OBJ_272 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				LD = /usr/bin/true;
-				OTHER_SWIFT_FLAGS = "-swift-version 5 -I $(TOOLCHAIN_DIR)/usr/lib/swift/pm/ManifestAPI -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk -package-description-version 5.0.0";
-				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -1512,7 +842,8 @@
 				SUPPORTED_PLATFORMS = "$(AVAILABLE_PLATFORMS)";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) SWIFT_PACKAGE";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				USE_HEADERMAP = NO;
 			};
 			name = Release;
@@ -1556,15 +887,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		OBJ_161 /* Build configuration list for PBXNativeTarget "PostgresClientKit" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				OBJ_162 /* Debug */,
-				OBJ_163 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		OBJ_2 /* Build configuration list for PBXProject "AlpineConnect" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1574,52 +896,26 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		OBJ_239 /* Build configuration list for PBXNativeTarget "PostgresClientKitPackageDescription" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				OBJ_240 /* Debug */,
-				OBJ_241 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		OBJ_244 /* Build configuration list for PBXNativeTarget "SSLService" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				OBJ_245 /* Debug */,
-				OBJ_246 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		OBJ_254 /* Build configuration list for PBXNativeTarget "SSLServicePackageDescription" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				OBJ_255 /* Debug */,
-				OBJ_256 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		OBJ_259 /* Build configuration list for PBXNativeTarget "Socket" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				OBJ_260 /* Debug */,
-				OBJ_261 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		OBJ_270 /* Build configuration list for PBXNativeTarget "SocketPackageDescription" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				OBJ_271 /* Debug */,
-				OBJ_272 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B19283702822EED400824EF2 /* XCRemoteSwiftPackageReference "PostgresClientKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/codewinsdotcom/PostgresClientKit.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.4.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B19283712822EED400824EF2 /* PostgresClientKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B19283702822EED400824EF2 /* XCRemoteSwiftPackageReference "PostgresClientKit" */;
+			productName = PostgresClientKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = OBJ_1 /* Project object */;
 }

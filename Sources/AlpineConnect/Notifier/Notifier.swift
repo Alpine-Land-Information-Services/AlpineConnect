@@ -27,9 +27,14 @@ public class Notifier {
     var timer: Timer?
     
     public func startChecking(timeIntervalInSeconds: TimeInterval = 10.0, completion: @escaping ([acNotification]) -> Void) {
-        Notifier.checkForNotification(completion: completion)
-        timer = Timer.scheduledTimer(withTimeInterval: timeIntervalInSeconds, repeats: true) { timer in
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { timer in
             Notifier.checkForNotification(completion: completion)
+            timer.invalidate()
+        }
+        timer = Timer.scheduledTimer(withTimeInterval: timeIntervalInSeconds, repeats: true) { timer in
+            DispatchQueue.main.async {
+                Notifier.checkForNotification(completion: completion)
+            }
         }
     }
     
