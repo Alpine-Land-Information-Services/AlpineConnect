@@ -11,7 +11,8 @@ import Network
 public class SwiftUIUpdater: ObservableObject {
     
     @Environment(\.openURL) var openURL
-    @Published var showAlert = false
+    
+    @Published public var showAlert = false
 
     public let updater = Updater.shared
     
@@ -60,7 +61,7 @@ public class SwiftUIUpdater: ObservableObject {
         })
     }
     
-    func alert() -> Alert {
+    public func alert() -> Alert {
         switch updater.updateStatus {
         case .updatedRequired:
             return Alert(title: Text("New Version Avalible"),
