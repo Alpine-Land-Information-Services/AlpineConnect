@@ -1,0 +1,261 @@
+//
+//  AuthenticationViewModel.swift
+//  AlpineConnect
+//
+//  Created by Jenya Lebid on 5/6/22.
+//
+
+import SwiftUI
+import Security
+import LocalAuthentication
+
+final class AuthenticationViewModel: ObservableObject {
+    
+    @Published var userManager = UserAuthenticationManager.shared
+    @Published var showingActivityIndicator: Bool = false
+    @Published var biometricLoginEnabled: Bool = false
+    @Published var supportBiometricAuthType: String?
+
+    var disableLoginButton: Bool {
+        if userManager.password.isEmpty || userManager.userName.isEmpty || showingActivityIndicator {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    func authenticateUser(completionHandler: @escaping(LoginResponseMessage) -> Void) {
+        if NetworkMonitor.shared.connected {
+            userManager.loginUser { loginResponse in
+                completionHandler(loginResponse)
+            }
+        } else {
+            updateSigninState(_: true, _: .offline)
+        }
+    }
+
+    func saveCredentialsToKeyChain() {
+        let userAccount = "AuthenticatedUserInfo"
+        let userCredentialsDict: [String: Any] = ["userName": userManager.userName, "password": userManager.password, "biometricLoginEnabled": biometricLoginEnabled]
+        let credentialsData: Data = try! NSKeyedArchiver.archivedData(withRootObject: userCredentialsDict, requiringSecureCoding: false)
+        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword as String,
+                                    kSecAttrAccount as String: userAccount,
+                                    kSecValueData as String: credentialsData]
+        SecItemDelete(query as CFDictionary)
+        let status: OSStatus = SecItemAdd(query as CFDictionary, nil)
+        if status == noErr {
+            UserDefaults().setValue(true, forKey: "saveCredentialsOnKeychain")
+        } else {
+            fatalError("Key chain did not save")
+        }
+    }
+    
+    func fetchCredentialsFromKeyChain() {
+        if UserDefaults().bool(forKey: "saveCredentialsOnKeychain") == false {
+            deleteAllKeyChainItems()
+            return;
+        } else {
+            fetchKeyChain()
+        }
+    }
+
+    private func fetchKeyChain() {
+        if let dictionaryValues = self.fetchKeyChainValues() {
+            self.userManager.userName = dictionaryValues["userName"] as? String ?? ""
+            self.userManager.storedUserName = dictionaryValues["userName"] as? String ?? ""
+            self.biometricLoginEnabled = dictionaryValues["biometricLoginEnabled"] as? Bool ?? false
+            self.userManager.storedPassword = dictionaryValues["password"] as? String ?? ""
+        }
+    }
+    
+    func updateCredentialsOnKeyChain(completionHandler: @escaping(Bool) -> ()) {
+        let userAccount = "AuthenticatedUserInfo"
+        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
+                                    kSecAttrAccount as String: userAccount]
+        let updatingUserDataDict: [String: Any] = ["userName": userManager.userName, "password": userManager.password, "biometricLoginEnabled": biometricLoginEnabled]
+        let userData: Data = try! NSKeyedArchiver.archivedData(withRootObject: updatingUserDataDict, requiringSecureCoding: false)
+        let updatingField: [String: Any] = [kSecAttrAccount as String: userAccount,
+                                            kSecValueData as String: userData
+        ]
+        let status = SecItemUpdate(query as CFDictionary, updatingField as CFDictionary)
+        if status == noErr {
+            completionHandler(true);
+        } else {
+            completionHandler(true);
+        }
+    }
+
+    func areCredentialsSaved() -> Bool {
+        return !(self.fetchKeyChainValues() == nil)
+    }
+
+    func credentialsChanged() -> Bool {
+        return ((userManager.storedUserName != userManager.userName) || (userManager.storedPassword != userManager.password))
+    }
+
+    func deleteAllKeyChainItems() {
+        let secItemClasses = [kSecClassGenericPassword, kSecClassInternetPassword, kSecClassCertificate, kSecClassKey, kSecClassIdentity]
+        for itemClass in secItemClasses {
+            let spec: NSDictionary = [kSecClass: itemClass]
+            SecItemDelete(spec)
+        }
+    }
+
+    private func fetchKeyChainValues() -> [String: Any]? {
+        let userAccount = "AuthenticatedUserInfo"
+        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
+                                    kSecAttrAccount as String: userAccount,
+                                    kSecReturnData as String: kCFBooleanTrue!,
+                                    kSecMatchLimit as String: kSecMatchLimitOne]
+        var dataTypeRef: AnyObject?
+        let status: OSStatus = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
+        if status == noErr {
+            if let data = dataTypeRef as? Data {
+                do {
+                    let dataDict = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [String: Any]
+                    return dataDict
+                } catch {
+                    print(error.localizedDescription)
+                    return nil
+                }
+            }
+        } else {
+            return nil
+        }
+        return nil
+    }
+
+    func isBiometricSupportedOnDevice() -> Bool {
+        let context = LAContext()
+        var contextError: NSError?
+        if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
+            if context.biometryType == .faceID || context.biometryType == .touchID {
+                DispatchQueue.main.async {
+                    self.supportBiometricAuthType = context.biometryType == .faceID ? "FaceID" : "TouchID"
+                }
+                return true
+            } else {
+                self.supportBiometricAuthType = nil
+                return false
+            }
+        } else {
+            self.supportBiometricAuthType = nil
+            return false
+        }
+    }
+
+    func askForBioMetricAuthenticationSetup() -> Bool {
+        let alreadyApprovedBioAuth = UserDefaults().bool(forKey: "biometricAuthAuthorized")
+        if isBiometricSupportedOnDevice() {
+            if alreadyApprovedBioAuth {
+                return false
+            } else {
+                if let lastAskedDate = fetchBiometricAuthRequestTimeFromUserDefault() {
+                    let numberOfDays = Date().daysBetweenDates(startDate: lastAskedDate)
+                    if numberOfDays < 5 {
+                        return false
+                    } else {
+                        return true
+                    }
+                } else {
+                    return true
+                }
+            }
+        } else {
+            return false
+        }
+    }
+
+    func saveBiometricAuthRequestTimeInUserDefault() {
+        let dateData: [String: Any] = ["date": Date()]
+        UserDefaults().setValue(dateData, forKey: "authorizationResponse")
+    }
+
+    func fetchBiometricAuthRequestTimeFromUserDefault() -> Date? {
+        if let dateData = UserDefaults().value(forKey: "authorizationResponse") as? [String: Any],
+           let date = dateData["date"] as? Date {
+            return date
+        } else {
+            return nil
+        }
+    }
+
+    func handleBiometricAuthorization() {
+        guard biometricLoginEnabled else {return}
+        let context = LAContext()
+        var contextError: NSError?
+        if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
+            context.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Access requires authentication") { result, error in
+                if  contextError != nil {
+                    return;
+                } else {
+                    if result {
+                        if NetworkMonitor.shared.connected {
+                            DispatchQueue.main.async {
+                                self.userManager.password = self.userManager.storedPassword ?? ""
+                                self.userManager.loginUser { response in
+                                    if response == .successfulLogin {
+                                        self.userManager.userLoggedIn = true
+                                    } else {
+                                        self.userManager.password = ""
+                                    }
+                                }
+                            }
+                        } else {
+                            DispatchQueue.main.async {
+                                self.userManager.password = self.userManager.storedPassword ?? ""
+                                self.updateSigninState(_: true, _: .offline)
+                            }
+                        }
+                    } else {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    func setupBioMetricAuthentication(completionHandler: @escaping(Bool) -> ()) {
+        let context = LAContext()
+        var contextError: NSError?
+        if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
+            context.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Access requires authentication") { result, error in
+                if  contextError != nil {
+                    completionHandler(false)
+                } else {
+                    if result {
+                        if result {
+                            DispatchQueue.main.async {
+                                self.biometricLoginEnabled = true
+                                self.updateCredentialsOnKeyChain { _ in }
+                                UserDefaults().setValue(true, forKey: "biometricAuthAuthorized")
+                                completionHandler(true)
+                            }
+                        }
+                    } else {
+                        completionHandler(false)
+                    }
+                }
+            }
+        }
+    }
+
+    func updateSigninState(_ status: Bool, _ connectionStatus: ConnectionState) {
+        DispatchQueue.main.async {
+            self.userManager.userLoggedIn = status
+            self.userManager.connectionState = connectionStatus
+        }
+    }
+}
+
+extension Date {
+    
+    func daysBetweenDates(startDate: Date) -> Int {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.day], from: startDate, to: self)
+        let numberOfDays = components.day ?? 0
+        return numberOfDays
+    }
+}
+
+

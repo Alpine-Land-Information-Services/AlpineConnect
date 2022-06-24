@@ -103,7 +103,7 @@ public class Tracker {
     
     static func sendData(_ data: TrackingData, handler: @escaping ((Bool) -> Void)) {
         guard let deviceId = data.deviceInfo.deviceID else { return }
-        PostgresClientManager.shared.pool?.withConnection(completionHandler: { pool in
+        TrackingManager.shared.pool?.withConnection(completionHandler: { pool in
             do {
                 print(#function, data)
                 let connection = try pool.get()

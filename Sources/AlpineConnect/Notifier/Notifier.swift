@@ -46,7 +46,7 @@ public class Notifier {
     public static func checkForNotification(completion: @escaping ([acNotification]) -> Void) {
         guard let devID = Tracker.deviceID() else { return }
         let appName = Tracker.appName()
-        PostgresClientManager.shared.pool?.withConnection { con_from_pool in
+        TrackingManager.shared.pool?.withConnection { con_from_pool in
             do {
                 let connection = try con_from_pool.get()
                 defer { connection.close() }
@@ -105,7 +105,7 @@ public class Notifier {
     public static func utilizeMessages() {
         guard let devID = Tracker.deviceID() else { return }
         let appName = Tracker.appName()
-        PostgresClientManager.shared.pool?.withConnection { con_from_pool in
+        TrackingManager.shared.pool?.withConnection { con_from_pool in
             do {
                 let connection = try con_from_pool.get()
                 defer { connection.close() }

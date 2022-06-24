@@ -50,7 +50,7 @@ public class Updater {
     }
     
     private func getAppInfo(name: String, completion: @escaping (String?, Error?) -> Void) {
-        PostgresClientManager.shared.pool?.withConnection { con_from_pool in
+        TrackingManager.shared.pool?.withConnection { con_from_pool in
             do {
                 let connection = try con_from_pool.get()
                 defer { connection.close() }
@@ -82,7 +82,7 @@ public class Updater {
     }
     
     func callUpdate(name: String, result: @escaping ((Bool, URL?) -> Void)) {
-        PostgresClientManager.shared.pool?.withConnection { con_from_pool in
+        TrackingManager.shared.pool?.withConnection { con_from_pool in
             do {
                 let connection = try con_from_pool.get()
                 defer { connection.close() }

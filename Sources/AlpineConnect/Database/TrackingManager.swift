@@ -1,5 +1,5 @@
 //
-//  PostgresClientKit.swift
+//  TrackingManager.swift
 //  AlpineConnect
 //
 //  Created by Jenya Lebid on 4/6/22.
@@ -15,10 +15,10 @@ public struct ConnectionInfo {
     var password = "i$mppWMB$I7Y4XoD"
 }
 
-public class PostgresClientManager {
+public class TrackingManager {
     
-    static let shared = PostgresClientManager()
-    static let sharedWithNoTimeout = PostgresClientManager(noTimeout: true)
+    static let shared = TrackingManager()
+    static let sharedWithNoTimeout = TrackingManager(noTimeout: true)
     var pool: ConnectionPool?
     
     init(noTimeout: Bool = false) {
