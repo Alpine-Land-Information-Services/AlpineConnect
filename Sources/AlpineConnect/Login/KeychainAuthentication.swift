@@ -5,16 +5,18 @@
 //  Created by Jenya Lebid on 5/6/22.
 //
 
-import SwiftUI
 import Security
 import LocalAuthentication
 
-final class AuthenticationViewModel: ObservableObject {
+final class KeychainAuthentication {
     
-    @Published var userManager = UserAuthenticationManager.shared
-    @Published var showingActivityIndicator: Bool = false
-    @Published var biometricLoginEnabled: Bool = false
-    @Published var supportBiometricAuthType: String?
+    static var shared = KeychainAuthentication()
+    
+    var userManager = UserAuthenticationManager.shared
+    
+    var showingActivityIndicator: Bool = false
+    var biometricLoginEnabled: Bool = false
+    var supportBiometricAuthType: String?
 
     var disableLoginButton: Bool {
         if userManager.password.isEmpty || userManager.userName.isEmpty || showingActivityIndicator {

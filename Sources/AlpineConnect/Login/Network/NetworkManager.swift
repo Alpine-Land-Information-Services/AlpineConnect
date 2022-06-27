@@ -10,8 +10,7 @@ import PostgresClientKit
 
 public class NetworkManager {
     
-    static public let shared = NetworkManager()
-    static public let sharedWithNoTimeout = NetworkManager(noTimeout: true)
+    static public var shared = NetworkManager()
     
     public var pool: ConnectionPool?
     
@@ -34,5 +33,9 @@ public class NetworkManager {
         configuration.applicationName = ci.application
         
         pool = ConnectionPool(connectionPoolConfiguration: connectionPoolConfiguration, connectionConfiguration: configuration)
+    }
+    
+    static func update() {
+        self.shared = NetworkManager()
     }
 }

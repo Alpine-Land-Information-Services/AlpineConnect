@@ -11,12 +11,12 @@ struct LoginTextField: ViewModifier {
     let color: Color
     let padding: CGFloat
     let lineWidth: CGFloat
-
+    
     func body(content: Content) -> some View {
         content
             .padding(padding)
             .overlay(RoundedRectangle(cornerRadius: padding)
-                        .stroke(color, lineWidth: lineWidth)
+                .stroke(color, lineWidth: lineWidth)
             )
     }
 }
