@@ -17,7 +17,7 @@ final class KeychainAuthentication {
     var showingActivityIndicator: Bool = false
     var biometricLoginEnabled: Bool = false
     var supportBiometricAuthType: String?
-
+    
     var disableLoginButton: Bool {
         if userManager.password.isEmpty || userManager.userName.isEmpty || showingActivityIndicator {
             return true
@@ -132,9 +132,7 @@ final class KeychainAuthentication {
         var contextError: NSError?
         if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
             if context.biometryType == .faceID || context.biometryType == .touchID {
-                DispatchQueue.main.async {
-                    self.supportBiometricAuthType = context.biometryType == .faceID ? "FaceID" : "TouchID"
-                }
+                self.supportBiometricAuthType = context.biometryType == .faceID ? "FaceID" : "TouchID"
                 return true
             } else {
                 self.supportBiometricAuthType = nil

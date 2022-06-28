@@ -28,8 +28,8 @@ public class UserAuthenticationManager: ObservableObject {
     @Published public var lastSync: Date? = nil
     
     func loginUser(completionHandler: @escaping(LoginResponseMessage) -> Void) {
-        guard !userName.isEmpty && !password.isEmpty else {return}
-        Login.shared.loginUser { loginResponse in
+        guard !userName.isEmpty && !password.isEmpty else { return }
+        Login.loginUser { loginResponse in
             if loginResponse == .successfulLogin {
                 DispatchQueue.main.async {
                     self.connectionState = .online

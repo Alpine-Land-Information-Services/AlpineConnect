@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PasswordChangeView: View {
     
+    @Environment(\.presentationMode) var presentationMode
+    
     @StateObject var viewModel: PasswordChangeViewModel
     
     init(required: Bool) {
@@ -17,36 +19,53 @@ struct PasswordChangeView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                Divider()
-                HStack {
-                    Text("Account User:")
-                        .font(.headline)
-                        .fontWeight(.medium)
-                    Text(UserAuthenticationManager.shared.userName)
+            ScrollView {
+                VStack {
+                    Divider()
+                    HStack {
+                        Text("Account User:")
+                            .font(.headline)
+                            .fontWeight(.medium)
+                        Text(UserAuthenticationManager.shared.userName)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    NewPassword(title: "Old Password", placeholder: "Enter old password", password: $viewModel.oldPassword)
+                    Divider()
+                        .frame(width: 60)
+                    NewPassword(title: "New Password", placeholder: "Enter new password", password: $viewModel.newPassword)
+                    Divider()
+                        .frame(width: 60)
+                    NewPassword(title: "New Password", placeholder: "Repeat new password", password: $viewModel.repeatedNewPassword)
+                    Spacer()
+                    Divider()
+                    submit
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                NewPassword(title: "Old Password", placeholder: "Enter old password", password: $viewModel.newPassword)
-                Divider()
-                    .frame(width: 60)
-                NewPassword(title: "New Password", placeholder: "Enter new password", password: $viewModel.newPassword)
-                Divider()
-                    .frame(width: 60)
-                NewPassword(title: "New Password", placeholder: "Repeat new password", password: $viewModel.repeatedNewPassword)
-                Spacer()
-                Divider()
-                submit
+                .alert(viewModel.alert().0, isPresented: $viewModel.showAlert, actions: {
+                    Button(viewModel.alert().1, action: viewModel.alert().3)
+                }, message: {
+                    Text(viewModel.alert().2)
+                })
             }
             .navigationTitle("Password Change")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        
+                        viewModel.dismiss.toggle()
                     } label: {
                         Text("Cancel")
                     }
                 }
+            }
+        }
+        .onChange(of: viewModel.dismiss) { _ in
+            presentationMode.wrappedValue.dismiss()
+        }
+        .overlay {
+            if viewModel.showSpinner {
+                Color.black.opacity(0.50)
+                ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .frame(height: 40)
             }
         }
         .navigationViewStyle(.stack)
@@ -72,7 +91,7 @@ struct PasswordChangeView: View {
     
     var submit: some View {
         Button {
-            
+            viewModel.changePassword()
         } label: {
             Text("Change Password")
                 .font(.headline)
@@ -82,6 +101,7 @@ struct PasswordChangeView: View {
                 .cornerRadius(10)
                 .padding()
         }
+        .disabled(viewModel.allFieldsFilled())
     }
     
     struct NewPassword: View {

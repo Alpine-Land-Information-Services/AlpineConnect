@@ -11,6 +11,9 @@ public struct AlpineLoginView: View {
     
     @StateObject var viewModel: LoginViewModel
     
+    @ObservedObject var loginAlert = LoginAlert.shared
+    @ObservedObject var updater = SwiftUIUpdater()
+    
     public init(info: LoginConnectionInfo) {
         _viewModel = StateObject(wrappedValue: LoginViewModel(info: info))
     }
@@ -18,14 +21,26 @@ public struct AlpineLoginView: View {
     public var body: some View {
         VStack {
             logo
+                .modifier(UpdateCheckModifier(automatic: true))
             login
+                .alert(isPresented: $loginAlert.showAlert) {
+                    loginAlert.alert()
+                }
             Spacer()
         }
         .padding()
         .frame(maxWidth: .infinity)
         .background(Image("Login-BG").resizable().ignoresSafeArea().blur(radius: 50, opaque: true).ignoresSafeArea())
-        .alert(isPresented: $viewModel.alert) {
-            viewModel.loginAlert.alert()
+
+        .sheet(isPresented: $viewModel.sheet) {
+            PasswordChangeView(required: true)
+        }
+        .onChange(of: loginAlert.showAlert) { _ in // WHY SPINNER?
+            viewModel.alert.toggle()
+            viewModel.spinner.toggle()
+        }
+        .onChange(of: loginAlert.showSheet) { _ in
+            viewModel.sheet.toggle()
         }
     }
     
@@ -44,6 +59,8 @@ public struct AlpineLoginView: View {
         VStack {
             TextField("Username", text: $viewModel.userManager.userName)
                 .customTextField(padding: 10)
+                .disableAutocorrection(true)
+                .autocapitalization(.none)
                 .frame(maxWidth: 400, minHeight: 40, alignment: .center)
                 .background(Color.white)
                 .foregroundColor(Color.black)
@@ -71,6 +88,7 @@ public struct AlpineLoginView: View {
         }
         .padding()
         .background(Color.init(red: 0, green: 0, blue: 0, opacity: 0.75)).cornerRadius(20)
+//        .modifier(UpdateCheckModifier(automatic: true))
     }
 }
 

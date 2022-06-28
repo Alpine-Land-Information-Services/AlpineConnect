@@ -10,37 +10,77 @@ import PostgresClientKit
 
 class Login {
     
-    static let shared = Login()
     
-    func loginUser(completionHandler: @escaping(LoginResponseMessage) -> ()) {
+    static func checkError(_ error: PostgresError) -> LoginResponseMessage {
+        switch error {
+        case .sqlError(notice: let notice):
+            switch notice.code {
+            case "28P01":
+                return .invalidCredentials
+            default:
+                assertionFailure("Postgres SQL Login Error: \(notice)")
+                return .unknownError
+            }
+        default:
+            assertionFailure("Unknown Postgres Login Error: \(error)")
+            return .unknownError
+        }
+    }
+    
+    static func loginUser(checkPasswordChange: Bool = true, completionHandler: @escaping (LoginResponseMessage) -> ()) {
         NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
             case .failure(let error):
-                switch error as! PostgresError {
-                case .sqlError(notice: let notice):
-                    switch notice.code {
-                    case "28P01":
-                        completionHandler(.invalidCredentials)
-                    default:
-                        assertionFailure("Postgres SQL Login Error: \(notice)")
-                    }
-                default:
-                    assertionFailure("Unknown Postgres Login Error: \(error)")
-                }
+                completionHandler(self.checkError(error as! PostgresError))
             case .success:
-                completionHandler(.successfulLogin)
+                self.checkPasswordChangeRequirement() { isRequred, error in
+                    if let error = error {
+                        completionHandler(self.checkError(error as! PostgresError))
+                    }
+                    else if isRequred {
+                        completionHandler(.passwordChangeRequired)
+                    }
+                    else {
+                        completionHandler(.successfulLogin)
+                    }
+                }
             }
         }
     }
     
-    func checkPasswordChangeRequirement(completionHandler: @escaping(LoginResponseMessage) -> ()) {
+    static func checkPasswordChangeRequirement(completionHandler: @escaping (Bool, Error?) -> ()) {
         NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
             case .failure(let error):
-                print(error)
-                completionHandler(.networkError)
-            case .success(let connection):
-                print(connection)
+                completionHandler(false, error)
+            case .success:
+                completionHandler(true, nil)
+            }
+        }
+    }
+    
+    static func changePassword(with password: String, completionHandler: @escaping (Bool, Error?) -> ()) {
+        NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
+            switch connectionRequestResponse {
+            case .success:
+                do {
+                    let connection = try connectionRequestResponse.get()
+                    let text = """
+                    ALTER ROLE \(UserAuthenticationManager.shared.userName) PASSWORD '\(password)'
+                    """
+                    
+                    let statement = try connection.prepareStatement(text: text)
+                    let cursor = try statement.execute()
+                    
+                    cursor.close()
+                    statement.close()
+                    completionHandler(true, nil)
+                }
+                catch {
+                    completionHandler(false, error)
+                }
+            case .failure(let error):
+                completionHandler(false, error)
             }
         }
     }

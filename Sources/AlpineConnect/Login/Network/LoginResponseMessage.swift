@@ -12,6 +12,8 @@ enum LoginResponseMessage {
     case inactiveUser
     case networkError
     case successfulLogin
+    case passwordChangeRequired
+    case unknownError
 }
 
 extension LoginResponseMessage: RawRepresentable {
@@ -35,6 +37,11 @@ extension LoginResponseMessage: RawRepresentable {
             return ("Error", "Network Error")
         case .successfulLogin:
             return ("Success", "Successfully signed")
+        case .passwordChangeRequired:
+            return ("Change Password", "Password change is required for your account.")
+        case .unknownError:
+            return ("Unknown Error", "Please contact development team for support.")
+
         }
     }
 }

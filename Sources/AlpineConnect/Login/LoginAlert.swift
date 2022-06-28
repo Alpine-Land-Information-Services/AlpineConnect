@@ -7,15 +7,19 @@
 
 import SwiftUI
 
-final class LoginAlert {
+class LoginAlert: ObservableObject {
+    
+    static let shared = LoginAlert()
+    
+    @Published var showAlert = false
+    @Published var showSheet = false
     
     var activeAlert: AlertType = .authenticationAlert
     var loginResponse: LoginResponseMessage?
-    var showAlertMessage: Bool = false
     
     var authenthication = KeychainAuthentication.shared
     var supportedBioAuthType: String? = nil
-
+    
     var alertTitle: String {
         if activeAlert == .biometricAuthAlert {
             return "Set up biometric authentication?"
@@ -25,7 +29,7 @@ final class LoginAlert {
             return "Save login credentials?"
         }
     }
-
+    
     var alertMessage: String {
         if activeAlert == .biometricAuthAlert {
             return "Your device supports \(supportedBioAuthType ?? "") sign in. You can enable this to expedite future sign in."
@@ -36,28 +40,18 @@ final class LoginAlert {
         }
     }
     
-    func emptyFieldAlert() {
-        self.showAlertMessage = true
-        activeAlert = .emptyFields
-    }
-
-    func updateShowAlertStatus(_ showingAlert: Bool) {
-        self.showAlertMessage = showingAlert
-
-    }
-
     func updateAlertType(_ alertType: AlertType) {
+        showAlert.toggle()
         self.activeAlert = alertType
     }
-
+    
     func updateSupportedBioAuthType(_ type: String?) {
         self.supportedBioAuthType = type
     }
-
+    
     func updateModelState(_ authenthication: KeychainAuthentication){
         updateSupportedBioAuthType(_: authenthication.supportBiometricAuthType)
         supportedBioAuthType = authenthication.supportBiometricAuthType
-        updateShowAlertStatus(_: true)
         updateAlertType(_: .biometricAuthAlert)
     }
     
@@ -66,7 +60,6 @@ final class LoginAlert {
         case .authenticationAlert:
             if loginResponse != .successfulLogin {
                 return Alert(title: Text(loginResponse?.rawValue.0 ?? ""), message: Text(loginResponse?.rawValue.1 ?? ""), dismissButton: .default(Text("Okay"), action: {
-                    self.updateShowAlertStatus(_: false)
                     return;
                 }))
             } else {
@@ -74,12 +67,12 @@ final class LoginAlert {
             }
         case .emptyFields:
             return Alert(title: Text("Empty Fields"), message: Text("All login fields must be filled."), dismissButton: .default(Text("Try Again"), action: {
-                self.updateShowAlertStatus(_: false)
                 return;
             }))
         case .biometricAuthAlert:
             return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Set Up"), action: {
                 self.authenthication.setupBioMetricAuthentication { result in
+                    self.authenthication.saveCredentialsToKeyChain()
                     self.authenthication.updateSigninState(_: true, _: .online)
                 }
             }), secondaryButton: .default(Text("Not now"), action: {
@@ -89,24 +82,16 @@ final class LoginAlert {
         case .keychainAlert:
             return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Yes"), action: {
                 self.authenthication.saveCredentialsToKeyChain()
-                self.updateShowAlertStatus(_: false)
-                if self.authenthication.askForBioMetricAuthenticationSetup() {
-                    self.updateSupportedBioAuthType(_: self.authenthication.supportBiometricAuthType)
-                    self.updateShowAlertStatus(_: true)
-                    self.updateAlertType(_: .biometricAuthAlert)
-                } else {
-                    self.authenthication.updateSigninState(_: true, _: .online)
-                }
+                self.authenthication.updateSigninState(_: true, _: .online)
             }), secondaryButton: .default(Text("No"), action: {
                 self.authenthication.updateSigninState(_: true, _: .online)
             }))
-
+            
         case .updateKeychainAlert:
             return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Update"), action: {
                 self.authenthication.updateCredentialsOnKeyChain { _ in
                     if self.authenthication.askForBioMetricAuthenticationSetup() {
                         self.updateSupportedBioAuthType(_: self.authenthication.supportBiometricAuthType)
-                        self.updateShowAlertStatus(_: true)
                         self.updateAlertType(_: .biometricAuthAlert)
                     } else {
                         self.authenthication.updateSigninState(_: true, _: .online)
@@ -115,6 +100,10 @@ final class LoginAlert {
             }), secondaryButton: .default(Text("Not now"), action: {
                 self.authenthication.updateSigninState(_: true, _: .online)
             }))
+        case .updatePassword:
+            return Alert(title: Text("Change Password"),
+                         message: Text("In order to login, your account requires a password change."),
+                         dismissButton: .default(Text("Change Now"), action: {self.showSheet.toggle()}))
         }
     }
 }
@@ -125,4 +114,5 @@ enum AlertType {
     case keychainAlert
     case biometricAuthAlert
     case updateKeychainAlert
+    case updatePassword
 }

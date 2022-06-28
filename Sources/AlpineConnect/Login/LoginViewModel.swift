@@ -9,20 +9,19 @@ import SwiftUI
 
 class LoginViewModel: ObservableObject {
     
-    @Published var userManager = UserAuthenticationManager.shared
-    var loginAlert = LoginAlert()
-    
     @Published var spinner = false
     @Published var alert = false
     @Published var sheet = false
     
+    @Published var userManager = UserAuthenticationManager.shared
+    
+    var loginAlert = LoginAlert.shared
     var authenthication = KeychainAuthentication.shared
     
     var info: LoginConnectionInfo
     
     init(info: LoginConnectionInfo) {
         self.info = info
-        
         setLoginConnectionInfo()
     }
     
@@ -40,13 +39,12 @@ class LoginViewModel: ObservableObject {
     }
     
     func loginButtonPressed() {
+        spinner.toggle()
         if !userManager.password.isEmpty && !userManager.userName.isEmpty {
-            spinner.toggle()
             updateLoginInfo()
             login()
         } else {
-            loginAlert.emptyFieldAlert()
-            alert.toggle()
+            loginAlert.updateAlertType(_: .emptyFields)
         }
     }
     
@@ -57,31 +55,28 @@ class LoginViewModel: ObservableObject {
     }
     
     func handleAuthenticationResponse(_ response: LoginResponseMessage) {
-        if response == .successfulLogin {
+        switch response {
+        case .successfulLogin:
             if authenthication.areCredentialsSaved() {
                 if authenthication.credentialsChanged() {
                     loginAlert.updateAlertType(_: .updateKeychainAlert)
-                    loginAlert.updateShowAlertStatus(_: true)
-                } else {
-                    if authenthication.askForBioMetricAuthenticationSetup() {
-                        loginAlert.updateModelState(_: authenthication)
-                        alert.toggle()
-                    } else {
-                        authenthication.updateSigninState(_: true, _: .online)
-                    }
                 }
-            } else {
-                loginAlert.updateShowAlertStatus(_: true)
+                else {
+                    authenthication.updateSigninState(_: true, _: .online)
+                }
+            }
+            else if authenthication.askForBioMetricAuthenticationSetup() {
+                loginAlert.updateModelState(_: authenthication)
+            }
+            else {
                 loginAlert.updateAlertType(_: .keychainAlert)
             }
-        } else {
-            DispatchQueue.main.async {
-                self.loginAlert.loginResponse = response
-                self.loginAlert.updateShowAlertStatus(_: true)
-                self.loginAlert.updateAlertType(_: .authenticationAlert)
-                self.spinner.toggle()
-                self.alert.toggle()
-            }
+        case .passwordChangeRequired:
+            loginAlert.updateAlertType(.updatePassword)
+
+        default:
+            loginAlert.loginResponse = response
+            loginAlert.updateAlertType(_: .authenticationAlert)
         }
     }
 }
