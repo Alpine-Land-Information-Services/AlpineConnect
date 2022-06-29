@@ -12,7 +12,7 @@ final class KeychainAuthentication {
     
     static var shared = KeychainAuthentication()
     
-    var userManager = UserAuthenticationManager.shared
+    var userManager = UserManager.shared
     
     var showingActivityIndicator: Bool = false
     var biometricLoginEnabled: Bool = false
@@ -28,12 +28,23 @@ final class KeychainAuthentication {
 
     func authenticateUser(completionHandler: @escaping(LoginResponseMessage) -> Void) {
         if NetworkMonitor.shared.connected {
-            userManager.loginUser { loginResponse in
-                completionHandler(loginResponse)
-            }
+            Login.loginUser(completionHandler: { response in
+                completionHandler(response)
+            })
         } else {
-            updateSigninState(_: true, _: .offline)
+            completionHandler(offlineCheck())
         }
+    }
+    
+
+    func offlineCheck() -> LoginResponseMessage {
+        if userManager.userName == userManager.storedUserName && userManager.password == userManager.storedPassword {
+            return .successfulLogin
+        }
+        if userManager.userName == userManager.storedUserName && userManager.password != userManager.storedPassword {
+            return .invalidCredentials
+        }
+        return .networkError
     }
 
     func saveCredentialsToKeyChain() {
@@ -193,7 +204,7 @@ final class KeychainAuthentication {
                         if NetworkMonitor.shared.connected {
                             DispatchQueue.main.async {
                                 self.userManager.password = self.userManager.storedPassword ?? ""
-                                self.userManager.loginUser { response in
+                                Login.loginUser { response in
                                     if response == .successfulLogin {
                                         self.userManager.userLoggedIn = true
                                     } else {
@@ -204,7 +215,7 @@ final class KeychainAuthentication {
                         } else {
                             DispatchQueue.main.async {
                                 self.userManager.password = self.userManager.storedPassword ?? ""
-                                self.updateSigninState(_: true, _: .offline)
+                                self.updateSigninState(true)
                             }
                         }
                     } else {
@@ -240,10 +251,9 @@ final class KeychainAuthentication {
         }
     }
 
-    func updateSigninState(_ status: Bool, _ connectionStatus: ConnectionState) {
+    func updateSigninState(_ status: Bool) {
         DispatchQueue.main.async {
             self.userManager.userLoggedIn = status
-            self.userManager.connectionState = connectionStatus
         }
     }
 }

@@ -31,47 +31,41 @@ public struct AlpineLoginView: View {
         .padding()
         .frame(maxWidth: .infinity)
         .background(Image("Login-BG").resizable().ignoresSafeArea().blur(radius: 50, opaque: true).ignoresSafeArea())
-
-        .sheet(isPresented: $viewModel.sheet) {
+        .sheet(isPresented: $loginAlert.showSheet) {
             PasswordChangeView(required: true)
         }
-        .onChange(of: loginAlert.showAlert) { _ in // WHY SPINNER?
-            viewModel.alert.toggle()
-            viewModel.spinner.toggle()
-        }
-        .onChange(of: loginAlert.showSheet) { _ in
-            viewModel.sheet.toggle()
+        .onChange(of: loginAlert.showAlert) { show in
+            if show {
+                viewModel.spinner = false
+            }
         }
     }
     
     var logo: some View {
         VStack {
             Image(packageResource: "SPI-Logo", ofType: ".png").resizable().aspectRatio(contentMode: .fit).frame(minWidth: 40, maxWidth: 200, minHeight: 50, maxHeight: 200, alignment: .center)
-            Text("Sierra Pacific Industries").font(.title3)
+            Text("Sierra Pacific Industries")
+                .font(.headline)
+                .fontWeight(.thin)
                 .foregroundColor(Color.white)
-            Text(viewModel.info.application).font(.subheadline)
-                .fontWeight(.bold)
+            Text(viewModel.info.application)
+                .font(.title3)
+                .fontWeight(.medium)
                 .foregroundColor(Color.white)
         }
     }
     
     var login: some View {
         VStack {
-            TextField("Username", text: $viewModel.userManager.userName)
+            TextField("Email", text: $viewModel.userManager.userName)
                 .customTextField(padding: 10)
                 .disableAutocorrection(true)
                 .autocapitalization(.none)
-                .frame(maxWidth: 400, minHeight: 40, alignment: .center)
-                .background(Color.white)
-                .foregroundColor(Color.black)
-                .cornerRadius(10).padding(.bottom, 5)
-
+                .padding(.bottom, 5)
+                .keyboardType(.emailAddress)
             SecureField("Password", text: $viewModel.userManager.password)
                 .customTextField(padding: 10)
-                .frame(maxWidth: 400, minHeight: 40, alignment: .center)
-                .background(Color.white)
-                .foregroundColor(Color.black)
-                .cornerRadius(10).padding(.bottom, 15)
+                .padding(.bottom, 15)
             ZStack {
                 Button {
                     viewModel.loginButtonPressed()
@@ -87,8 +81,7 @@ public struct AlpineLoginView: View {
             }
         }
         .padding()
-        .background(Color.init(red: 0, green: 0, blue: 0, opacity: 0.75)).cornerRadius(20)
-//        .modifier(UpdateCheckModifier(automatic: true))
+        .background(Color.black.opacity(0.75)).cornerRadius(20)
     }
 }
 

@@ -38,7 +38,7 @@ class PasswordChangeViewModel: ObservableObject {
     }
     
     func backToLogin() {
-        UserAuthenticationManager.shared.password = ""
+        UserManager.shared.password = ""
         dismiss.toggle()
     }
     
@@ -60,11 +60,11 @@ class PasswordChangeViewModel: ObservableObject {
             sendAlert(alert: .notMatchedPasswords)
             return
         }
-        guard oldPassword == UserAuthenticationManager.shared.password else {
+        guard oldPassword == UserManager.shared.password else {
             sendAlert(alert: .invalidCredentials)
             return
         }
-        guard newPassword != UserAuthenticationManager.shared.password else {
+        guard newPassword != UserManager.shared.password else {
             sendAlert(alert: .oldPasswordMatch)
             return
         }

@@ -10,10 +10,8 @@ import SwiftUI
 class LoginViewModel: ObservableObject {
     
     @Published var spinner = false
-    @Published var alert = false
-    @Published var sheet = false
     
-    @Published var userManager = UserAuthenticationManager.shared
+    @Published var userManager = UserManager.shared
     
     var loginAlert = LoginAlert.shared
     var authenthication = KeychainAuthentication.shared
@@ -62,17 +60,22 @@ class LoginViewModel: ObservableObject {
                     loginAlert.updateAlertType(_: .updateKeychainAlert)
                 }
                 else {
-                    authenthication.updateSigninState(_: true, _: .online)
+                    authenthication.updateSigninState(true)
                 }
             }
             else if authenthication.askForBioMetricAuthenticationSetup() {
                 loginAlert.updateModelState(_: authenthication)
             }
             else {
-                loginAlert.updateAlertType(_: .keychainAlert)
+                authenthication.saveCredentialsToKeyChain()
+                authenthication.updateSigninState(true)
             }
         case .passwordChangeRequired:
             loginAlert.updateAlertType(.updatePassword)
+        case .inactiveUser:
+            loginAlert.updateAlertType(.inactiveUser)
+        case .networkError:
+            fatalError()
 
         default:
             loginAlert.loginResponse = response

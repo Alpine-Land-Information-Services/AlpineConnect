@@ -26,7 +26,7 @@ struct PasswordChangeView: View {
                         Text("Account User:")
                             .font(.headline)
                             .fontWeight(.medium)
-                        Text(UserAuthenticationManager.shared.userName)
+                        Text(UserManager.shared.userName)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()

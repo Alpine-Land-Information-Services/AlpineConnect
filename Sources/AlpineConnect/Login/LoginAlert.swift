@@ -73,18 +73,18 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Set Up"), action: {
                 self.authenthication.setupBioMetricAuthentication { result in
                     self.authenthication.saveCredentialsToKeyChain()
-                    self.authenthication.updateSigninState(_: true, _: .online)
+                    self.authenthication.updateSigninState(true)
                 }
             }), secondaryButton: .default(Text("Not now"), action: {
                 self.authenthication.saveBiometricAuthRequestTimeInUserDefault()
-                self.authenthication.updateSigninState(_: true, _: .online)
+                self.authenthication.updateSigninState(true)
             }))
         case .keychainAlert:
             return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Yes"), action: {
                 self.authenthication.saveCredentialsToKeyChain()
-                self.authenthication.updateSigninState(_: true, _: .online)
+                self.authenthication.updateSigninState(true)
             }), secondaryButton: .default(Text("No"), action: {
-                self.authenthication.updateSigninState(_: true, _: .online)
+                self.authenthication.updateSigninState(true)
             }))
             
         case .updateKeychainAlert:
@@ -94,16 +94,20 @@ class LoginAlert: ObservableObject {
                         self.updateSupportedBioAuthType(_: self.authenthication.supportBiometricAuthType)
                         self.updateAlertType(_: .biometricAuthAlert)
                     } else {
-                        self.authenthication.updateSigninState(_: true, _: .online)
+                        self.authenthication.updateSigninState(true)
                     }
                 }
             }), secondaryButton: .default(Text("Not now"), action: {
-                self.authenthication.updateSigninState(_: true, _: .online)
+                self.authenthication.updateSigninState(true)
             }))
         case .updatePassword:
             return Alert(title: Text("Change Password"),
                          message: Text("In order to login, your account requires a password change."),
                          dismissButton: .default(Text("Change Now"), action: {self.showSheet.toggle()}))
+        case .inactiveUser:
+            return Alert(title: Text("Unauthorized Access"),
+                         message: Text("Your account does not have access to this application. Contact administator for more information."),
+                         dismissButton: .default(Text("OK"), action: {}))
         }
     }
 }
@@ -115,4 +119,5 @@ enum AlertType {
     case biometricAuthAlert
     case updateKeychainAlert
     case updatePassword
+    case inactiveUser
 }
