@@ -59,7 +59,15 @@ class Login {
                 do {
                     let connection = try connectionRequestResponse.get()
                     
-                    let text = "SELECT * FROM application_users WHERE login = '\(UserManager.shared.userName)'"
+                    let text = """
+                    SELECT
+                    id,
+                    is_application_administrator,
+                    first_name,
+                    last_name,
+                    require_password_change
+                    FROM application_users WHERE login = '\(UserManager.shared.userName)'
+                    """
                     
                     let statement = try connection.prepareStatement(text: text)
                     let cursor = try statement.execute()
@@ -74,12 +82,12 @@ class Login {
                     for row in cursor {
                         let columns = try row.get().columns
 
-                        UserManager.shared.userInfo.id = UUID(uuidString: try columns[6].string())
-                        UserManager.shared.userInfo.isAdmin = try columns[4].bool()
+                        UserManager.shared.userInfo.id = UUID(uuidString: try columns[0].string())
+                        UserManager.shared.userInfo.isAdmin = try columns[1].bool()
+                        UserManager.shared.userInfo.firstName = try columns[2].optionalString() ?? ""
                         UserManager.shared.userInfo.firstName = try columns[3].optionalString() ?? ""
-                        UserManager.shared.userInfo.firstName = try columns[5].optionalString() ?? ""
                         
-                        if try columns[2].bool() {
+                        if try columns[4].bool() {
                             completionHandler(true, nil, nil)
                         }
                         else {

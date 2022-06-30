@@ -9,26 +9,26 @@ import Foundation
 
 public class UserManager: ObservableObject {
     
-    struct UserInfo: Codable {
+    public struct UserInfo: Codable {
         
-        var login: String = ""
+        public init() {}
         
-        var id: UUID!
-        var firstName: String = ""
-        var lastName: String = ""
-        var isAdmin: Bool = false
+        public var id: UUID!
+        public var firstName: String = ""
+        public var lastName: String = ""
+        public var isAdmin: Bool = false
     }
     
     public static let shared = UserManager()
     
-    var userInfo = UserInfo()
+    public var userInfo = UserInfo()
     
-    public var storedPassword: String? = nil
-    public var storedUserName: String? = nil
-    public var password: String = ""
+    var storedPassword: String? = nil
+    var storedUserName: String? = nil
+    var password: String = ""
     
     @Published public var userName: String = ""
-    @Published public var inputPassword: String = ""
+    @Published var inputPassword: String = ""
     
     @Published public var userLoggedIn: Bool = false
     @Published public var lastSync: Date? = nil
