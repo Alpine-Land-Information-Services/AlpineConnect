@@ -27,19 +27,18 @@ class LoginViewModel: ObservableObject {
         NetworkMonitor.shared.start()
         LoginConnectionInfo.shared = info
         authenthication.fetchCredentialsFromKeyChain()
-        authenthication.handleBiometricAuthorization()
+        authenthication.handleBiometricAuthorization { result in
+            if result {
+                self.login()
+            }
+        }
     }
-    
-    func updateLoginInfo() {
-        let newInfo = LoginConnectionInfo(host: info.host, database: info.database, application: info.application, user: userManager.userName, password: userManager.password)
-        LoginConnectionInfo.shared = newInfo
-        NetworkManager.update()
-    }
-    
+
     func loginButtonPressed() {
         spinner.toggle()
-        if !userManager.password.isEmpty && !userManager.userName.isEmpty {
-            updateLoginInfo()
+        if !userManager.inputPassword.isEmpty && !userManager.userName.isEmpty {
+            userManager.password = userManager.inputPassword
+            NetworkManager.update()
             login()
         } else {
             loginAlert.updateAlertType(_: .emptyFields)
@@ -75,7 +74,7 @@ class LoginViewModel: ObservableObject {
         case .inactiveUser:
             loginAlert.updateAlertType(.inactiveUser)
         case .networkError:
-            fatalError()
+            loginAlert.updateAlertType(.offlineDiffirentUser)
 
         default:
             loginAlert.loginResponse = response

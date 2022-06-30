@@ -21,6 +21,8 @@ class PasswordChangeViewModel: ObservableObject {
     var alertType: PasswordAlertType = .notMatchedPasswords
     var unknownErrorMessage = ""
     
+    let userManager = UserManager.shared
+    
     @Published var oldPassword: String = ""
     @Published var newPassword: String = ""
     @Published var repeatedNewPassword: String = ""
@@ -38,7 +40,7 @@ class PasswordChangeViewModel: ObservableObject {
     }
     
     func backToLogin() {
-        UserManager.shared.password = ""
+        UserManager.shared.inputPassword = ""
         dismiss.toggle()
     }
     
@@ -75,6 +77,8 @@ class PasswordChangeViewModel: ObservableObject {
             if changed {
                 self.sendAlert(alert: .passwordChanged)
                 self.asyncSpinnerChange()
+                self.userManager.password = self.newPassword
+                KeychainAuthentication.shared.updateCredentialsOnKeyChain { _ in }
             }
             if let errorResponse = errorResponse {
                 self.unknownErrorMessage = String(describing: errorResponse)

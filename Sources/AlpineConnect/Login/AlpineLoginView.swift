@@ -63,7 +63,7 @@ public struct AlpineLoginView: View {
                 .autocapitalization(.none)
                 .padding(.bottom, 5)
                 .keyboardType(.emailAddress)
-            SecureField("Password", text: $viewModel.userManager.password)
+            SecureField("Password", text: $viewModel.userManager.inputPassword)
                 .customTextField(padding: 10)
                 .padding(.bottom, 15)
             ZStack {

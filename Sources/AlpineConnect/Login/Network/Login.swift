@@ -100,13 +100,23 @@ class Login {
             case .success:
                 do {
                     let connection = try connectionRequestResponse.get()
-                    let text = "ALTER ROLE \(UserManager.shared.userName) PASSWORD '\(password)'"
+                    var text = "ALTER ROLE \(UserManager.shared.userName) PASSWORD '\(password)'"
                     
                     let statement = try connection.prepareStatement(text: text)
                     let cursor = try statement.execute()
                     
-                    cursor.close()
-                    statement.close()
+                    defer { cursor.close() }
+                    defer { statement.close() }
+                    
+                    text = "UPDATE application_users SET require_password_change = FALSE WHERE login = '\(UserManager.shared.userName)'"
+                    
+                    let u_statement = try connection.prepareStatement(text: text)
+                    let u_cursor = try u_statement.execute()
+                    
+                    defer { u_cursor.close() }
+                    defer { u_statement.close() }
+                    
+                    
                     completionHandler(true, nil)
                 }
                 catch {

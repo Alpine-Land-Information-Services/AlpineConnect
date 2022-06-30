@@ -17,6 +17,7 @@ enum LoginResponseMessage {
 }
 
 extension LoginResponseMessage: RawRepresentable {
+    
     init?(rawValue: (String, String)) {
         switch rawValue {
         case ("Error", "Network Error"): self = .networkError

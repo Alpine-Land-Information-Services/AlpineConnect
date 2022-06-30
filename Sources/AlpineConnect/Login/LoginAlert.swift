@@ -9,6 +9,16 @@ import SwiftUI
 
 class LoginAlert: ObservableObject {
     
+    enum AlertType {
+        case authenticationAlert
+        case emptyFields
+        case biometricAuthAlert
+        case updateKeychainAlert
+        case updatePassword
+        case inactiveUser
+        case offlineDiffirentUser
+    }
+    
     static let shared = LoginAlert()
     
     @Published var showAlert = false
@@ -41,7 +51,9 @@ class LoginAlert: ObservableObject {
     }
     
     func updateAlertType(_ alertType: AlertType) {
-        showAlert.toggle()
+        DispatchQueue.main.async {
+            self.showAlert.toggle()
+        }
         self.activeAlert = alertType
     }
     
@@ -76,17 +88,8 @@ class LoginAlert: ObservableObject {
                     self.authenthication.updateSigninState(true)
                 }
             }), secondaryButton: .default(Text("Not now"), action: {
-                self.authenthication.saveBiometricAuthRequestTimeInUserDefault()
                 self.authenthication.updateSigninState(true)
             }))
-        case .keychainAlert:
-            return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Yes"), action: {
-                self.authenthication.saveCredentialsToKeyChain()
-                self.authenthication.updateSigninState(true)
-            }), secondaryButton: .default(Text("No"), action: {
-                self.authenthication.updateSigninState(true)
-            }))
-            
         case .updateKeychainAlert:
             return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Update"), action: {
                 self.authenthication.updateCredentialsOnKeyChain { _ in
@@ -108,16 +111,14 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text("Unauthorized Access"),
                          message: Text("Your account does not have access to this application. Contact administator for more information."),
                          dismissButton: .default(Text("OK"), action: {}))
+        case .offlineDiffirentUser:
+            var message = "You are not connected to network, only \n \(UserManager.shared.storedUserName ?? "") \n is able to login. Connect to network to sign in as a diffirent user."
+            if UserManager.shared.storedUserName == nil {
+                message = "You are not connected to network. You must first login while connected in order to use application in offline mode."
+            }
+            return Alert(title: Text("Offline"),
+                         message: Text(message),
+                         dismissButton: .default(Text("OK"), action: {}))
         }
     }
-}
-
-enum AlertType {
-    case authenticationAlert
-    case emptyFields
-    case keychainAlert
-    case biometricAuthAlert
-    case updateKeychainAlert
-    case updatePassword
-    case inactiveUser
 }

@@ -15,7 +15,8 @@ public class NetworkManager {
     public var pool: ConnectionPool?
     
     public init(noTimeout: Bool = true) {
-        let ci = LoginConnectionInfo.shared
+        let info = LoginConnectionInfo.shared
+        let userManager = UserManager.shared
         
         var connectionPoolConfiguration = ConnectionPoolConfiguration()
         connectionPoolConfiguration.maximumConnections = 10
@@ -26,11 +27,11 @@ public class NetworkManager {
         connectionPoolConfiguration.metricsResetWhenLogged = false
         
         var configuration = PostgresClientKit.ConnectionConfiguration()
-        configuration.host = ci.host
-        configuration.database = ci.database
-        configuration.user = ci.user
-        configuration.credential = .scramSHA256(password: ci.password)
-        configuration.applicationName = ci.application
+        configuration.host = info.host
+        configuration.database = info.database
+        configuration.user = userManager.userName
+        configuration.credential = .scramSHA256(password: userManager.password)
+        configuration.applicationName = info.application
         
         pool = ConnectionPool(connectionPoolConfiguration: connectionPoolConfiguration, connectionConfiguration: configuration)
     }

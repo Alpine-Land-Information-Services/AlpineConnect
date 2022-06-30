@@ -26,7 +26,7 @@ struct PasswordChangeView: View {
                         Text("Account User:")
                             .font(.headline)
                             .fontWeight(.medium)
-                        Text(UserManager.shared.userName)
+                        Text(viewModel.userManager.userName)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
@@ -97,6 +97,7 @@ struct PasswordChangeView: View {
                 .font(.headline)
                 .padding()
                 .foregroundColor(Color.white)
+                .frame(maxWidth: .infinity)
                 .background(Color.accentColor)
                 .cornerRadius(10)
                 .padding()
@@ -116,7 +117,6 @@ struct PasswordChangeView: View {
                 Text("\(title):")
                     .font(.callout)
                 SecureField(placeholder, text: $password)
-                    .customTextField(padding: 10)
                     .frame(maxWidth: .infinity, minHeight: 40, alignment: .center)
                     .foregroundColor(Color.black)
                     .cornerRadius(10)
@@ -128,6 +128,7 @@ struct PasswordChangeView: View {
 }
 
 struct PasswordChangeView_Previews: PreviewProvider {
+    
     static var previews: some View {
         PasswordChangeView(required: true)
             .previewInterfaceOrientation(.landscapeLeft)

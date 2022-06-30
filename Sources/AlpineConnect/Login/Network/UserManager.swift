@@ -23,10 +23,12 @@ public class UserManager: ObservableObject {
     
     var userInfo = UserInfo()
     
+    public var storedPassword: String? = nil
+    public var storedUserName: String? = nil
+    public var password: String = ""
+    
     @Published public var userName: String = ""
-    @Published public var password: String = ""
-    @Published public var storedPassword: String? = nil
-    @Published public var storedUserName: String? = nil
+    @Published public var inputPassword: String = ""
     
     @Published public var userLoggedIn: Bool = false
     @Published public var lastSync: Date? = nil
