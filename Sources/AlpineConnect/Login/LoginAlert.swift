@@ -109,7 +109,7 @@ class LoginAlert: ObservableObject {
                          dismissButton: .default(Text("Change Now"), action: {self.showSheet.toggle()}))
         case .inactiveUser:
             return Alert(title: Text("Unauthorized Access"),
-                         message: Text("Your account does not have access to this application. Contact administator for more information."),
+                         message: Text("Your account does not have access to this application. \n \nContact Kris Anderson \n+1 479 431 4298"),
                          dismissButton: .default(Text("OK"), action: {}))
         case .offlineDiffirentUser:
             var message = "You are not connected to network, only \n \(UserManager.shared.storedUserName ?? "") \n is able to login. Connect to network to sign in as a diffirent user."

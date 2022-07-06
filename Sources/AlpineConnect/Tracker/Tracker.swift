@@ -23,7 +23,7 @@ public class Tracker {
         }
     }
     
-    static func appVersion() -> String {
+    public static func appVersion() -> String {
         return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     }
     
@@ -31,19 +31,19 @@ public class Tracker {
         return Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "Unknown"
     }
     
-    static func deviceID() -> UUID? {
+    public static func deviceID() -> UUID? {
         return UIDevice.current.identifierForVendor
     }
     
-    static func deviceType() -> String {
+    public static func deviceType() -> String {
         return UIDevice.current.type.rawValue
     }
     
-    static func deviceName() -> String {
+    public static func deviceName() -> String {
         return UIDevice.current.name
     }
     
-    static func deviceVersion() -> String {
+    public static func deviceVersion() -> String {
         return UIDevice.current.systemVersion
     }
     

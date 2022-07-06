@@ -27,8 +27,11 @@ final class KeychainAuthentication {
         }
     }
     
-    
     func offlineCheck() -> LoginResponseMessage {
+        guard Login.getUserFromUserDefaults() else {
+            return .networkError
+        }
+        
         if userManager.userName == userManager.storedUserName && userManager.password == userManager.storedPassword {
             return .successfulLogin
         }

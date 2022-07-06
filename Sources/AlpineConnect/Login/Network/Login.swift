@@ -16,6 +16,8 @@ class Login {
             switch notice.code {
             case "28P01":
                 return .invalidCredentials
+            case "42501":
+                return .inactiveUser
             default:
                 assertionFailure("Postgres SQL Login Error: \(notice)")
                 return .unknownError
@@ -81,11 +83,15 @@ class Login {
                     
                     for row in cursor {
                         let columns = try row.get().columns
+                        
+                        var info = UserManager.shared.userInfo
 
-                        UserManager.shared.userInfo.id = UUID(uuidString: try columns[0].string())
-                        UserManager.shared.userInfo.isAdmin = try columns[1].bool()
-                        UserManager.shared.userInfo.firstName = try columns[2].optionalString() ?? ""
-                        UserManager.shared.userInfo.firstName = try columns[3].optionalString() ?? ""
+                        info.id = UUID(uuidString: try columns[0].string())
+                        info.isAdmin = try columns[1].bool()
+                        info.firstName = try columns[2].optionalString() ?? ""
+                        info.firstName = try columns[3].optionalString() ?? ""
+                        
+                        saveUserToUserDefaults(info)
                         
                         if try columns[4].bool() {
                             completionHandler(true, nil, nil)
@@ -100,6 +106,24 @@ class Login {
                 }
             }
         }
+    }
+    
+    static func saveUserToUserDefaults(_ info: UserManager.UserInfo) {
+        UserManager.shared.userInfo = info
+        
+        if let encoded = try? JSONEncoder().encode(info) {
+            UserDefaults.standard.set(encoded, forKey: "UserInfo")
+        }
+    }
+    
+    static func getUserFromUserDefaults() -> Bool {
+        if let info = UserDefaults.standard.object(forKey: "UserInfo") as? Data {
+            if let loadedInfo = try? JSONDecoder().decode(UserManager.UserInfo.self, from: info) {
+                UserManager.shared.userInfo = loadedInfo
+                return true
+            }
+        }
+        return false
     }
     
     static func changePassword(with password: String, completionHandler: @escaping (Bool, Error?) -> ()) {

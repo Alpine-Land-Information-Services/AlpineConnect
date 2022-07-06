@@ -13,6 +13,7 @@ public class NetworkMonitor {
     static public let shared = NetworkMonitor()
     
     public var connected = false
+    public var action: (() -> Void)?
 
     public func start() {
         let monitor = NWPathMonitor()
@@ -20,6 +21,9 @@ public class NetworkMonitor {
         monitor.pathUpdateHandler = { path in
             if path.status == .satisfied {
                 self.connected = true
+                if let action = self.action {
+                    action()
+                }
             }
             else {
                 self.connected = false
