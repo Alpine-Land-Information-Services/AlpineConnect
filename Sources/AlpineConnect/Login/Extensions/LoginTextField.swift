@@ -8,9 +8,14 @@
 import SwiftUI
 
 struct LoginTextField: ViewModifier {
-    let color: Color
-    let padding: CGFloat
-    let lineWidth: CGFloat
+    
+    let color: Color = .gray
+    let padding: CGFloat = 10
+    let lineWidth: CGFloat = 0
+    
+    var placeholder: String
+    
+    @Binding var value: String
     
     func body(content: Content) -> some View {
         content
@@ -18,6 +23,7 @@ struct LoginTextField: ViewModifier {
             .overlay(RoundedRectangle(cornerRadius: padding)
                 .stroke(color, lineWidth: lineWidth)
             )
+            .modifier(PlaceholderStyle(showPlaceHolder: value.isEmpty, placeholder: placeholder))
             .frame(maxWidth: 400, minHeight: 40, alignment: .center)
             .background(Color.white)
             .foregroundColor(Color.black)
@@ -25,8 +31,27 @@ struct LoginTextField: ViewModifier {
     }
 }
 
+public struct PlaceholderStyle: ViewModifier {
+    var showPlaceHolder: Bool
+    var placeholder: String
+
+    public func body(content: Content) -> some View {
+        ZStack(alignment: .leading) {
+            if showPlaceHolder {
+                Text(placeholder)
+                .padding(.horizontal, 15)
+                .foregroundColor(Color.gray)
+                .font(.callout)
+            }
+            content
+            .foregroundColor(Color.black)
+            .padding(5.0)
+        }
+    }
+}
+
 extension View {
-    func customTextField(color: Color = Color.gray, padding: CGFloat = 3, lineWidth: CGFloat = 0) -> some View {
-        self.modifier(LoginTextField(color: color, padding: padding, lineWidth: lineWidth))
+    func loginField(placeholder: String, value: Binding<String>) -> some View {
+        self.modifier(LoginTextField(placeholder: placeholder, value: value))
     }
 }

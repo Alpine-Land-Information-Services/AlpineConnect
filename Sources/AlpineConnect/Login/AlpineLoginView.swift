@@ -21,7 +21,7 @@ public struct AlpineLoginView: View {
     public var body: some View {
         VStack {
             logo
-                .modifier(UpdateCheckModifier(automatic: true))
+                .modifier(UpdateCheckModifier(automatic: true, DBPassword: viewModel.info.connectDBPassword))
             login
                 .alert(isPresented: $loginAlert.showAlert) {
                     loginAlert.alert()
@@ -38,6 +38,9 @@ public struct AlpineLoginView: View {
             if show {
                 viewModel.spinner = false
             }
+        }
+        .onDisappear {
+            viewModel.userManager.inputPassword = ""
         }
     }
     
@@ -57,14 +60,14 @@ public struct AlpineLoginView: View {
     
     var login: some View {
         VStack {
-            TextField("Email", text: $viewModel.userManager.userName)
-                .customTextField(padding: 10)
+            TextField("", text: $viewModel.userManager.userName)
+                .loginField(placeholder: "Email", value: $viewModel.userManager.userName)
                 .disableAutocorrection(true)
                 .autocapitalization(.none)
                 .padding(.bottom, 5)
                 .keyboardType(.emailAddress)
-            SecureField("Password", text: $viewModel.userManager.inputPassword)
-                .customTextField(padding: 10)
+            SecureField("", text: $viewModel.userManager.inputPassword)
+                .loginField(placeholder: "Password", value: $viewModel.userManager.inputPassword)
                 .padding(.bottom, 15)
             ZStack {
                 Button {

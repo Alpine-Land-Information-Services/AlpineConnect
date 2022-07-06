@@ -13,8 +13,9 @@ public struct UpdateCheckModifier: ViewModifier {
     
     var automatic: Bool
     
-    public init(automatic: Bool) {
+    public init(automatic: Bool, DBPassword: String) {
         self.automatic = automatic
+        TrackerConnectionInfo.shared.password = DBPassword
     }
     
     public func body(content: Content) -> some View {

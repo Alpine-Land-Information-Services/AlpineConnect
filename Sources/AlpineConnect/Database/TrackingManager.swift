@@ -8,26 +8,30 @@
 import Foundation
 import PostgresClientKit
 
-public struct ConnectionInfo {
+public struct TrackerConnectionInfo {
+    
+    static var shared = TrackerConnectionInfo()
+    
     var host: String = "alpine-database-1.cz1ugaicrz33.us-west-1.rds.amazonaws.com"
     var database: String = "iOS_maintenance"
-    var user = "postgres"
-    var password = "i$mppWMB$I7Y4XoD"
+    var user = "ios_maintenance"
+    var password = ""
 }
 
 public class TrackingManager {
     
     static let shared = TrackingManager()
-    static let sharedWithNoTimeout = TrackingManager(noTimeout: true)
+    
     var pool: ConnectionPool?
     
-    init(noTimeout: Bool = false) {
-        let ci = ConnectionInfo()
+    init() {
+        let ci = TrackerConnectionInfo.shared
+        
         var connectionPoolConfiguration = ConnectionPoolConfiguration()
         connectionPoolConfiguration.maximumConnections = 10
-        connectionPoolConfiguration.maximumPendingRequests = noTimeout ? nil : 60
-        connectionPoolConfiguration.pendingRequestTimeout = noTimeout ? nil : 180
-        connectionPoolConfiguration.allocatedConnectionTimeout = noTimeout ? nil : 240
+        connectionPoolConfiguration.maximumPendingRequests = 60
+        connectionPoolConfiguration.pendingRequestTimeout = 180
+        connectionPoolConfiguration.allocatedConnectionTimeout = 240
         connectionPoolConfiguration.dispatchQueue = DispatchQueue.global()
         connectionPoolConfiguration.metricsResetWhenLogged = false
         

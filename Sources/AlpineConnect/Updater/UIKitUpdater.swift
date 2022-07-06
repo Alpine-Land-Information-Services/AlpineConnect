@@ -11,11 +11,9 @@ import Network
 public class UIKitUpdater: NSObject {
     
     let updater = Updater.shared
-//    var appName: String
     var viewController: UIViewController
     
     public init(viewController: UIViewController) {
-//        self.appName = Tracker.appName()
         self.viewController = viewController
     }
     
