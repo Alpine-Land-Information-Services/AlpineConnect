@@ -10,7 +10,7 @@ import SwiftUI
 struct LoginTextField: ViewModifier {
     
     let color: Color = .gray
-    let padding: CGFloat = 10
+    let padding: CGFloat = 6
     let lineWidth: CGFloat = 0
     
     var placeholder: String
@@ -39,7 +39,7 @@ public struct PlaceholderStyle: ViewModifier {
         ZStack(alignment: .leading) {
             if showPlaceHolder {
                 Text(placeholder)
-                .padding(.horizontal, 15)
+                .padding(.horizontal, 10)
                 .foregroundColor(Color.gray)
                 .font(.callout)
             }

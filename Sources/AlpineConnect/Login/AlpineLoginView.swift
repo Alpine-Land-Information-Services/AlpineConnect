@@ -13,7 +13,7 @@ public struct AlpineLoginView: View {
     
     @ObservedObject var loginAlert = LoginAlert.shared
     @ObservedObject var updater = SwiftUIUpdater()
-    
+        
     public init(info: LoginConnectionInfo) {
         _viewModel = StateObject(wrappedValue: LoginViewModel(info: info))
     }
@@ -46,7 +46,7 @@ public struct AlpineLoginView: View {
     
     var logo: some View {
         VStack {
-            Image(packageResource: "SPI-Logo", ofType: ".png").resizable().aspectRatio(contentMode: .fit).frame(minWidth: 40, maxWidth: 200, minHeight: 50, maxHeight: 200, alignment: .center)
+                Image(packageResource: "SPI-Logo", ofType: ".png").resizable().aspectRatio(contentMode: .fit).frame(minWidth: 0, maxWidth: 200, minHeight: 0, maxHeight: 200, alignment: .center)
             Text("Sierra Pacific Industries")
                 .font(.headline)
                 .fontWeight(.thin)
@@ -64,11 +64,10 @@ public struct AlpineLoginView: View {
                 .loginField(placeholder: "Email", value: $viewModel.userManager.userName)
                 .disableAutocorrection(true)
                 .autocapitalization(.none)
-                .padding(.bottom, 5)
                 .keyboardType(.emailAddress)
+                .padding(.bottom, 4)
             SecureField("", text: $viewModel.userManager.inputPassword)
                 .loginField(placeholder: "Password", value: $viewModel.userManager.inputPassword)
-                .padding(.bottom, 15)
             ZStack {
                 Button {
                     viewModel.loginButtonPressed()
@@ -81,6 +80,16 @@ public struct AlpineLoginView: View {
                     ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
                         .frame(height: 40)
                 }
+            }
+            .padding(6)
+            Divider()
+                .foregroundColor(Color.white)
+                .frame(width: 100)
+            Button {
+                
+            } label: {
+                Text("Register")
+                    .font(.callout)
             }
         }
         .padding()
