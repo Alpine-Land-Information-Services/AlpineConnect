@@ -5,94 +5,72 @@
 //  Created by Jenya Lebid on 7/7/22.
 //
 
+import UIKit
 import SwiftUI
 
-struct Popup<T: View>: ViewModifier {
-    let popup: T
-    let alignment: Alignment
-    let direction: Direction
-    let isPresented: Bool
+public class FormSheetWrapper<Content: View>: UIViewController, UIPopoverPresentationControllerDelegate {
 
-    init(isPresented: Bool, alignment: Alignment, direction: Direction, @ViewBuilder content: () -> T) {
-        self.isPresented = isPresented
-        self.alignment = alignment
-        self.direction = direction
-        popup = content()
+    var content: () -> Content
+    var onDismiss: (() -> Void)?
+
+    private var hostVC: UIHostingController<Content>?
+
+    required init?(coder: NSCoder) { fatalError("") }
+
+    public init(content: @escaping () -> Content) {
+        self.content = content
+        super.init(nibName: nil, bundle: nil)
     }
 
-    func body(content: Content) -> some View {
-        content
-            .overlay(popupContent())
+    func show() {
+        guard hostVC == nil else { return }
+        let vc = UIHostingController(rootView: content())
+
+        vc.view.sizeToFit()
+        vc.preferredContentSize = vc.view.bounds.size
+
+        vc.modalPresentationStyle = .formSheet
+        vc.presentationController?.delegate = self
+        hostVC = vc
+        self.present(vc, animated: true, completion: nil)
     }
 
-    @ViewBuilder
-    private func popupContent() -> some View {
-        GeometryReader { geometry in
-            if isPresented {
-                popup
-                    .animation(.spring())
-                    .transition(.offset(x: 0, y: direction.offset(popupFrame: geometry.frame(in: .global))))
-                    .frame(width: geometry.size.width, height: geometry.size.height, alignment: alignment)
-            }
-        }
+    func hide() {
+        guard let vc = self.hostVC, !vc.isBeingDismissed else { return }
+        dismiss(animated: true, completion: nil)
+        hostVC = nil
+    }
+
+    public func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+        hostVC = nil
+        self.onDismiss?()
     }
 }
 
-extension Popup {
-    enum Direction {
-        case top, bottom
+struct ResizeableSheet<Content: View> : UIViewControllerRepresentable {
 
-        func offset(popupFrame: CGRect) -> CGFloat {
-            switch self {
-            case .top:
-                let aboveScreenEdge = -popupFrame.maxY
-                return aboveScreenEdge
-            case .bottom:
-                let belowScreenEdge = UIScreen.main.bounds.height - popupFrame.minY
-                return belowScreenEdge
-            }
+    @Binding var show: Bool
+
+    let content: () -> Content
+
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ResizeableSheet<Content>>) -> FormSheetWrapper<Content> {
+        let vc = FormSheetWrapper(content: content)
+        vc.onDismiss = { self.show = false }
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: FormSheetWrapper<Content>, context: UIViewControllerRepresentableContext<ResizeableSheet<Content>>) {
+        if show {
+            uiViewController.show()
+        }
+        else {
+            uiViewController.hide()
         }
     }
 }
 
 extension View {
-    func popup<T: View>(
-        isPresented: Bool,
-        alignment: Alignment = .center,
-        direction: Popup<T>.Direction = .bottom,
-        @ViewBuilder content: () -> T
-    ) -> some View {
-        return modifier(Popup(isPresented: isPresented, alignment: alignment, direction: direction, content: content))
-    }
-}
-
-private extension View {
-    func onGlobalFrameChange(_ onChange: @escaping (CGRect) -> Void) -> some View {
-        background(GeometryReader { geometry in
-            Color.clear.preference(key: FramePreferenceKey.self, value: geometry.frame(in: .global))
-        })
-        .onPreferenceChange(FramePreferenceKey.self, perform: onChange)
-    }
-
-    func print(_ varargs: Any...) -> Self {
-        Swift.print(varargs)
-        return self
-    }
-}
-
-private struct FramePreferenceKey: PreferenceKey {
-    static let defaultValue = CGRect.zero
-    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
-        value = nextValue()
-    }
-}
-
-private extension View {
-    @ViewBuilder func applyIf<T: View>(_ condition: @autoclosure () -> Bool, apply: (Self) -> T) -> some View {
-        if condition() {
-            apply(self)
-        } else {
-            self
-        }
+    public func resizableSheet<Content: View>(isPresented: Binding<Bool>, @ViewBuilder content: @escaping () -> Content) -> some View {
+        self.background(ResizeableSheet(show: isPresented, content: content))
     }
 }

@@ -10,7 +10,7 @@ import SwiftUI
 class LoginViewModel: ObservableObject {
     
     @Published var spinner = false
-    
+    @Published var register = false
     @Published var userManager = UserManager.shared
     
     var loginAlert = LoginAlert.shared

@@ -22,18 +22,21 @@ public struct AlpineLoginView: View {
         VStack {
             logo
                 .modifier(UpdateCheckModifier(automatic: true, DBPassword: viewModel.info.connectDBPassword))
+                .sheet(isPresented: $loginAlert.showSheet) {
+                    PasswordChangeView(required: true)
+                }
             login
                 .alert(isPresented: $loginAlert.showAlert) {
                     loginAlert.alert()
+                }
+                .sheet(isPresented: $viewModel.register) {
+                    RegisterView(show: $viewModel.register)
                 }
             Spacer()
         }
         .padding()
         .frame(maxWidth: .infinity)
         .background(Image("Login-BG").resizable().ignoresSafeArea().blur(radius: 50, opaque: true).ignoresSafeArea())
-        .sheet(isPresented: $loginAlert.showSheet) {
-            PasswordChangeView(required: true)
-        }
         .onChange(of: loginAlert.showAlert) { show in
             if show {
                 viewModel.spinner = false
@@ -86,7 +89,7 @@ public struct AlpineLoginView: View {
                 .foregroundColor(Color.white)
                 .frame(width: 100)
             Button {
-                
+                viewModel.register.toggle()
             } label: {
                 Text("Register")
                     .font(.callout)
