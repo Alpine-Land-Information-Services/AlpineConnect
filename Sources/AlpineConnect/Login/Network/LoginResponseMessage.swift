@@ -8,12 +8,25 @@
 import Foundation
 
 enum LoginResponseMessage {
-    case invalidCredentials
-    case inactiveUser
-    case networkError
+
     case successfulLogin
+    case invalidCredentials
+    case wrongPassword
+    
     case passwordChangeRequired
+    case registrationRequired
+    case infoChangeRequired
+    
+    case offlineDiffirentUser
+    case inactiveUser
+    case userExists
+    case emptyFields
+    case networkError
     case unknownError
+    
+    case authenticationAlert
+    case enableBiometricsAlert
+    case updateKeychainAlert
 }
 
 extension LoginResponseMessage: RawRepresentable {
@@ -42,7 +55,8 @@ extension LoginResponseMessage: RawRepresentable {
             return ("Change Password", "Password change is required for your account.")
         case .unknownError:
             return ("Unknown Error", "Please contact development team for support.")
-
+        default:
+            return ("Not Done", "Not Done")
         }
     }
 }

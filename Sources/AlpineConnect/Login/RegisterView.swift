@@ -12,18 +12,21 @@ struct RegisterView: View {
     
     @StateObject var viewModel: RegisterViewModel
     
-    @Binding var show: Bool
+    @Binding var open: Bool
     
-    init(show: Binding<Bool>) {
-        self._show = show
-        _viewModel = StateObject(wrappedValue: RegisterViewModel())
+    var isRegistration: Bool
+    
+    init(open: Binding<Bool>, isRegistration: Bool) {
+        self._open = open
+        self.isRegistration = isRegistration
+        _viewModel = StateObject(wrappedValue: RegisterViewModel(open: open.wrappedValue))
     }
     
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 10) {
-                    Text("Enter your name and company email address to be sent a one time password for login.")
+                    Text(isRegistration ? "Fill out the registration form to be sent a temporary password for login." : "Fill out the form to update you user account information.")
                         .font(.footnote)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Divider()
@@ -39,25 +42,41 @@ struct RegisterView: View {
                         .disableAutocorrection(true)
                         .autocapitalization(.none)
                         .keyboardType(.emailAddress)
-                    Spacer()
+                    Divider()
+                        .padding()
+                        .frame(width: 100, alignment: .center)
+                    TextFieldBlock(title: "Confirm Email", value: $viewModel.confirmEmail, required: true, changed: .constant(false))
+                        .disableAutocorrection(true)
+                        .autocapitalization(.none)
+                        .keyboardType(.emailAddress)
+                        .padding(.bottom, 20)
+                    Divider()
+                        .padding()
                     submit
                 }
                 .padding()
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            show.toggle()
+                            viewModel.open.toggle()
                         } label: {
                             Text("Cancel")
                         }
                     }
                 }
-                .navigationTitle("Register")
+                .navigationTitle(isRegistration ? "User Registration" : "User Information Update")
                 .background(Color.init(uiColor: .systemBackground))
+                .onChange(of: viewModel.open) { value in
+                    open = value
+                }
             }
         }
-        .alert("Invalid Email", isPresented: $viewModel.alert, actions: { Button("Try Again") {} }, message: {
-            Text("You entered an invalid email.")
+        .alert(viewModel.alert().0, isPresented: $viewModel.showAlert, actions: { Button {
+            viewModel.alert().3()
+        } label: {
+            Text(viewModel.alert().2)
+        }}, message: {
+            Text(viewModel.alert().1)
         })
     }
     
@@ -65,7 +84,7 @@ struct RegisterView: View {
         Button {
             viewModel.submit()
         } label: {
-            Text("Send")
+            Text(isRegistration ? "Register" : "Update")
                 .font(.headline)
                 .padding()
                 .foregroundColor(Color.white)
@@ -74,7 +93,7 @@ struct RegisterView: View {
                 .cornerRadius(10)
                 .padding()
         }
-        .disabled(viewModel.submitEnabled())
+        .disabled(viewModel.checkMissingRequirements())
     }
     
     struct SecurityQuestion: View {
@@ -94,6 +113,6 @@ struct RegisterView: View {
 
 struct RegisterView_Previews: PreviewProvider {
     static var previews: some View {
-        RegisterView(show: .constant(true))
+        RegisterView(open: .constant(true), isRegistration: false)
     }
 }

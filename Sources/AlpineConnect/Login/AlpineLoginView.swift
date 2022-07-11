@@ -23,14 +23,23 @@ public struct AlpineLoginView: View {
             logo
                 .modifier(UpdateCheckModifier(automatic: true, DBPassword: viewModel.info.connectDBPassword))
                 .sheet(isPresented: $loginAlert.showSheet) {
-                    PasswordChangeView(required: true)
+                    switch loginAlert.activeAlert {
+                    case .registrationRequired:
+                        RegisterView(open: $loginAlert.showSheet, isRegistration: true)
+                    case .infoChangeRequired:
+                        RegisterView(open: $loginAlert.showSheet, isRegistration: false)
+                    case .passwordChangeRequired:
+                        PasswordChangeView(required: true)
+                    default:
+                        EmptyView()
+                    }
                 }
             login
                 .alert(isPresented: $loginAlert.showAlert) {
                     loginAlert.alert()
                 }
                 .sheet(isPresented: $viewModel.register) {
-                    RegisterView(show: $viewModel.register)
+                    RegisterView(open: $viewModel.register, isRegistration: true)
                 }
             Spacer()
         }

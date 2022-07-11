@@ -9,29 +9,19 @@ import SwiftUI
 
 class LoginAlert: ObservableObject {
     
-    enum AlertType {
-        case authenticationAlert
-        case emptyFields
-        case biometricAuthAlert
-        case updateKeychainAlert
-        case updatePassword
-        case inactiveUser
-        case offlineDiffirentUser
-    }
-    
     static let shared = LoginAlert()
     
     @Published var showAlert = false
     @Published var showSheet = false
     
-    var activeAlert: AlertType = .authenticationAlert
+    var activeAlert: LoginResponseMessage = .inactiveUser
     var loginResponse: LoginResponseMessage?
     
     var authenthication = KeychainAuthentication.shared
     var supportedBioAuthType: String? = nil
     
     var alertTitle: String {
-        if activeAlert == .biometricAuthAlert {
+        if activeAlert == .enableBiometricsAlert {
             return "Set up biometric authentication?"
         } else if activeAlert == .updateKeychainAlert {
             return "Update stored login credentials in memory?"
@@ -41,7 +31,7 @@ class LoginAlert: ObservableObject {
     }
     
     var alertMessage: String {
-        if activeAlert == .biometricAuthAlert {
+        if activeAlert == .enableBiometricsAlert {
             return "Your device supports \(supportedBioAuthType ?? "") sign in. You can enable this to expedite future sign in."
         } else if  activeAlert == .updateKeychainAlert {
             return "Update your stored credentials with the latest login credentials."
@@ -50,7 +40,7 @@ class LoginAlert: ObservableObject {
         }
     }
     
-    func updateAlertType(_ alertType: AlertType) {
+    func updateAlertType(_ alertType: LoginResponseMessage) {
         DispatchQueue.main.async {
             self.showAlert.toggle()
         }
@@ -61,10 +51,10 @@ class LoginAlert: ObservableObject {
         self.supportedBioAuthType = type
     }
     
-    func updateModelState(_ authenthication: KeychainAuthentication){
+    func updateModelState(_ authenthication: KeychainAuthentication) {
         updateSupportedBioAuthType(_: authenthication.supportBiometricAuthType)
         supportedBioAuthType = authenthication.supportBiometricAuthType
-        updateAlertType(_: .biometricAuthAlert)
+        updateAlertType(_: .enableBiometricsAlert)
     }
     
     func alert() -> Alert {
@@ -81,7 +71,7 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text("Empty Fields"), message: Text("All login fields must be filled."), dismissButton: .default(Text("Try Again"), action: {
                 return;
             }))
-        case .biometricAuthAlert:
+        case .enableBiometricsAlert:
             return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Set Up"), action: {
                 self.authenthication.setupBioMetricAuthentication { result in
                     self.authenthication.saveCredentialsToKeyChain()
@@ -95,7 +85,7 @@ class LoginAlert: ObservableObject {
                 self.authenthication.updateCredentialsOnKeyChain { _ in
                     if self.authenthication.askForBioMetricAuthenticationSetup() {
                         self.updateSupportedBioAuthType(_: self.authenthication.supportBiometricAuthType)
-                        self.updateAlertType(_: .biometricAuthAlert)
+                        self.updateAlertType(_: .enableBiometricsAlert)
                     } else {
                         self.authenthication.updateSigninState(true)
                     }
@@ -103,7 +93,7 @@ class LoginAlert: ObservableObject {
             }), secondaryButton: .default(Text("Not now"), action: {
                 self.authenthication.updateSigninState(true)
             }))
-        case .updatePassword:
+        case .passwordChangeRequired:
             return Alert(title: Text("Change Password"),
                          message: Text("In order to login, your account requires a password change."),
                          dismissButton: .default(Text("Change Now"), action: {self.showSheet.toggle()}))
@@ -119,6 +109,16 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text("Offline"),
                          message: Text(message),
                          dismissButton: .default(Text("OK"), action: {}))
+        case .registrationRequired:
+            return Alert(title: Text("New User"),
+                         message: Text("Your account does not exist, please register to proceed."),
+                         dismissButton: .default(Text("Register Now"), action: {self.showSheet.toggle()}))
+        case .infoChangeRequired:
+            return Alert(title: Text("Update User"),
+                         message: Text("Please update your user information to proceed."),
+                         dismissButton: .default(Text("Update Now"), action: {self.showSheet.toggle()}))
+        default:
+            return Alert(title: Text("NOT SETUP ALERT"))
         }
     }
 }

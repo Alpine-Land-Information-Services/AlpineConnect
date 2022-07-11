@@ -69,16 +69,17 @@ class LoginViewModel: ObservableObject {
                 authenthication.saveCredentialsToKeyChain()
                 authenthication.updateSigninState(true)
             }
-        case .passwordChangeRequired:
-            loginAlert.updateAlertType(.updatePassword)
-        case .inactiveUser:
-            loginAlert.updateAlertType(.inactiveUser)
-        case .networkError:
-            loginAlert.updateAlertType(.offlineDiffirentUser)
+//        case .registrationRequired:
+//
+//        case .passwordChangeRequired:
+//            loginAlert.updateAlertType(.updatePassword)
+//        case .inactiveUser:
+//            loginAlert.updateAlertType(.inactiveUser)
+//        case .networkError:
+//            loginAlert.updateAlertType(.offlineDiffirentUser)
 
         default:
-            loginAlert.loginResponse = response
-            loginAlert.updateAlertType(_: .authenticationAlert)
+            loginAlert.updateAlertType(response)
         }
     }
 }

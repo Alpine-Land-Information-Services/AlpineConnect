@@ -10,8 +10,8 @@ import PostgresClientKit
 
 class Login {
     
-    static func checkError(_ error: PostgresError) -> LoginResponseMessage {
-        switch error {
+    static func checkError(_ error: Error) -> LoginResponseMessage {
+        switch error as! PostgresError {
         case .sqlError(notice: let notice):
             switch notice.code {
             case "28P01":
@@ -32,31 +32,83 @@ class Login {
         NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
             case .failure(let error):
-                completionHandler(self.checkError(error as! PostgresError))
+                checkConnectUser(isConnectedToDBUser: false) { connectResponse in
+                    if connectResponse == .successfulLogin && checkError(error) == .invalidCredentials {
+                        completionHandler(.wrongPassword)
+                    }
+                    else {
+                        completionHandler(connectResponse)
+                    }
+                }
             case .success:
-                self.getApplicationUser() { isRequred, response, error in
+                self.getApplicationUser() {response, error in
                     if let error = error {
-                        completionHandler(self.checkError(error as! PostgresError))
+                        completionHandler(self.checkError(error))
                     }
                     if let response = response {
                         completionHandler(response)
                     }
-                    else if isRequred {
-                        completionHandler(.passwordChangeRequired)
-                    }
                     else {
-                        completionHandler(.successfulLogin)
+                        checkConnectUser(isConnectedToDBUser: true) { connectResponse in
+                            completionHandler(connectResponse)
+                        }
                     }
                 }
             }
         }
     }
     
-    static func getApplicationUser(completionHandler: @escaping (Bool, LoginResponseMessage?, Error?) -> ()) {
+    static func checkConnectUser(isConnectedToDBUser: Bool, handler: @escaping (LoginResponseMessage) -> ()) {
+        TrackingManager.shared.pool?.withConnection { response in
+            switch response {
+            case .success:
+                do {
+                    let connection = try response.get()
+                    
+                    let text = """
+                    SELECT password_change_required
+                    FROM user_authentication WHERE email = '\(UserManager.shared.userName)'
+                    """
+                    let statement = try connection.prepareStatement(text: text)
+                    let cursor = try statement.execute()
+                    
+                    defer { statement.close() }
+                    defer { cursor.close() }
+                    
+                    if cursor.rowCount == 0 {
+                        if isConnectedToDBUser {
+                            handler(.infoChangeRequired)
+                        }
+                        else {
+                            handler(.registrationRequired)
+                        }
+                    }
+                    else {
+                        for row in cursor {
+                            let columns = try row.get().columns
+                            if try columns[0].bool() {
+                                handler(.passwordChangeRequired)
+                            }
+                            else {
+                                handler(.successfulLogin)
+                            }
+                        }
+                    }
+                }
+                catch {
+                    handler(checkError(error))
+                }
+            case .failure(let error):
+                handler(checkError(error))
+            }
+        }
+    }
+    
+    static func getApplicationUser(completionHandler: @escaping (LoginResponseMessage?, Error?) -> ()) {
         NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
             case .failure(let error):
-                completionHandler(false, nil, error)
+                completionHandler(nil, error)
             case .success:
                 do {
                     let connection = try connectionRequestResponse.get()
@@ -66,8 +118,7 @@ class Login {
                     id,
                     is_application_administrator,
                     first_name,
-                    last_name,
-                    require_password_change
+                    last_name
                     FROM application_users WHERE login = '\(UserManager.shared.userName)'
                     """
                     
@@ -75,7 +126,7 @@ class Login {
                     let cursor = try statement.execute()
                     
                     if cursor.rowCount == 0 {
-                        completionHandler(false, .inactiveUser, nil)
+                        completionHandler(.inactiveUser, nil)
                     }
                     
                     defer { statement.close() }
@@ -85,7 +136,7 @@ class Login {
                         let columns = try row.get().columns
                         
                         var info = UserManager.shared.userInfo
-
+                        
                         info.id = UUID(uuidString: try columns[0].string())
                         info.isAdmin = try columns[1].bool()
                         info.firstName = try columns[2].optionalString() ?? ""
@@ -93,16 +144,11 @@ class Login {
                         
                         saveUserToUserDefaults(info)
                         
-                        if try columns[4].bool() {
-                            completionHandler(true, nil, nil)
-                        }
-                        else {
-                            completionHandler(false, nil, nil)
-                        }
+                        completionHandler(nil, nil)
                     }
                 }
                 catch {
-                    completionHandler(false, nil, error)
+                    completionHandler(nil, error)
                 }
             }
         }
