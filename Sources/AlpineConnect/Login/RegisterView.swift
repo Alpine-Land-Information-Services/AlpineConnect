@@ -82,7 +82,7 @@ struct RegisterView: View {
     
     var submit: some View {
         Button {
-            viewModel.submit()
+            viewModel.submit(existingDBUser: !isRegistration)
         } label: {
             Text(isRegistration ? "Register" : "Update")
                 .font(.headline)

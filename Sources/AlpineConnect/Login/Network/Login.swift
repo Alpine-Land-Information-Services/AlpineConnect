@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  Login.swift
+//  AlpineConnect
 //
 //  Created by Jenya Lebid on 6/23/22.
 //
@@ -41,11 +41,11 @@ class Login {
                     }
                 }
             case .success:
-                self.getApplicationUser() {response, error in
+                self.getApplicationUser() { response, error in
                     if let error = error {
                         completionHandler(self.checkError(error))
                     }
-                    if let response = response {
+                    else if let response = response {
                         completionHandler(response)
                     }
                     else {
@@ -64,16 +64,17 @@ class Login {
             case .success:
                 do {
                     let connection = try response.get()
-                    
+
                     let text = """
                     SELECT password_change_required
                     FROM user_authentication WHERE email = '\(UserManager.shared.userName)'
                     """
                     let statement = try connection.prepareStatement(text: text)
                     let cursor = try statement.execute()
-                    
+
                     defer { statement.close() }
                     defer { cursor.close() }
+
                     
                     if cursor.rowCount == 0 {
                         if isConnectedToDBUser {
@@ -117,8 +118,8 @@ class Login {
                     SELECT
                     id,
                     is_application_administrator,
-                    first_name,
-                    last_name
+                    require_password_change
+                    
                     FROM application_users WHERE login = '\(UserManager.shared.userName)'
                     """
                     
@@ -134,17 +135,16 @@ class Login {
                     
                     for row in cursor {
                         let columns = try row.get().columns
+                                                
+                        UserManager.shared.userInfo.id = UUID(uuidString: try columns[0].string())
+                        UserManager.shared.userInfo.isAdmin = try columns[1].bool()
                         
-                        var info = UserManager.shared.userInfo
-                        
-                        info.id = UUID(uuidString: try columns[0].string())
-                        info.isAdmin = try columns[1].bool()
-                        info.firstName = try columns[2].optionalString() ?? ""
-                        info.firstName = try columns[3].optionalString() ?? ""
-                        
-                        saveUserToUserDefaults(info)
-                        
-                        completionHandler(nil, nil)
+                        if try columns[2].bool() {
+                            completionHandler(.passwordChangeRequired, nil)
+                        }
+                        else {
+                            completionHandler(nil, nil)
+                        }
                     }
                 }
                 catch {
@@ -172,7 +172,7 @@ class Login {
         return false
     }
     
-    static func changePassword(with password: String, completionHandler: @escaping (Bool, Error?) -> ()) {
+    static func changePassword(with password: String, completionHandler: @escaping (Bool, LoginResponseMessage?) -> ()) {
         NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
             case .success:
@@ -198,10 +198,10 @@ class Login {
                     completionHandler(true, nil)
                 }
                 catch {
-                    completionHandler(false, error)
+                    completionHandler(false, checkError(error))
                 }
             case .failure(let error):
-                completionHandler(false, error)
+                completionHandler(false, checkError(error))
             }
         }
     }

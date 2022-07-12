@@ -17,6 +17,7 @@ public class UserManager: ObservableObject {
         public var firstName: String = ""
         public var lastName: String = ""
         public var isAdmin: Bool = false
+        public var requirePasswordChange = false
     }
     
     public static let shared = UserManager()

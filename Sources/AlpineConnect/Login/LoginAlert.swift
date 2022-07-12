@@ -117,6 +117,11 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text("Update User"),
                          message: Text("Please update your user information to proceed."),
                          dismissButton: .default(Text("Update Now"), action: {self.showSheet.toggle()}))
+            
+        case .wrongPassword:
+            return Alert(title: Text("Invalid Password"),
+                         message: Text("Your password is incorrect."),
+                         dismissButton: .default(Text("OK"), action: {}))
         default:
             return Alert(title: Text("NOT SETUP ALERT"))
         }

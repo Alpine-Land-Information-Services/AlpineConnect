@@ -15,70 +15,22 @@ class Register {
         case invalidEmail
         case missingFields
         case registerSuccess
+        case updateSuccess
         case newUser
         case userExists
         case emailsDiffer
-        case none
+        case unknownError
     }
     
     struct RegistrationInfo {
-
+        
         var email: String
         var firstName: String
         var lastName: String
     }
     
-    static func registerUser(info: RegistrationInfo, handler: @escaping (RegisterResponse) -> ()) {
-        checkUserRegistration { registrationCheckHandler in
-            if registrationCheckHandler == .newUser {
-                doRegistration(info: info) { registerHandler in
-                    handler(registerHandler)
-                }
-            }
-            else {
-                handler(registrationCheckHandler)
-            }
-        }
-    }
-    
-    
-    static func checkUserRegistration(handler: @escaping (RegisterResponse) -> ()) {
-        TrackingManager.shared.pool?.withConnection { response in
-            switch response {
-            case .success:
-                do {
-                    let connection = try response.get()
-                    
-                    let text = """
-                    SELECT COUNT (*)
-                    FROM user_authentication WHERE email = '\(UserManager.shared.userName)'
-                    """
-                    let statement = try connection.prepareStatement(text: text)
-                    let cursor = try statement.execute()
-                    
-                    defer { statement.close() }
-                    defer { cursor.close() }
 
-                    for row in cursor {
-                        let columns = try row.get().columns
-                        if try columns[0].int() == 0 {
-                            handler(.userExists)
-                        }
-                        else {
-                            handler(.newUser)
-                        }
-                    }
-                }
-                catch {
-                    fatalError("Error updating user: \(error)")
-                }
-            case .failure(let error):
-                fatalError("Error updating user: \(error)")
-            }
-        }
-    }
-    
-    static func doRegistration(info: RegistrationInfo, handler: @escaping (RegisterResponse) -> ()) {
+    static func registerUser(existingDBUser: Bool, info: RegistrationInfo, handler: @escaping (RegisterResponse) -> ()) {
         TrackingManager.shared.pool?.withConnection { response in
             switch response {
             case .failure(let error):
@@ -96,19 +48,39 @@ class Register {
                     cursor.close()
                     
                     text = """
-                    INSERT INTO user_authentication(email) VALUES ($1)
+                    INSERT INTO user_authentication(email, existing_db_user) VALUES ($1, $2)
                     """
                     
                     statement = try connection.prepareStatement(text: text)
-                    cursor = try statement.execute(parameterValues: [info.email])
+                    cursor = try statement.execute(parameterValues: [info.email, existingDBUser])
                     
                     defer { statement.close() }
                     defer { cursor.close() }
                     
-                    handler(.registerSuccess)
+                    if existingDBUser {
+                        handler(.updateSuccess)
+                    }
+                    else {
+                        handler(.registerSuccess)
+                    }
                 }
                 catch {
-                    fatalError("Error updating user: \(error)")
+                    if let error = error as? PostgresError {
+                        switch error {
+                        case .sqlError(let notice):
+                            switch notice.code {
+                            case "23505":
+                                handler(.userExists)
+                            default:
+                                handler(.unknownError)
+                            }
+                        default:
+                            handler(.unknownError)
+                        }
+                    }
+                    else {
+                        fatalError("Error updating user: \(error)")
+                    }
                 }
             }
         }

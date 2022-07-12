@@ -25,7 +25,7 @@ class RegisterViewModel: ObservableObject {
         self.open = open
     }
     
-    var registerStatus: Register.RegisterResponse = .none
+    var registerStatus: Register.RegisterResponse = .unknownError
     
     func isValidEmail(_ email: String) -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
@@ -34,7 +34,7 @@ class RegisterViewModel: ObservableObject {
         return emailPred.evaluate(with: email)
     }
     
-    func submit() {
+    func submit(existingDBUser: Bool) {
         guard isValidEmail(email) else {
             registerStatus = .invalidEmail
             showAlert.toggle()
@@ -52,7 +52,7 @@ class RegisterViewModel: ObservableObject {
             return
         }
         
-        Register.registerUser(info: makeInfo()) { response in
+        Register.registerUser(existingDBUser: existingDBUser, info: makeInfo()) { response in
             self.registerStatus = response
             DispatchQueue.main.async {
                 self.showAlert.toggle()
@@ -78,6 +78,8 @@ class RegisterViewModel: ObservableObject {
             return ("Missing Fields", "Fill out all of the fields outlined in red.", "Try Again", {})
         case .registerSuccess:
             return ("Success", "Your registration was sucessfull, a one time password will be sent to your email.", "OK", {self.open.toggle()})
+        case .updateSuccess:
+            return ("Success", "Thank you, your information has been updated. You are now able to login.", "OK", {self.open.toggle()})
         case .userExists:
             return ("User Exists", "There is already an account associated with provided email.", "OK", {})
         case .emailsDiffer:
