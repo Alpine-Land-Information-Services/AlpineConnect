@@ -54,6 +54,14 @@ public struct AlpineLoginView: View {
         .onDisappear {
             viewModel.userManager.inputPassword = ""
         }
+//        .task {
+//            do {
+//                try await Register.register(info: Register.RegistrationInfo(email: "jlebid@alpine-lis.com", firstName: "Test", lastName: "Test"))
+//            }
+//            catch {
+//                fatalError()
+//            }
+//        }
     }
     
     var logo: some View {

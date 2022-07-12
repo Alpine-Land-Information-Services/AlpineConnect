@@ -52,11 +52,9 @@ class RegisterViewModel: ObservableObject {
             return
         }
         
-        Register.registerUser(existingDBUser: existingDBUser, info: makeInfo()) { response in
-            self.registerStatus = response
-            DispatchQueue.main.async {
-                self.showAlert.toggle()
-            }
+        Task {
+            registerStatus = await Register.registerUser(info: makeInfo())
+            showAlert.toggle()
         }
     }
     

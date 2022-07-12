@@ -9,6 +9,12 @@ import Foundation
 
 public class UserManager: ObservableObject {
     
+    struct LoginInfo: Codable {
+        
+        var email: String
+        var password: String
+    }
+    
     public struct UserInfo: Codable {
         
         public init() {}

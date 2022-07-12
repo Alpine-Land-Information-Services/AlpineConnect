@@ -46,6 +46,8 @@ class LoginViewModel: ObservableObject {
     }
     
     func login() {
+        
+        
         authenthication.authenticateUser { response in
             self.handleAuthenticationResponse(_: response)
         }
@@ -69,15 +71,6 @@ class LoginViewModel: ObservableObject {
                 authenthication.saveCredentialsToKeyChain()
                 authenthication.updateSigninState(true)
             }
-//        case .registrationRequired:
-//
-//        case .passwordChangeRequired:
-//            loginAlert.updateAlertType(.updatePassword)
-//        case .inactiveUser:
-//            loginAlert.updateAlertType(.inactiveUser)
-//        case .networkError:
-//            loginAlert.updateAlertType(.offlineDiffirentUser)
-
         default:
             loginAlert.updateAlertType(response)
         }
