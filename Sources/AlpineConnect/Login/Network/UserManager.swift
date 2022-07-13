@@ -20,10 +20,10 @@ public class UserManager: ObservableObject {
         public init() {}
         
         public var id: UUID!
+        public var isAdmin: Bool = false
+
         public var firstName: String = ""
         public var lastName: String = ""
-        public var isAdmin: Bool = false
-        public var requirePasswordChange = false
     }
     
     public static let shared = UserManager()

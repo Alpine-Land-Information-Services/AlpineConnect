@@ -14,7 +14,7 @@ class LoginAlert: ObservableObject {
     @Published var showAlert = false
     @Published var showSheet = false
     
-    var activeAlert: LoginResponseMessage = .inactiveUser
+    var activeAlert: LoginResponseMessage = .noAccess
     var loginResponse: LoginResponseMessage?
     
     var authenthication = KeychainAuthentication.shared
@@ -97,7 +97,7 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text("Change Password"),
                          message: Text("In order to login, your account requires a password change."),
                          dismissButton: .default(Text("Change Now"), action: {self.showSheet.toggle()}))
-        case .inactiveUser:
+        case .noAccess:
             return Alert(title: Text("Unauthorized Access"),
                          message: Text("Your account does not have access to this application. \n \nContact Kris Anderson \n+1 479 431 4298"),
                          dismissButton: .default(Text("OK"), action: {}))
@@ -110,13 +110,14 @@ class LoginAlert: ObservableObject {
                          message: Text(message),
                          dismissButton: .default(Text("OK"), action: {}))
         case .registrationRequired:
-            return Alert(title: Text("New User"),
+            return Alert(title: Text("No Account"),
                          message: Text("Your account does not exist, please register to proceed."),
-                         dismissButton: .default(Text("Register Now"), action: {self.showSheet.toggle()}))
-        case .infoChangeRequired:
-            return Alert(title: Text("Update User"),
-                         message: Text("Please update your user information to proceed."),
-                         dismissButton: .default(Text("Update Now"), action: {self.showSheet.toggle()}))
+                         primaryButton: .default(Text("Register Now"), action: {self.showSheet.toggle()}),
+                         secondaryButton: .cancel())
+        case .inactiveUser:
+            return Alert(title: Text("Account Locked"),
+                         message: Text("Your account is locked. \n \nContact Kris Anderson \n+1 479 431 4298"),
+                         dismissButton: .default(Text("OK"), action: {}))
             
         case .wrongPassword:
             return Alert(title: Text("Invalid Password"),

@@ -15,7 +15,7 @@ class Register {
         case invalidEmail
         case missingFields
         case registerSuccess
-        case updateSuccess
+        case requestSent
         case newUser
         case userExists
         case emailsDiffer
@@ -29,43 +29,51 @@ class Register {
         var lastName: String
     }
     
-    static func register(info: RegistrationInfo) async throws -> (HTTPURLResponse) {
-        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user/register?email=\(info.email)&firstName=\(info.firstName)&lastName=\(info.lastName)") else {
+    static func register(info: RegistrationInfo) async throws -> (String, HTTPURLResponse) {
+        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user/registerJson") else {
             fatalError("Registration URL Error")
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let data = try JSONEncoder().encode(info)
         
-        let (_, response) = try await URLSession.shared.upload(for: request, from: data)
+        let (body, response) = try await URLSession.shared.upload(for: request, from: data)
+        
+        let stringBody = String(decoding: body, as: UTF8.self)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             fatalError("Cannot get HTTP URL Response")
         }
         
-        return httpResponse
+        return (stringBody, httpResponse)
     }
     
-    static func registerUser(info: RegistrationInfo) async -> RegisterResponse {
+    static func registerUser(info: RegistrationInfo) async -> (RegisterResponse, String) {
         do {
-            let resposnse = try await register(info: info)
+            let (body, response) = try await register(info: info)
+            let prefix = body.prefix(20)
             
-            switch resposnse.statusCode {
+            switch response.statusCode {
             case 200:
-                return .registerSuccess
+                switch prefix {
+                case "\"Email sent to Admin":
+                    return (.requestSent, body)
+                default:
+                    return (.registerSuccess, body)
+                }
             case 409:
-                return .userExists
+                return (.userExists, body)
             default:
-                return .unknownError
+                return (.unknownError, String(response.statusCode))
             }
         }
         catch {
             fatalError("\(error)")
         }
     }
-    
 
 //    static func registerUser(existingDBUser: Bool, info: RegistrationInfo, handler: @escaping (RegisterResponse) -> ()) {
 //        TrackingManager.shared.pool?.withConnection { response in
@@ -122,4 +130,5 @@ class Register {
 //            }
 //        }
 //    }
+    
 }

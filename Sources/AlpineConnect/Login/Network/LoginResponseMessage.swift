@@ -15,9 +15,9 @@ enum LoginResponseMessage {
     
     case passwordChangeRequired
     case registrationRequired
-    case infoChangeRequired
     
     case offlineDiffirentUser
+    case noAccess
     case inactiveUser
     case userExists
     case emptyFields
@@ -35,7 +35,7 @@ extension LoginResponseMessage: RawRepresentable {
         switch rawValue {
         case ("Error", "Network Error"): self = .networkError
         case ("Invalid Credentials", "The login credentials you entered does not exist in our system"): self = .invalidCredentials
-        case ("Inactive User", "Your account is inactive. Please check your user status with an administrator"): self = .inactiveUser
+        case ("Inactive User", "Your account is inactive. Please check your user status with an administrator"): self = .noAccess
         case ("Success", "Successfully signed"): self = .successfulLogin
         default:
             return nil
@@ -43,7 +43,7 @@ extension LoginResponseMessage: RawRepresentable {
     }
     var rawValue: (String, String) {
         switch self {
-        case .inactiveUser:
+        case .noAccess:
             return ("Inactive User", "Your account is inactive. Please check your user status with an administrator")
         case .invalidCredentials:
             return ("Invalid Credentials", "The login credentials you entered are invalid.")

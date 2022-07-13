@@ -11,6 +11,8 @@ class LoginViewModel: ObservableObject {
     
     @Published var spinner = false
     @Published var register = false
+    @Published var showResetPassword = false
+    
     @Published var userManager = UserManager.shared
     
     var loginAlert = LoginAlert.shared

@@ -19,6 +19,7 @@ class RegisterViewModel: ObservableObject {
     @Published var confirmEmail = ""
     
     @Published var showAlert = false
+    @Published var showSpinner = false
     @Published var open: Bool
     
     init(open: Bool) {
@@ -26,16 +27,10 @@ class RegisterViewModel: ObservableObject {
     }
     
     var registerStatus: Register.RegisterResponse = .unknownError
+    var registerMesssage = ""
     
-    func isValidEmail(_ email: String) -> Bool {
-        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-
-        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
-        return emailPred.evaluate(with: email)
-    }
-    
-    func submit(existingDBUser: Bool) {
-        guard isValidEmail(email) else {
+    func submit() {
+        guard Check.isValidEmail(email) else {
             registerStatus = .invalidEmail
             showAlert.toggle()
             return
@@ -52,9 +47,14 @@ class RegisterViewModel: ObservableObject {
             return
         }
         
+        showSpinner.toggle()
+        
         Task {
-            registerStatus = await Register.registerUser(info: makeInfo())
-            showAlert.toggle()
+            (registerStatus, registerMesssage) = await Register.registerUser(info: makeInfo())
+            DispatchQueue.main.async {
+                self.showSpinner.toggle()
+                self.showAlert.toggle()
+            }
         }
     }
     
@@ -75,15 +75,15 @@ class RegisterViewModel: ObservableObject {
         case .missingFields:
             return ("Missing Fields", "Fill out all of the fields outlined in red.", "Try Again", {})
         case .registerSuccess:
-            return ("Success", "Your registration was sucessfull, a one time password will be sent to your email.", "OK", {self.open.toggle()})
-        case .updateSuccess:
-            return ("Success", "Thank you, your information has been updated. You are now able to login.", "OK", {self.open.toggle()})
+            return ("Successful Registration", "You are now registerd, temporary password will be emailed to you shortly.", "OK", {self.open.toggle()})
+        case .requestSent:
+            return ("Request Sent", "Your registration request is sent to administrator. Once approved, you will be emailed a temporary password.", "OK", {self.open.toggle()})
         case .userExists:
             return ("User Exists", "There is already an account associated with provided email.", "OK", {})
         case .emailsDiffer:
             return ("Email Mismatch", "Make sure both email fields are the same.", "Try Again", {})
         default:
-            return ("Unknown Error", "Unknown Registration error, contact support.", "OK", {})
+            return ("Unknown Error", "Registration error code: \(registerMesssage), contact support.", "OK", {})
         }
     }
     
@@ -91,11 +91,10 @@ class RegisterViewModel: ObservableObject {
         return Register.RegistrationInfo(email: email, firstName: firstName, lastName: lastName)
     }
     
-    
-    func sendEmail() {
-        let sender = Mail.User(name: "Alpine LIS", email: "")
-        let reciever = Mail.User(name: firstName + "" + lastName, email: email)
-        
-        let mail = Mail(from: sender, to: [reciever], subject: "", text: "")
-    }
+//    func sendEmail() {
+//        let sender = Mail.User(name: "Alpine LIS", email: "")
+//        let reciever = Mail.User(name: firstName + "" + lastName, email: email)
+//
+//        let mail = Mail(from: sender, to: [reciever], subject: "", text: "")
+//    }
 }

@@ -14,11 +14,8 @@ struct RegisterView: View {
     
     @Binding var open: Bool
     
-    var isRegistration: Bool
-    
-    init(open: Binding<Bool>, isRegistration: Bool) {
+    init(open: Binding<Bool>) {
         self._open = open
-        self.isRegistration = isRegistration
         _viewModel = StateObject(wrappedValue: RegisterViewModel(open: open.wrappedValue))
     }
     
@@ -26,7 +23,7 @@ struct RegisterView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 10) {
-                    Text(isRegistration ? "Fill out the registration form to be sent a temporary password for login." : "Fill out the form to update you user account information.")
+                    Text("Fill out the registration form to be sent a temporary password for login.")
                         .font(.footnote)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Divider()
@@ -52,7 +49,7 @@ struct RegisterView: View {
                         .padding(.bottom, 20)
                     Divider()
                         .padding()
-                    submit
+                    SpinnerButton(label: "Register", action: viewModel.submit, isDisabled: viewModel.checkMissingRequirements(), activated: $viewModel.showSpinner)
                 }
                 .padding()
                 .toolbar {
@@ -64,7 +61,7 @@ struct RegisterView: View {
                         }
                     }
                 }
-                .navigationTitle(isRegistration ? "User Registration" : "User Information Update")
+                .navigationTitle("User Registration")
                 .background(Color.init(uiColor: .systemBackground))
                 .onChange(of: viewModel.open) { value in
                     open = value
@@ -78,22 +75,6 @@ struct RegisterView: View {
         }}, message: {
             Text(viewModel.alert().1)
         })
-    }
-    
-    var submit: some View {
-        Button {
-            viewModel.submit(existingDBUser: !isRegistration)
-        } label: {
-            Text(isRegistration ? "Register" : "Update")
-                .font(.headline)
-                .padding()
-                .foregroundColor(Color.white)
-                .frame(maxWidth: .infinity)
-                .background(Color.accentColor)
-                .cornerRadius(10)
-                .padding()
-        }
-        .disabled(viewModel.checkMissingRequirements())
     }
     
     struct SecurityQuestion: View {
@@ -113,6 +94,6 @@ struct RegisterView: View {
 
 struct RegisterView_Previews: PreviewProvider {
     static var previews: some View {
-        RegisterView(open: .constant(true), isRegistration: false)
+        RegisterView(open: .constant(true))
     }
 }

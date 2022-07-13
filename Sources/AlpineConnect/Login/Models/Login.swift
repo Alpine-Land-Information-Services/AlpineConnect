@@ -10,47 +10,34 @@ import PostgresClientKit
 
 class Login {
     
-    static func checkError(_ error: Error) -> LoginResponseMessage {
-        switch error as! PostgresError {
-        case .sqlError(notice: let notice):
-            switch notice.code {
-            case "28P01":
-                return .invalidCredentials
-            case "42501":
-                return .inactiveUser
-            default:
-                assertionFailure("Postgres SQL Login Error: \(notice)")
-                return .unknownError
-            }
-        default:
-            assertionFailure("Unknown Postgres Login Error: \(error)")
-            return .unknownError
-        }
+    struct BackendUser: Codable {
+        
+        var id: String
+        var email: String
+        var isActive: Bool
+        var forceChangePassword: Bool
+        var firstName: String
+        var lastName: String
     }
     
     static func loginUser(checkPasswordChange: Bool = true, completionHandler: @escaping (LoginResponseMessage) -> ()) {
         NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
-            case .failure(let error):
-                checkConnectUser(isConnectedToDBUser: false) { connectResponse in
-                    if connectResponse == .successfulLogin && checkError(error) == .invalidCredentials {
-                        completionHandler(.wrongPassword)
-                    }
-                    else {
-                        completionHandler(connectResponse)
-                    }
+            case .failure:
+                Task {
+                    completionHandler(await getBackendStatus(email: UserManager.shared.userName, DBConnected: false))
                 }
             case .success:
                 self.getApplicationUser() { response, error in
                     if let error = error {
-                        completionHandler(self.checkError(error))
+                        completionHandler(Check.checkPostgresError(error))
                     }
                     else if let response = response {
                         completionHandler(response)
                     }
                     else {
-                        checkConnectUser(isConnectedToDBUser: true) { connectResponse in
-                            completionHandler(connectResponse)
+                        Task {
+                            completionHandler(await getBackendStatus(email: UserManager.shared.userName, DBConnected: true))
                         }
                     }
                 }
@@ -58,51 +45,60 @@ class Login {
         }
     }
     
-    static func checkConnectUser(isConnectedToDBUser: Bool, handler: @escaping (LoginResponseMessage) -> ()) {
-        TrackingManager.shared.pool?.withConnection { response in
-            switch response {
-            case .success:
-                do {
-                    let connection = try response.get()
-
-                    let text = """
-                    SELECT password_change_required
-                    FROM user_authentication WHERE email = '\(UserManager.shared.userName)'
-                    """
-                    let statement = try connection.prepareStatement(text: text)
-                    let cursor = try statement.execute()
-
-                    defer { statement.close() }
-                    defer { cursor.close() }
-
-                    
-                    if cursor.rowCount == 0 {
-                        if isConnectedToDBUser {
-                            handler(.infoChangeRequired)
-                        }
-                        else {
-                            handler(.registrationRequired)
-                        }
+    static func getBackendUser(email: String) async throws -> (BackendUser, HTTPURLResponse) {
+        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user?email=\(email)") else {
+            fatalError("Reset Password URL Error")
+        }
+        
+        var request = URLRequest(url: url)
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                
+        let (body, response) = try await URLSession.shared.data(for: request)
+        
+        let user = try JSONDecoder().decode(BackendUser.self, from: body)
+                
+        guard let httpResponse = response as? HTTPURLResponse else {
+            fatalError("Cannot get HTTP URL Response")
+        }
+        
+        return (user, httpResponse)
+    }
+    
+    static func getBackendStatus(email: String, DBConnected: Bool) async -> LoginResponseMessage {
+        do {
+            let (user, response) = try await getBackendUser(email: email)
+            
+            switch response.statusCode {
+            case 200:
+                if DBConnected {
+                    if !user.isActive {
+                        return .inactiveUser
                     }
-                    else {
-                        for row in cursor {
-                            let columns = try row.get().columns
-                            if try columns[0].bool() {
-                                handler(.passwordChangeRequired)
-                            }
-                            else {
-                                handler(.successfulLogin)
-                            }
-                        }
+                    if user.forceChangePassword {
+                        return .passwordChangeRequired
                     }
+                    fillUserInfo(user: user)
+                    return .successfulLogin
                 }
-                catch {
-                    handler(checkError(error))
-                }
-            case .failure(let error):
-                handler(checkError(error))
+                return .wrongPassword
+            default:
+                return .unknownError
             }
         }
+        catch {
+            switch error.localizedDescription {
+            case "The data couldn’t be read because it is missing.":
+                return .registrationRequired
+            default:
+                return .unknownError
+            }
+        }
+    }
+    
+    static func fillUserInfo(user: BackendUser) {
+        UserManager.shared.userInfo.firstName = user.firstName
+        UserManager.shared.userInfo.lastName = user.lastName
+        saveUserToUserDefaults(UserManager.shared.userInfo)
     }
     
     static func getApplicationUser(completionHandler: @escaping (LoginResponseMessage?, Error?) -> ()) {
@@ -117,9 +113,7 @@ class Login {
                     let text = """
                     SELECT
                     id,
-                    is_application_administrator,
-                    require_password_change
-                    
+                    is_application_administrator
                     FROM application_users WHERE login = '\(UserManager.shared.userName)'
                     """
                     
@@ -127,7 +121,7 @@ class Login {
                     let cursor = try statement.execute()
                     
                     if cursor.rowCount == 0 {
-                        completionHandler(.inactiveUser, nil)
+                        completionHandler(.noAccess, nil)
                     }
                     
                     defer { statement.close() }
@@ -139,12 +133,7 @@ class Login {
                         UserManager.shared.userInfo.id = UUID(uuidString: try columns[0].string())
                         UserManager.shared.userInfo.isAdmin = try columns[1].bool()
                         
-                        if try columns[2].bool() {
-                            completionHandler(.passwordChangeRequired, nil)
-                        }
-                        else {
-                            completionHandler(nil, nil)
-                        }
+                        completionHandler(nil, nil)
                     }
                 }
                 catch {
@@ -172,37 +161,50 @@ class Login {
         return false
     }
     
-    static func changePassword(with password: String, completionHandler: @escaping (Bool, LoginResponseMessage?) -> ()) {
-        NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
-            switch connectionRequestResponse {
-            case .success:
-                do {
-                    let connection = try connectionRequestResponse.get()
-                    var text = "ALTER ROLE \(UserManager.shared.userName) PASSWORD '\(password)'"
-                    
-                    let statement = try connection.prepareStatement(text: text)
-                    let cursor = try statement.execute()
-                    
-                    defer { cursor.close() }
-                    defer { statement.close() }
-                    
-                    text = "UPDATE application_users SET require_password_change = FALSE WHERE login = '\(UserManager.shared.userName)'"
-                    
-                    let u_statement = try connection.prepareStatement(text: text)
-                    let u_cursor = try u_statement.execute()
-                    
-                    defer { u_cursor.close() }
-                    defer { u_statement.close() }
-                    
-                    
-                    completionHandler(true, nil)
-                }
-                catch {
-                    completionHandler(false, checkError(error))
-                }
-            case .failure(let error):
-                completionHandler(false, checkError(error))
-            }
-        }
-    }
+    //    static func checkConnectUser(isConnectedToDBUser: Bool, handler: @escaping (LoginResponseMessage) -> ()) {
+    //        TrackingManager.shared.pool?.withConnection { response in
+    //            switch response {
+    //            case .success:
+    //                do {
+    //                    let connection = try response.get()
+    //
+    //                    let text = """
+    //                    SELECT password_change_required
+    //                    FROM user_authentication WHERE email = '\(UserManager.shared.userName)'
+    //                    """
+    //                    let statement = try connection.prepareStatement(text: text)
+    //                    let cursor = try statement.execute()
+    //
+    //                    defer { statement.close() }
+    //                    defer { cursor.close() }
+    //
+    //
+    //                    if cursor.rowCount == 0 {
+    //                        if isConnectedToDBUser {
+    //                            handler(.infoChangeRequired)
+    //                        }
+    //                        else {
+    //                            handler(.registrationRequired)
+    //                        }
+    //                    }
+    //                    else {
+    //                        for row in cursor {
+    //                            let columns = try row.get().columns
+    //                            if try columns[0].bool() {
+    //                                handler(.passwordChangeRequired)
+    //                            }
+    //                            else {
+    //                                handler(.successfulLogin)
+    //                            }
+    //                        }
+    //                    }
+    //                }
+    //                catch {
+    //                    handler(checkError(error))
+    //                }
+    //            case .failure(let error):
+    //                handler(checkError(error))
+    //            }
+    //        }
+    //    }
 }

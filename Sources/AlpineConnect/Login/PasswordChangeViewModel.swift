@@ -73,19 +73,19 @@ class PasswordChangeViewModel: ObservableObject {
         
         showSpinner.toggle()
         
-        Login.changePassword(with: newPassword, completionHandler: { changed, errorResponse in
-            if changed {
-                self.sendAlert(alert: .passwordChanged)
-                self.asyncSpinnerChange()
-                self.userManager.password = self.newPassword
-                KeychainAuthentication.shared.updateCredentialsOnKeyChain { _ in }
-            }
-            if let errorResponse = errorResponse {
-                self.unknownErrorMessage = String(describing: errorResponse)
-                self.sendAlert(alert: .unknownError)
-                self.asyncSpinnerChange()
-            }
-        })
+//        PasswordChange.changePassword(with: newPassword, completionHandler: { changed, errorResponse in
+//            if changed {
+//                self.sendAlert(alert: .passwordChanged)
+//                self.asyncSpinnerChange()
+//                self.userManager.password = self.newPassword
+//                KeychainAuthentication.shared.updateCredentialsOnKeyChain { _ in }
+//            }
+//            if let errorResponse = errorResponse {
+//                self.unknownErrorMessage = String(describing: errorResponse)
+//                self.sendAlert(alert: .unknownError)
+//                self.asyncSpinnerChange()
+//            }
+//        })
     }
     
     func alert() -> (String, String, String, () -> Void) {

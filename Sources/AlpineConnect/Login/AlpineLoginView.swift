@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AlpineUI
 
 public struct AlpineLoginView: View {
     
@@ -13,7 +14,7 @@ public struct AlpineLoginView: View {
     
     @ObservedObject var loginAlert = LoginAlert.shared
     @ObservedObject var updater = SwiftUIUpdater()
-        
+    
     public init(info: LoginConnectionInfo) {
         _viewModel = StateObject(wrappedValue: LoginViewModel(info: info))
     }
@@ -25,9 +26,7 @@ public struct AlpineLoginView: View {
                 .sheet(isPresented: $loginAlert.showSheet) {
                     switch loginAlert.activeAlert {
                     case .registrationRequired:
-                        RegisterView(open: $loginAlert.showSheet, isRegistration: true)
-                    case .infoChangeRequired:
-                        RegisterView(open: $loginAlert.showSheet, isRegistration: false)
+                        RegisterView(open: $loginAlert.showSheet)
                     case .passwordChangeRequired:
                         PasswordChangeView(required: true)
                     default:
@@ -39,13 +38,16 @@ public struct AlpineLoginView: View {
                     loginAlert.alert()
                 }
                 .sheet(isPresented: $viewModel.register) {
-                    RegisterView(open: $viewModel.register, isRegistration: true)
+                    RegisterView(open: $viewModel.register)
                 }
             Spacer()
         }
         .padding()
         .frame(maxWidth: .infinity)
         .background(Image("Login-BG").resizable().ignoresSafeArea().blur(radius: 50, opaque: true).ignoresSafeArea())
+        .resizableSheet(isPresented: $viewModel.showResetPassword) {
+            PasswordResetView(open: $viewModel.showResetPassword)
+        }
         .onChange(of: loginAlert.showAlert) { show in
             if show {
                 viewModel.spinner = false
@@ -54,19 +56,13 @@ public struct AlpineLoginView: View {
         .onDisappear {
             viewModel.userManager.inputPassword = ""
         }
-//        .task {
-//            do {
-//                try await Register.register(info: Register.RegistrationInfo(email: "jlebid@alpine-lis.com", firstName: "Test", lastName: "Test"))
-//            }
-//            catch {
-//                fatalError()
-//            }
-//        }
     }
     
     var logo: some View {
         VStack {
-                Image(packageResource: "SPI-Logo", ofType: ".png").resizable().aspectRatio(contentMode: .fit).frame(minWidth: 0, maxWidth: 200, minHeight: 0, maxHeight: 200, alignment: .center)
+            Image(packageResource: "SPI-Logo", ofType: ".png").resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(minWidth: 0, maxWidth: 200, minHeight: 0, maxHeight: 200, alignment: .center)
             Text("Sierra Pacific Industries")
                 .font(.headline)
                 .fontWeight(.thin)
@@ -102,18 +98,19 @@ public struct AlpineLoginView: View {
                 }
             }
             .padding(6)
-            Divider()
-                .foregroundColor(Color.white)
-                .frame(width: 100)
-            Button {
-                viewModel.register.toggle()
-            } label: {
-                Text("Register")
-                    .font(.callout)
+            HStack {
+                Button("Register", action: {viewModel.register.toggle()})
+                Divider()
+                    .frame(height: 20, alignment: .center)
+                Button("Forgot Password?", action: {viewModel.showResetPassword.toggle()})
             }
+            .padding(.bottom, 8)
+            .font(.caption)
+            .frame(maxWidth: .infinity, alignment: .center)
         }
-        .padding()
+        .padding([.leading, .top, .trailing])
         .background(Color.black.opacity(0.75)).cornerRadius(20)
+        .frame(maxWidth: 400, alignment: .center)
     }
 }
 

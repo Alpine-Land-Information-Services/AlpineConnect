@@ -37,9 +37,9 @@ struct PasswordChangeView: View {
                     Divider()
                         .frame(width: 60)
                     NewPassword(title: "New Password", placeholder: "Repeat new password", password: $viewModel.repeatedNewPassword)
-                    Spacer()
+                        .padding(.bottom, 20)
                     Divider()
-                    submit
+                    SpinnerButton(label: "Change Password", action: viewModel.changePassword, isDisabled: viewModel.allFieldsFilled(), activated: $viewModel.showSpinner)
                 }
                 .alert(viewModel.alert().0, isPresented: $viewModel.showAlert, actions: {
                     Button(viewModel.alert().1, action: viewModel.alert().3)
@@ -71,39 +71,21 @@ struct PasswordChangeView: View {
         .navigationViewStyle(.stack)
     }
     
-    var isRequired: some View {
-        VStack {
-            Divider()
-            Text("PASSWORD CHANGE IS REQUIRED")
-                .font(.headline)
-                .fontWeight(.bold)
-                .foregroundColor(Color.white)
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .center)
-                .background(Color.red)
-                .cornerRadius(4)
-                .padding()
-                .shadow(color: Color(uiColor: .systemGray5), radius: 5, x: 5, y: 5)
-            Divider()
-                .padding(.bottom)
-        }
-    }
-    
-    var submit: some View {
-        Button {
-            viewModel.changePassword()
-        } label: {
-            Text("Change Password")
-                .font(.headline)
-                .padding()
-                .foregroundColor(Color.white)
-                .frame(maxWidth: .infinity)
-                .background(Color.accentColor)
-                .cornerRadius(10)
-                .padding()
-        }
-        .disabled(viewModel.allFieldsFilled())
-    }
+//    var submit: some View {
+//        Button {
+//            viewModel.changePassword()
+//        } label: {
+//            Text("Change Password")
+//                .font(.headline)
+//                .padding()
+//                .foregroundColor(Color.white)
+//                .frame(maxWidth: .infinity)
+//                .background(Color.accentColor)
+//                .cornerRadius(10)
+//                .padding()
+//        }
+//        .disabled(viewModel.allFieldsFilled())
+//    }
     
     struct NewPassword: View {
         
