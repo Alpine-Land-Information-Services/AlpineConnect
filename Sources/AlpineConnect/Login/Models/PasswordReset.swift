@@ -13,6 +13,7 @@ class PasswordReset {
         case invalidEmail
         case requestSent
         case noUser
+        case notConnected
         case unknownError
     }
     
@@ -42,7 +43,9 @@ class PasswordReset {
             
             switch response.statusCode {
             case 200:
-                return(.requestSent, body)
+                return (.requestSent, body)
+            case 404:
+                return (.noUser, body)
             default:
                 return(.unknownError, String(response.statusCode) + " - " + body)
             }

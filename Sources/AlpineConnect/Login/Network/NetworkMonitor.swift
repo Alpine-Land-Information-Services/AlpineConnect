@@ -8,11 +8,11 @@
 import Foundation
 import Network
 
-public class NetworkMonitor {
+public class NetworkMonitor: ObservableObject {
     
     static public let shared = NetworkMonitor()
     
-    public var connected = false
+    @Published public var connected = false
     public var action: (() -> Void)?
 
     public func start() {

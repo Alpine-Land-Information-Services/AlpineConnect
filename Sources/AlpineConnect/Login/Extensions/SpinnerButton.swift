@@ -24,6 +24,7 @@ struct SpinnerButton: View {
             }
             else {
                 Text(label)
+                    .frame(maxWidth: .infinity)
             }
         }
         .font(.headline)

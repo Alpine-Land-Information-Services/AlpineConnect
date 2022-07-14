@@ -9,19 +9,9 @@ import SwiftUI
 
 class PasswordChangeViewModel: ObservableObject {
     
-    enum PasswordAlertType {
-        case notMatchedPasswords
-        case passwordChanged
-        case oldPasswordMatch
-        case invalidCredentials
-        case unknownError
-    }
-    
     var required: Bool
-    var alertType: PasswordAlertType = .notMatchedPasswords
-    var unknownErrorMessage = ""
-    
-    let userManager = UserManager.shared
+    var status: PasswordChange.Status = .unknownError
+    var message = ""
     
     @Published var oldPassword: String = ""
     @Published var newPassword: String = ""
@@ -44,8 +34,8 @@ class PasswordChangeViewModel: ObservableObject {
         dismiss.toggle()
     }
     
-    func sendAlert(alert: PasswordAlertType) {
-        alertType = alert
+    func sendAlert(alert: PasswordChange.Status) {
+        status = alert
         DispatchQueue.main.async {
             self.showAlert.toggle()
         }
@@ -70,8 +60,28 @@ class PasswordChangeViewModel: ObservableObject {
             sendAlert(alert: .oldPasswordMatch)
             return
         }
+        guard NetworkMonitor.shared.connected else {
+            sendAlert(alert: .notConnected)
+            return
+        }
         
         showSpinner.toggle()
+        
+        let info = PasswordChange.PasswordInfo(email: UserManager.shared.userName, currentPassword: UserManager.shared.password, newPassword: newPassword)
+        
+        Task {
+            (status, message) = await PasswordChange.changePassword(info: info)
+            
+            if status == .passwordChanged {
+                UserManager.shared.password = newPassword
+                KeychainAuthentication.shared.updateCredentialsOnKeyChain { _ in }
+            }
+            
+            DispatchQueue.main.async {
+                self.showSpinner.toggle()
+                self.sendAlert(alert: self.status)
+            }
+        }
         
 //        PasswordChange.changePassword(with: newPassword, completionHandler: { changed, errorResponse in
 //            if changed {
@@ -89,7 +99,7 @@ class PasswordChangeViewModel: ObservableObject {
     }
     
     func alert() -> (String, String, String, () -> Void) {
-        switch alertType {
+        switch status {
         case .notMatchedPasswords:
             return ("Mismatched Fields", "Try Again", "New password fields do not match.", {})
         case .passwordChanged:
@@ -97,9 +107,11 @@ class PasswordChangeViewModel: ObservableObject {
         case .invalidCredentials:
             return ("Incorrect Password", "Try Again", "Your old password is incorrect.", {})
         case .unknownError:
-            return ("Unknown Error", "OK", "Report this error to the development team: \(unknownErrorMessage)", {})
+            return ("Unknown Error", "OK", "Report this error to the development team: \(message)", {})
         case .oldPasswordMatch:
             return ("Same Password", "Try Again", "Your old password cannot be the same as the new password.", {})
+        case .notConnected:
+            return ("Offline", "You are not connected to network, password change is only possible while online.", "OK", {})
         }
     }
 }

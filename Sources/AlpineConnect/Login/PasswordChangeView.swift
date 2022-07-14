@@ -26,7 +26,7 @@ struct PasswordChangeView: View {
                         Text("Account User:")
                             .font(.headline)
                             .fontWeight(.medium)
-                        Text(viewModel.userManager.userName)
+                        Text(UserManager.shared.userName)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
@@ -61,31 +61,8 @@ struct PasswordChangeView: View {
         .onChange(of: viewModel.dismiss) { _ in
             presentationMode.wrappedValue.dismiss()
         }
-        .overlay {
-            if viewModel.showSpinner {
-                Color.black.opacity(0.50)
-                ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    .frame(height: 40)
-            }
-        }
         .navigationViewStyle(.stack)
     }
-    
-//    var submit: some View {
-//        Button {
-//            viewModel.changePassword()
-//        } label: {
-//            Text("Change Password")
-//                .font(.headline)
-//                .padding()
-//                .foregroundColor(Color.white)
-//                .frame(maxWidth: .infinity)
-//                .background(Color.accentColor)
-//                .cornerRadius(10)
-//                .padding()
-//        }
-//        .disabled(viewModel.allFieldsFilled())
-//    }
     
     struct NewPassword: View {
         

@@ -16,7 +16,6 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/codewinsdotcom/PostgresClientKit.git", from: "1.4.3"),
         .package(url: "https://github.com/jenyalebid/AlpineUI.git", from: "1.0.0"),
-        .package(url: "https://github.com/Kitura/Swift-SMTP.git", from: "6.0.0")
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
     ],
@@ -25,7 +24,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "AlpineConnect",
-            dependencies: ["PostgresClientKit", "AlpineUI", .product(name: "SwiftSMTP", package: "Swift-SMTP")],
+            dependencies: ["PostgresClientKit", "AlpineUI"],
             resources: [.process("Resources")]),
         .testTarget(
             name: "AlpineConnectTests",

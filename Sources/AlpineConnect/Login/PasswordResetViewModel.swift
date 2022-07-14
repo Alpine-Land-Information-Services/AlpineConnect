@@ -28,6 +28,11 @@ class PasswordResetViewModel: ObservableObject {
             showAlert.toggle()
             return
         }
+        guard NetworkMonitor.shared.connected else {
+            resetStatus = .notConnected
+            showAlert.toggle()
+            return
+        }
         
         showSpinner.toggle()
         
@@ -45,9 +50,11 @@ class PasswordResetViewModel: ObservableObject {
         case .invalidEmail:
             return ("Invalid Email", "Enter a valid email address, with @ symbol and domain.", "Try Again", {})
         case .requestSent:
-            return ("Reset Successful", "A new temporary password will be sent to your email shortly.", "OK", {self.open.toggle()})
+            return ("Reset Request Sent", "You will recieve an email with reset confirmation shortly.", "OK", {self.open.toggle()})
         case .noUser:
             return ("Invalid User", "No user with provided email address exists.", "OK", {})
+        case .notConnected:
+            return ("Offline", "You are not connected to network, password reset is only possible while online.", "OK", {})
         default:
             return ("Unknown Error", "Error Code: \(message)", "OK", {})
         }

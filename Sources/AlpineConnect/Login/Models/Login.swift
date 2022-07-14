@@ -20,6 +20,8 @@ class Login {
         var lastName: String
     }
     
+    static var user: BackendUser?
+    
     static func loginUser(checkPasswordChange: Bool = true, completionHandler: @escaping (LoginResponseMessage) -> ()) {
         NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
@@ -28,17 +30,16 @@ class Login {
                     completionHandler(await getBackendStatus(email: UserManager.shared.userName, DBConnected: false))
                 }
             case .success:
-                self.getApplicationUser() { response, error in
-                    if let error = error {
-                        completionHandler(Check.checkPostgresError(error))
+                Task {
+                    let backendResponse = await getBackendStatus(email: UserManager.shared.userName, DBConnected: true)
+                    
+                    if backendResponse != .successfulLogin {
+                        completionHandler(backendResponse)
+                        return
                     }
-                    else if let response = response {
+                    
+                    self.getApplicationUser() { response, error in
                         completionHandler(response)
-                    }
-                    else {
-                        Task {
-                            completionHandler(await getBackendStatus(email: UserManager.shared.userName, DBConnected: true))
-                        }
                     }
                 }
             }
@@ -64,9 +65,10 @@ class Login {
         return (user, httpResponse)
     }
     
-    static func getBackendStatus(email: String, DBConnected: Bool) async -> LoginResponseMessage {
+    static func getBackendStatus(email: String, DBConnected: Bool) async -> (LoginResponseMessage) {
         do {
             let (user, response) = try await getBackendUser(email: email)
+            self.user = user
             
             switch response.statusCode {
             case 200:
@@ -95,17 +97,11 @@ class Login {
         }
     }
     
-    static func fillUserInfo(user: BackendUser) {
-        UserManager.shared.userInfo.firstName = user.firstName
-        UserManager.shared.userInfo.lastName = user.lastName
-        saveUserToUserDefaults(UserManager.shared.userInfo)
-    }
-    
-    static func getApplicationUser(completionHandler: @escaping (LoginResponseMessage?, Error?) -> ()) {
+    static func getApplicationUser(completionHandler: @escaping (LoginResponseMessage, Error?) -> ()) {
         NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
             case .failure(let error):
-                completionHandler(nil, error)
+                completionHandler(Check.checkPostgresError(error), error)
             case .success:
                 do {
                     let connection = try connectionRequestResponse.get()
@@ -120,27 +116,74 @@ class Login {
                     let statement = try connection.prepareStatement(text: text)
                     let cursor = try statement.execute()
                     
-                    if cursor.rowCount == 0 {
-                        completionHandler(.noAccess, nil)
-                    }
-                    
                     defer { statement.close() }
                     defer { cursor.close() }
+                    
+                    if cursor.rowCount == 0 {
+                        createApplicationUser(user: self.user!) { response, error in
+                            completionHandler(response, error)
+                            return
+                        }
+                    }
                     
                     for row in cursor {
                         let columns = try row.get().columns
                                                 
-                        UserManager.shared.userInfo.id = UUID(uuidString: try columns[0].string())
-                        UserManager.shared.userInfo.isAdmin = try columns[1].bool()
+                        let id = UUID(uuidString: try columns[0].string())
+                        let isAdmin = try columns[1].bool()
                         
-                        completionHandler(nil, nil)
+                        fillPrimaryUserInfo(id: id!.uuidString, isAdmin: isAdmin)
+                        
+                        completionHandler(.successfulLogin, nil)
                     }
                 }
                 catch {
-                    completionHandler(nil, error)
+                    completionHandler(Check.checkPostgresError(error), error)
                 }
             }
         }
+    }
+    
+    static func createApplicationUser(user: BackendUser, completionHandler: @escaping (LoginResponseMessage, Error?) -> ()) {
+        NetworkManager.shared.pool?.withConnection { response in
+            switch response {
+            case .success:
+                do {
+                    let connection = try response.get()
+                    
+                    let text = """
+                    INSERT INTO public.application_users("\(GlobalNames.shared.applicationUserIDName)", login, user_name) VALUES ($1, $2, $3)
+                    """
+                    print(text)
+                    let statement = try connection.prepareStatement(text: text)
+                    let cursor = try statement.execute(parameterValues: [user.id, user.email, user.firstName + " " + user.lastName])
+
+                    defer { statement.close() }
+                    defer { cursor.close() }
+                    
+                    fillPrimaryUserInfo(id: user.id, isAdmin: false)
+                    
+                    completionHandler(.successfulLogin, nil)
+                }
+                catch {
+                    completionHandler(Check.checkPostgresError(error), error)
+                }
+            case .failure(let error):
+                completionHandler(Check.checkPostgresError(error), error)
+            }
+        }
+    }
+    
+    static func fillPrimaryUserInfo(id: String, isAdmin: Bool) {
+        UserManager.shared.userInfo.id = UUID(uuidString: id)
+        UserManager.shared.userInfo.isAdmin = isAdmin
+        saveUserToUserDefaults(UserManager.shared.userInfo)
+    }
+    
+    static func fillUserInfo(user: BackendUser) {
+        UserManager.shared.userInfo.firstName = user.firstName
+        UserManager.shared.userInfo.lastName = user.lastName
+        saveUserToUserDefaults(UserManager.shared.userInfo)
     }
     
     static func saveUserToUserDefaults(_ info: UserManager.UserInfo) {

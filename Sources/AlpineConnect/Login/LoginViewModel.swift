@@ -37,19 +37,23 @@ class LoginViewModel: ObservableObject {
     }
 
     func loginButtonPressed() {
-        spinner.toggle()
-        if !userManager.inputPassword.isEmpty && !userManager.userName.isEmpty {
-            userManager.password = userManager.inputPassword
-            NetworkManager.update()
-            login()
-        } else {
+        guard !userManager.inputPassword.isEmpty && !userManager.userName.isEmpty else {
             loginAlert.updateAlertType(_: .emptyFields)
+            return
         }
+        guard Check.isValidEmail(userManager.userName) else {
+            loginAlert.updateAlertType(.invalidEmail)
+            return
+        }
+        
+        spinner.toggle()
+        
+        userManager.password = userManager.inputPassword
+        NetworkManager.update()
+        login()
     }
     
     func login() {
-        
-        
         authenthication.authenticateUser { response in
             self.handleAuthenticationResponse(_: response)
         }
@@ -58,16 +62,16 @@ class LoginViewModel: ObservableObject {
     func handleAuthenticationResponse(_ response: LoginResponseMessage) {
         switch response {
         case .successfulLogin:
-            if authenthication.areCredentialsSaved() {
+            if authenthication.askForBioMetricAuthenticationSetup() {
+                loginAlert.updateModelState(_: authenthication)
+            }
+            else if authenthication.areCredentialsSaved() {
                 if authenthication.credentialsChanged() {
                     loginAlert.updateAlertType(_: .updateKeychainAlert)
                 }
                 else {
                     authenthication.updateSigninState(true)
                 }
-            }
-            else if authenthication.askForBioMetricAuthenticationSetup() {
-                loginAlert.updateModelState(_: authenthication)
             }
             else {
                 authenthication.saveCredentialsToKeyChain()

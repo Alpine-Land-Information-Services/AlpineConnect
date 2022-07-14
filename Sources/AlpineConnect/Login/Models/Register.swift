@@ -19,6 +19,7 @@ class Register {
         case newUser
         case userExists
         case emailsDiffer
+        case notConnected
         case unknownError
     }
     
@@ -30,7 +31,7 @@ class Register {
     }
     
     static func register(info: RegistrationInfo) async throws -> (String, HTTPURLResponse) {
-        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user/registerJson") else {
+        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user/register") else {
             fatalError("Registration URL Error")
         }
         
@@ -64,7 +65,7 @@ class Register {
                 default:
                     return (.registerSuccess, body)
                 }
-            case 409:
+            case 400:
                 return (.userExists, body)
             default:
                 return (.unknownError, String(response.statusCode))

@@ -12,6 +12,7 @@ enum LoginResponseMessage {
     case successfulLogin
     case invalidCredentials
     case wrongPassword
+    case invalidEmail
     
     case passwordChangeRequired
     case registrationRequired

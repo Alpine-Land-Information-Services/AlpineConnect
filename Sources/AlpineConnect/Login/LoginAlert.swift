@@ -47,13 +47,9 @@ class LoginAlert: ObservableObject {
         self.activeAlert = alertType
     }
     
-    func updateSupportedBioAuthType(_ type: String?) {
-        self.supportedBioAuthType = type
-    }
-    
     func updateModelState(_ authenthication: KeychainAuthentication) {
-        updateSupportedBioAuthType(_: authenthication.supportBiometricAuthType)
         supportedBioAuthType = authenthication.supportBiometricAuthType
+        authenthication.saveBiometricAuthRequestTimeInUserDefault()
         updateAlertType(_: .enableBiometricsAlert)
     }
     
@@ -78,13 +74,14 @@ class LoginAlert: ObservableObject {
                     self.authenthication.updateSigninState(true)
                 }
             }), secondaryButton: .default(Text("Not now"), action: {
+                self.authenthication.saveCredentialsToKeyChain()
                 self.authenthication.updateSigninState(true)
             }))
         case .updateKeychainAlert:
             return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Update"), action: {
                 self.authenthication.updateCredentialsOnKeyChain { _ in
                     if self.authenthication.askForBioMetricAuthenticationSetup() {
-                        self.updateSupportedBioAuthType(_: self.authenthication.supportBiometricAuthType)
+                        self.supportedBioAuthType = self.authenthication.supportBiometricAuthType
                         self.updateAlertType(_: .enableBiometricsAlert)
                     } else {
                         self.authenthication.updateSigninState(true)
@@ -102,10 +99,7 @@ class LoginAlert: ObservableObject {
                          message: Text("Your account does not have access to this application. \n \nContact Kris Anderson \n+1 479 431 4298"),
                          dismissButton: .default(Text("OK"), action: {}))
         case .offlineDiffirentUser:
-            var message = "You are not connected to network, only \n \(UserManager.shared.storedUserName ?? "") \n is able to login. Connect to network to sign in as a diffirent user."
-            if UserManager.shared.storedUserName == nil {
-                message = "You are not connected to network. You must first login while connected in order to use application in offline mode."
-            }
+            let message = "You are not connected to network, only \n \(UserManager.shared.storedUserName ?? "") \n is able to login. Connect to network to sign in as a diffirent user."
             return Alert(title: Text("Offline"),
                          message: Text(message),
                          dismissButton: .default(Text("OK"), action: {}))
@@ -123,6 +117,14 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text("Invalid Password"),
                          message: Text("Your password is incorrect."),
                          dismissButton: .default(Text("OK"), action: {}))
+        case .networkError:
+            return Alert(title: Text("Offline"),
+                         message: Text("You are not connected to network. You must first login while connected in order to use application in offline mode."),
+                         dismissButton: .default(Text("OK"), action: {}))
+        case .invalidEmail:
+            return Alert(title: Text("Invalid Email"),
+                         message: Text("Enter a valid email address, with @ symbol and domain."),
+                         dismissButton: .default(Text("Try Again"), action: {}))
         default:
             return Alert(title: Text("NOT SETUP ALERT"))
         }

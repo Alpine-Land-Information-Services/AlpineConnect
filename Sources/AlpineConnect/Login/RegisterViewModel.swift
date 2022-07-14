@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftSMTP
 
 class RegisterViewModel: ObservableObject {
     
@@ -35,7 +34,6 @@ class RegisterViewModel: ObservableObject {
             showAlert.toggle()
             return
         }
-        
         guard !checkMissingRequirements() && email == confirmEmail else {
             registerStatus = .missingFields
             
@@ -43,6 +41,11 @@ class RegisterViewModel: ObservableObject {
                 registerStatus = .emailsDiffer
             }
             
+            showAlert.toggle()
+            return
+        }
+        guard NetworkMonitor.shared.connected else {
+            registerStatus = .notConnected
             showAlert.toggle()
             return
         }
@@ -82,6 +85,8 @@ class RegisterViewModel: ObservableObject {
             return ("User Exists", "There is already an account associated with provided email.", "OK", {})
         case .emailsDiffer:
             return ("Email Mismatch", "Make sure both email fields are the same.", "Try Again", {})
+        case .notConnected:
+            return ("Offline", "You are not connected to network, registration is only possible while online.", "OK", {})
         default:
             return ("Unknown Error", "Registration error code: \(registerMesssage), contact support.", "OK", {})
         }
@@ -90,11 +95,4 @@ class RegisterViewModel: ObservableObject {
     func makeInfo() -> Register.RegistrationInfo {
         return Register.RegistrationInfo(email: email, firstName: firstName, lastName: lastName)
     }
-    
-//    func sendEmail() {
-//        let sender = Mail.User(name: "Alpine LIS", email: "")
-//        let reciever = Mail.User(name: firstName + "" + lastName, email: email)
-//
-//        let mail = Mail(from: sender, to: [reciever], subject: "", text: "")
-//    }
 }

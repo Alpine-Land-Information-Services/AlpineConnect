@@ -31,12 +31,14 @@ final class KeychainAuthentication {
         guard Login.getUserFromUserDefaults() else {
             return .networkError
         }
-        
         if userManager.userName == userManager.storedUserName && userManager.password == userManager.storedPassword {
             return .successfulLogin
         }
+        if userManager.userName != userManager.storedUserName {
+            return .offlineDiffirentUser
+        }
         if userManager.userName == userManager.storedUserName && userManager.password != userManager.storedPassword {
-            return .invalidCredentials
+            return .wrongPassword
         }
         return .networkError
     }
@@ -84,12 +86,17 @@ final class KeychainAuthentication {
         let updatingField: [String: Any] = [kSecAttrAccount as String: userAccount,
                                             kSecValueData as String: userData
         ]
+        updateStoredPassword(newPassword: userManager.password)
         let status = SecItemUpdate(query as CFDictionary, updatingField as CFDictionary)
         if status == noErr {
             completionHandler(true);
         } else {
             completionHandler(true);
         }
+    }
+    
+    func updateStoredPassword(newPassword: String) {
+        UserManager.shared.storedPassword = newPassword
     }
     
     func areCredentialsSaved() -> Bool {
@@ -157,7 +164,7 @@ final class KeychainAuthentication {
             } else {
                 if let lastAskedDate = fetchBiometricAuthRequestTimeFromUserDefault() {
                     let numberOfDays = Date().daysBetweenDates(startDate: lastAskedDate)
-                    if numberOfDays < 3 {
+                    if numberOfDays < 2 {
                         return false
                     } else {
                         return true

@@ -13,6 +13,7 @@ public struct AlpineLoginView: View {
     @StateObject var viewModel: LoginViewModel
     
     @ObservedObject var loginAlert = LoginAlert.shared
+    @ObservedObject var networkMonitor = NetworkMonitor.shared
     @ObservedObject var updater = SwiftUIUpdater()
     
     public init(info: LoginConnectionInfo) {
@@ -88,7 +89,8 @@ public struct AlpineLoginView: View {
                 Button {
                     viewModel.loginButtonPressed()
                 } label: {
-                    Text("Sign In").frame(width: 250, height: 60, alignment: .center)
+                    Text("Sign In")
+                        .frame(width: 250, height: 60, alignment: .center)
                 }
                 .foregroundColor(viewModel.spinner ? Color.accentColor : Color.white).font(.title)
                 .background(Color.accentColor).cornerRadius(15)
@@ -107,6 +109,7 @@ public struct AlpineLoginView: View {
             .padding(.bottom, 8)
             .font(.caption)
             .frame(maxWidth: .infinity, alignment: .center)
+            .disabled(!networkMonitor.connected)
         }
         .padding([.leading, .top, .trailing])
         .background(Color.black.opacity(0.75)).cornerRadius(20)
