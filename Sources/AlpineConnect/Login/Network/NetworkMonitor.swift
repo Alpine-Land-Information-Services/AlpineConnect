@@ -20,7 +20,9 @@ public class NetworkMonitor: ObservableObject {
         monitor.start(queue: DispatchQueue(label: "NetworkMonitor"))
         monitor.pathUpdateHandler = { path in
             if path.status == .satisfied {
-                self.connected = true
+                DispatchQueue.main.async {
+                    self.connected = true
+                }
                 if let action = self.action {
                     action()
                 }

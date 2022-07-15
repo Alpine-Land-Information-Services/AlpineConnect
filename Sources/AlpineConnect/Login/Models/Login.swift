@@ -8,21 +8,31 @@
 import Foundation
 import PostgresClientKit
 
-class Login {
+public class Login {
     
-    struct BackendUser: Codable {
+    public struct BackendUser: Codable {
         
-        var id: String
-        var email: String
+        public var id: UUID
+        public var email: String
+        public var firstName: String
+        public var lastName: String
+        
         var isActive: Bool
         var forceChangePassword: Bool
-        var firstName: String
-        var lastName: String
     }
     
-    static var user: BackendUser?
+    struct UserLoginUpdate: Codable {
+        
+        var email: String
+        var lat: Double?
+        var lng: Double?
+        var appName: String
+        var info: String
+    }
     
-    static func loginUser(checkPasswordChange: Bool = true, completionHandler: @escaping (LoginResponseMessage) -> ()) {
+    public static var user: BackendUser!
+    
+    static func loginUser(info: UserLoginUpdate, completionHandler: @escaping (LoginResponse) -> ()) {
         NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
             case .failure:
@@ -37,10 +47,7 @@ class Login {
                         completionHandler(backendResponse)
                         return
                     }
-                    
-                    self.getApplicationUser() { response, error in
-                        completionHandler(response)
-                    }
+                    completionHandler(await updateUserLogin(info: info))
                 }
             }
         }
@@ -65,7 +72,7 @@ class Login {
         return (user, httpResponse)
     }
     
-    static func getBackendStatus(email: String, DBConnected: Bool) async -> (LoginResponseMessage) {
+    static func getBackendStatus(email: String, DBConnected: Bool) async -> (LoginResponse) {
         do {
             let (user, response) = try await getBackendUser(email: email)
             self.user = user
@@ -97,85 +104,69 @@ class Login {
         }
     }
     
-    static func getApplicationUser(completionHandler: @escaping (LoginResponseMessage, Error?) -> ()) {
-        NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
-            switch connectionRequestResponse {
-            case .failure(let error):
-                completionHandler(Check.checkPostgresError(error), error)
-            case .success:
-                do {
-                    let connection = try connectionRequestResponse.get()
-                    
-                    let text = """
-                    SELECT
-                    id,
-                    is_application_administrator
-                    FROM application_users WHERE login = '\(UserManager.shared.userName)'
-                    """
-                    
-                    let statement = try connection.prepareStatement(text: text)
-                    let cursor = try statement.execute()
-                    
-                    defer { statement.close() }
-                    defer { cursor.close() }
-                    
-                    if cursor.rowCount == 0 {
-                        createApplicationUser(user: self.user!) { response, error in
-                            completionHandler(response, error)
-                            return
-                        }
-                    }
-                    
-                    for row in cursor {
-                        let columns = try row.get().columns
-                                                
-                        let id = UUID(uuidString: try columns[0].string())
-                        let isAdmin = try columns[1].bool()
-                        
-                        fillPrimaryUserInfo(id: id!.uuidString, isAdmin: isAdmin)
-                        
-                        completionHandler(.successfulLogin, nil)
-                    }
-                }
-                catch {
-                    completionHandler(Check.checkPostgresError(error), error)
-                }
+    static func updateUserLogin(info: UserLoginUpdate) async -> LoginResponse {
+        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user/logged") else {
+            fatalError("Registration URL Error")
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            let data = try JSONEncoder().encode(info)
+            let (body, response) = try await URLSession.shared.upload(for: request, from: data)
+            
+            let stringBody = String(decoding: body, as: UTF8.self)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                fatalError("Cannot get HTTP URL Response")
             }
+            
+            switch httpResponse.statusCode {
+            case 200:
+                return .successfulLogin
+            default:
+                return .unknownError
+            }
+        }
+        catch {
+            return Check.checkPostgresError(error)
         }
     }
     
-    static func createApplicationUser(user: BackendUser, completionHandler: @escaping (LoginResponseMessage, Error?) -> ()) {
-        NetworkManager.shared.pool?.withConnection { response in
-            switch response {
-            case .success:
-                do {
-                    let connection = try response.get()
-                    
-                    let text = """
-                    INSERT INTO public.application_users("\(GlobalNames.shared.applicationUserIDName)", login, user_name) VALUES ($1, $2, $3)
-                    """
-                    print(text)
-                    let statement = try connection.prepareStatement(text: text)
-                    let cursor = try statement.execute(parameterValues: [user.id, user.email, user.firstName + " " + user.lastName])
-
-                    defer { statement.close() }
-                    defer { cursor.close() }
-                    
-                    fillPrimaryUserInfo(id: user.id, isAdmin: false)
-                    
-                    completionHandler(.successfulLogin, nil)
-                }
-                catch {
-                    completionHandler(Check.checkPostgresError(error), error)
-                }
-            case .failure(let error):
-                completionHandler(Check.checkPostgresError(error), error)
-            }
-        }
-    }
+//    static func createApplicationUser(user: BackendUser, completionHandler: @escaping (LoginResponse, Error?) -> ()) {
+//        NetworkManager.shared.pool?.withConnection { response in
+//            switch response {
+//            case .success:
+//                do {
+//                    let connection = try response.get()
+//
+//                    let text = """
+//                    INSERT INTO public.application_users("\(GlobalNames.shared.applicationUserIDName)", login, user_name) VALUES ($1, $2, $3)
+//                    """
+//                    print(text)
+//                    let statement = try connection.prepareStatement(text: text)
+//                    let cursor = try statement.execute(parameterValues: [user.id, user.email, user.firstName + " " + user.lastName])
+//
+//                    defer { statement.close() }
+//                    defer { cursor.close() }
+//
+//                    fillPrimaryUserInfo(id: user.id, isAdmin: false)
+//
+//                    completionHandler(.successfulLogin, nil)
+//                }
+//                catch {
+//                    completionHandler(Check.checkPostgresError(error), error)
+//                }
+//            case .failure(let error):
+//                completionHandler(Check.checkPostgresError(error), error)
+//            }
+//        }
+//    }
     
-    static func fillPrimaryUserInfo(id: String, isAdmin: Bool) {
-        UserManager.shared.userInfo.id = UUID(uuidString: id)
+    static func fillPrimaryUserInfo(id: UUID, isAdmin: Bool) {
+        UserManager.shared.userInfo.id = id
         UserManager.shared.userInfo.isAdmin = isAdmin
         saveUserToUserDefaults(UserManager.shared.userInfo)
     }

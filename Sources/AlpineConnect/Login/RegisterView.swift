@@ -10,6 +10,8 @@ import AlpineUI
 
 struct RegisterView: View {
     
+    @Environment(\.colorScheme) var colorScheme
+    
     @StateObject var viewModel: RegisterViewModel
     
     @Binding var open: Bool
@@ -62,7 +64,6 @@ struct RegisterView: View {
                     }
                 }
                 .navigationTitle("User Registration")
-                .background(Color.init(uiColor: .systemBackground))
                 .onChange(of: viewModel.open) { value in
                     open = value
                 }

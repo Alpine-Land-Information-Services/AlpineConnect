@@ -9,17 +9,21 @@ import Foundation
 
 public struct LoginConnectionInfo {
     
-    static var shared = LoginConnectionInfo(host: "", database: "", application: "", connectDBPassword: "")
+    static var shared = LoginConnectionInfo(host: "", database: "", appFullName: "", appDBName: "", connectDBPassword: "", appUserFunction: {_ in })
     
-    public init(host: String, database: String, application: String, connectDBPassword: String) {
+    public init(host: String, database: String, appFullName: String, appDBName: String, connectDBPassword: String, appUserFunction: @escaping (@escaping (LoginResponse) -> ()) -> ()) {
         self.host = host
         self.database = database
-        self.application = application
+        self.appFullName = appFullName
+        self.appDBName = appDBName
         self.connectDBPassword = connectDBPassword
+        self.appUserFunction = appUserFunction
     }
     
     var host: String
     var database: String
+    var appFullName: String
+    var appDBName: String
     var connectDBPassword: String
-    var application: String
+    var appUserFunction: (@escaping (LoginResponse) -> ()) -> ()
 }

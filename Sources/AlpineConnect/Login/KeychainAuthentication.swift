@@ -17,9 +17,9 @@ final class KeychainAuthentication {
     var biometricLoginEnabled: Bool = false
     var supportBiometricAuthType: String?
         
-    func authenticateUser(completionHandler: @escaping(LoginResponseMessage) -> Void) {
+    func authenticateUser(info: Login.UserLoginUpdate, completionHandler: @escaping(LoginResponse) -> Void) {
         if NetworkMonitor.shared.connected {
-            Login.loginUser(completionHandler: { response in
+            Login.loginUser(info: info, completionHandler: { response in
                 completionHandler(response)
             })
         } else {
@@ -27,7 +27,7 @@ final class KeychainAuthentication {
         }
     }
     
-    func offlineCheck() -> LoginResponseMessage {
+    func offlineCheck() -> LoginResponse {
         guard Login.getUserFromUserDefaults() else {
             return .networkError
         }

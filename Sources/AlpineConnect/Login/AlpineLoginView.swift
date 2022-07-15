@@ -68,7 +68,7 @@ public struct AlpineLoginView: View {
                 .font(.headline)
                 .fontWeight(.thin)
                 .foregroundColor(Color.white)
-            Text(viewModel.info.application)
+            Text(viewModel.info.appFullName)
                 .font(.title3)
                 .fontWeight(.medium)
                 .foregroundColor(Color.white)
@@ -83,7 +83,7 @@ public struct AlpineLoginView: View {
                 .autocapitalization(.none)
                 .keyboardType(.emailAddress)
                 .padding(.bottom, 4)
-            SecureField("", text: $viewModel.userManager.inputPassword)
+            passwordField
                 .loginField(placeholder: "Password", value: $viewModel.userManager.inputPassword)
             ZStack {
                 Button {
@@ -114,6 +114,30 @@ public struct AlpineLoginView: View {
         .padding([.leading, .top, .trailing])
         .background(Color.black.opacity(0.75)).cornerRadius(20)
         .frame(maxWidth: 400, alignment: .center)
+    }
+    
+    var passwordField: some View {
+        
+        Group {
+            if viewModel.showPassword {
+                TextField("", text: $viewModel.userManager.inputPassword)
+            }
+            else {
+                SecureField("", text: $viewModel.userManager.inputPassword)
+            }
+        }
+        .overlay {
+            Button {
+                viewModel.showPassword.toggle()
+            } label: {
+                Image(systemName: viewModel.showPassword ? "eye.slash" : "eye")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 20, height: 15)
+                    .foregroundColor(.gray)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
     }
 }
 

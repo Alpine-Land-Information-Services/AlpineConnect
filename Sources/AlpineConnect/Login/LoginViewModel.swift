@@ -12,6 +12,7 @@ class LoginViewModel: ObservableObject {
     @Published var spinner = false
     @Published var register = false
     @Published var showResetPassword = false
+    @Published var showPassword = false
     
     @Published var userManager = UserManager.shared
     
@@ -41,10 +42,10 @@ class LoginViewModel: ObservableObject {
             loginAlert.updateAlertType(_: .emptyFields)
             return
         }
-        guard Check.isValidEmail(userManager.userName) else {
-            loginAlert.updateAlertType(.invalidEmail)
-            return
-        }
+//        guard Check.isValidEmail(userManager.userName) else {
+//            loginAlert.updateAlertType(.invalidEmail)
+//            return
+//        }
         
         spinner.toggle()
         
@@ -54,28 +55,42 @@ class LoginViewModel: ObservableObject {
     }
     
     func login() {
-        authenthication.authenticateUser { response in
+        authenthication.authenticateUser(info: makeLoginUpdateInfo()) { response in
             self.handleAuthenticationResponse(_: response)
         }
     }
     
-    func handleAuthenticationResponse(_ response: LoginResponseMessage) {
+    func makeLoginUpdateInfo() -> Login.UserLoginUpdate {
+        return Login.UserLoginUpdate(email: userManager.userName, appName: info.appDBName, info: userManager.userName)
+    }
+    
+    func handleAuthenticationResponse(_ response: LoginResponse) {
+        
+
+        
         switch response {
         case .successfulLogin:
-            if authenthication.askForBioMetricAuthenticationSetup() {
-                loginAlert.updateModelState(_: authenthication)
-            }
-            else if authenthication.areCredentialsSaved() {
-                if authenthication.credentialsChanged() {
-                    loginAlert.updateAlertType(_: .updateKeychainAlert)
+            info.appUserFunction { userFunctionResponse in
+                switch userFunctionResponse {
+                case .successfulLogin:
+                    if self.authenthication.askForBioMetricAuthenticationSetup() {
+                        self.loginAlert.updateModelState(_: self.authenthication)
+                    }
+                    else if self.authenthication.areCredentialsSaved() {
+                        if self.authenthication.credentialsChanged() {
+                            self.loginAlert.updateAlertType(_: .updateKeychainAlert)
+                        }
+                        else {
+                            self.authenthication.updateSigninState(true)
+                        }
+                    }
+                    else {
+                        self.authenthication.saveCredentialsToKeyChain()
+                        self.authenthication.updateSigninState(true)
+                    }
+                default:
+                    self.loginAlert.updateAlertType(userFunctionResponse)
                 }
-                else {
-                    authenthication.updateSigninState(true)
-                }
-            }
-            else {
-                authenthication.saveCredentialsToKeyChain()
-                authenthication.updateSigninState(true)
             }
         default:
             loginAlert.updateAlertType(response)

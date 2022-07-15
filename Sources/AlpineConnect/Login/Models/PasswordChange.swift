@@ -12,6 +12,7 @@ class PasswordChange {
     enum Status {
         case notMatchedPasswords
         case passwordChanged
+        case weakPassword
         case oldPasswordMatch
         case invalidCredentials
         case notConnected

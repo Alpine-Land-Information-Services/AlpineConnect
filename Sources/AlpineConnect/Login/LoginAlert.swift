@@ -14,33 +14,33 @@ class LoginAlert: ObservableObject {
     @Published var showAlert = false
     @Published var showSheet = false
     
-    var activeAlert: LoginResponseMessage = .noAccess
-    var loginResponse: LoginResponseMessage?
+    var activeAlert: LoginResponse = .noAccess
+    var loginResponse: LoginResponse?
     
     var authenthication = KeychainAuthentication.shared
     var supportedBioAuthType: String? = nil
     
     var alertTitle: String {
         if activeAlert == .enableBiometricsAlert {
-            return "Set up biometric authentication?"
+            return "Set Up Biometric Authentication?"
         } else if activeAlert == .updateKeychainAlert {
-            return "Update stored login credentials in memory?"
+            return "Update Stored Login Credentials in Memory?"
         } else {
-            return "Save login credentials?"
+            return "Save Login Credentials?"
         }
     }
     
     var alertMessage: String {
         if activeAlert == .enableBiometricsAlert {
-            return "Your device supports \(supportedBioAuthType ?? "") sign in. You can enable this to expedite future sign in."
+            return "Your device supports \(supportedBioAuthType ?? ""). You can enable this to expedite future sign in."
         } else if  activeAlert == .updateKeychainAlert {
             return "Update your stored credentials with the latest login credentials."
         } else {
-            return "This will expedite future login."
+            return "This will expedite future sign in."
         }
     }
     
-    func updateAlertType(_ alertType: LoginResponseMessage) {
+    func updateAlertType(_ alertType: LoginResponse) {
         DispatchQueue.main.async {
             self.showAlert.toggle()
         }
@@ -57,14 +57,14 @@ class LoginAlert: ObservableObject {
         switch activeAlert {
         case .authenticationAlert:
             if loginResponse != .successfulLogin {
-                return Alert(title: Text(loginResponse?.rawValue.0 ?? ""), message: Text(loginResponse?.rawValue.1 ?? ""), dismissButton: .default(Text("Okay"), action: {
+                return Alert(title: Text(loginResponse?.rawValue.0 ?? ""), message: Text(loginResponse?.rawValue.1 ?? ""), dismissButton: .default(Text("OK"), action: {
                     return;
                 }))
             } else {
                 return Alert(title: Text(""))
             }
         case .emptyFields:
-            return Alert(title: Text("Empty Fields"), message: Text("All login fields must be filled."), dismissButton: .default(Text("Try Again"), action: {
+            return Alert(title: Text("Empty Fields"), message: Text("All login fields must be filled."), dismissButton: .default(Text("OK"), action: {
                 return;
             }))
         case .enableBiometricsAlert:
@@ -124,9 +124,9 @@ class LoginAlert: ObservableObject {
         case .invalidEmail:
             return Alert(title: Text("Invalid Email"),
                          message: Text("Enter a valid email address, with @ symbol and domain."),
-                         dismissButton: .default(Text("Try Again"), action: {}))
+                         dismissButton: .default(Text("OK"), action: {}))
         default:
-            return Alert(title: Text("NOT SETUP ALERT"))
+            return Alert(title: Text("UNKNOWN ALERT: \(activeAlert.rawValue.0 + "" + activeAlert.rawValue.1)"))
         }
     }
 }

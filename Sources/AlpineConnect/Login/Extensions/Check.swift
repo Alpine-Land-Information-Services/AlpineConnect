@@ -17,7 +17,7 @@ public class Check {
         return emailPred.evaluate(with: email)
     }
     
-    static func checkPostgresError(_ error: Error) -> LoginResponseMessage {
+    public static func checkPostgresError(_ error: Error) -> LoginResponse {
         switch error as! PostgresError {
         case .sqlError(notice: let notice):
             switch notice.code {

@@ -31,7 +31,7 @@ public class NetworkManager {
         configuration.database = info.database
         configuration.user = userManager.userName
         configuration.credential = .scramSHA256(password: userManager.password)
-        configuration.applicationName = info.application
+        configuration.applicationName = info.appDBName
         
         pool = ConnectionPool(connectionPoolConfiguration: connectionPoolConfiguration, connectionConfiguration: configuration)
     }

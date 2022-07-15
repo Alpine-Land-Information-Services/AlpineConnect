@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AlpineUI
 
 struct PasswordChangeView: View {
     
@@ -29,15 +30,24 @@ struct PasswordChangeView: View {
                         Text(UserManager.shared.userName)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding([.leading, .top, .trailing])
+                    HStack {
+                        CheckmarkBlock(text: "Reveal Password", checked: $viewModel.showPassword, changed: .constant(false))
+                        Divider()
+                        Text("Password must contain at least 6 characters and include at least one letter, special character such as @#$%, and a number.")
+                            .font(.footnote)
+                            .foregroundColor(.red)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    NewPassword(title: "Old Password", placeholder: "Enter old password", password: $viewModel.oldPassword)
+                    PasswordField(title: "Old Password", placeholder: "Enter old password", password: $viewModel.oldPassword, showPassword: $viewModel.showPassword)
                     Divider()
                         .frame(width: 60)
-                    NewPassword(title: "New Password", placeholder: "Enter new password", password: $viewModel.newPassword)
+                    PasswordField(title: "New Password", placeholder: "Enter new password", password: $viewModel.newPassword, showPassword: $viewModel.showPassword)
                     Divider()
                         .frame(width: 60)
-                    NewPassword(title: "New Password", placeholder: "Repeat new password", password: $viewModel.repeatedNewPassword)
-                        .padding(.bottom, 20)
+                    PasswordField(title: "New Password", placeholder: "Repeat new password", password: $viewModel.repeatedNewPassword, showPassword: $viewModel.showPassword)
+                        .padding(.bottom)
                     Divider()
                     SpinnerButton(label: "Change Password", action: viewModel.changePassword, isDisabled: viewModel.allFieldsFilled(), activated: $viewModel.showSpinner)
                 }
@@ -64,22 +74,35 @@ struct PasswordChangeView: View {
         .navigationViewStyle(.stack)
     }
     
-    struct NewPassword: View {
+    struct PasswordField: View {
         
         var title: String
         var placeholder: String
         
         @Binding var password: String
+        @Binding var showPassword: Bool
         
         var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text("\(title):")
-                    .font(.callout)
-                SecureField(placeholder, text: $password)
-                    .frame(maxWidth: .infinity, minHeight: 40, alignment: .center)
-                    .foregroundColor(Color.black)
-                    .cornerRadius(10)
-                    .textFieldStyle(.roundedBorder)
+                    .font(.footnote)
+                Group {
+                    if showPassword {
+                        TextField(placeholder, text: $password)
+                    }
+                    else {
+                        SecureField(placeholder, text: $password)
+                    }
+                }
+                .frame(height: 24)
+                .padding(6.0)
+                .foregroundColor(Color(uiColor: .label))
+                .overlay (
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke(Color((password == "") ? UIColor.systemRed : UIColor.systemGray), lineWidth: (password == "") ? 1.2 : 0.2)
+                )
+                .background(Color(UIColor.systemGray6).opacity(0.5))
+                .cornerRadius(5)
             }
             .padding()
         }
@@ -90,6 +113,6 @@ struct PasswordChangeView_Previews: PreviewProvider {
     
     static var previews: some View {
         PasswordChangeView(required: true)
-            .previewInterfaceOrientation(.landscapeLeft)
+            .previewInterfaceOrientation(.landscapeRight)
     }
 }

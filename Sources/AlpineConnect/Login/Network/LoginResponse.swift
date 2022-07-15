@@ -1,5 +1,5 @@
 //
-//  LoginResponseMessage.swift
+//  LoginResponse.swift
 //  AlpineConnect
 //
 //  Created by Jenya Lebid on 6/27/22.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum LoginResponseMessage {
+public enum LoginResponse {
 
     case successfulLogin
     case invalidCredentials
@@ -30,9 +30,9 @@ enum LoginResponseMessage {
     case updateKeychainAlert
 }
 
-extension LoginResponseMessage: RawRepresentable {
+extension LoginResponse: RawRepresentable {
     
-    init?(rawValue: (String, String)) {
+    public init?(rawValue: (String, String)) {
         switch rawValue {
         case ("Error", "Network Error"): self = .networkError
         case ("Invalid Credentials", "The login credentials you entered does not exist in our system"): self = .invalidCredentials
@@ -42,7 +42,7 @@ extension LoginResponseMessage: RawRepresentable {
             return nil
         }
     }
-    var rawValue: (String, String) {
+    public var rawValue: (String, String) {
         switch self {
         case .noAccess:
             return ("Inactive User", "Your account is inactive. Please check your user status with an administrator")
