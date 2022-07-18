@@ -22,7 +22,7 @@ class LoginAlert: ObservableObject {
     
     var alertTitle: String {
         if activeAlert == .enableBiometricsAlert {
-            return "Set Up Biometric Authentication?"
+            return "Set Up \(supportedBioAuthType ?? "")?"
         } else if activeAlert == .updateKeychainAlert {
             return "Update Stored Login Credentials in Memory?"
         } else {
@@ -32,7 +32,7 @@ class LoginAlert: ObservableObject {
     
     var alertMessage: String {
         if activeAlert == .enableBiometricsAlert {
-            return "Your device supports \(supportedBioAuthType ?? ""). You can enable this to expedite future sign in."
+            return "This will expedite future sign in by not having to enter your password manually."
         } else if  activeAlert == .updateKeychainAlert {
             return "Update your stored credentials with the latest login credentials."
         } else {

@@ -35,6 +35,9 @@ public class SwiftUIUpdater: ObservableObject {
                 self.updater.updateStatus = .notConnected
                 if automatic {
                     self.alertToggle(show: false)
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: NSNotification.Name("UpdateStatus"), object: nil)
+                    }
                 }
                 else {
                     self.alertToggle(show: true)
@@ -61,13 +64,13 @@ public class SwiftUIUpdater: ObservableObject {
         })
     }
     
-    public func alert() -> Alert {
+    public func alert(dismissAction: @escaping () -> ()) -> Alert {
         switch updater.updateStatus {
         case .updatedRequired:
             return Alert(title: Text("New Version Avalible"),
                          message: Text("Update to the latest version for best functionality."),
                          primaryButton: .default(Text("Update"), action: callUpdate),
-                         secondaryButton: .destructive(Text("Not Now")))
+                         secondaryButton: .destructive(Text("Not Now"), action: dismissAction))
         case .latestVersion:
             return Alert(title: Text("No Updates Avalible"),
                          message: Text("You are already on the latest version."),

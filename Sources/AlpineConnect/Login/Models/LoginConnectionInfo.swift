@@ -11,7 +11,8 @@ public struct LoginConnectionInfo {
     
     static var shared = LoginConnectionInfo(host: "", database: "", appFullName: "", appDBName: "", connectDBPassword: "", appUserFunction: {_ in })
     
-    public init(host: String, database: String, appFullName: String, appDBName: String, connectDBPassword: String, appUserFunction: @escaping (@escaping (LoginResponse) -> ()) -> ()) {
+    public init(host: String, database: String, appFullName: String, appDBName: String, connectDBPassword: String,
+                appUserFunction: @escaping (@escaping (LoginResponse) -> ()) -> ()) {
         self.host = host
         self.database = database
         self.appFullName = appFullName

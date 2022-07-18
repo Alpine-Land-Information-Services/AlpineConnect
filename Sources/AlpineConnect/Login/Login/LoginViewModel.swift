@@ -26,15 +26,19 @@ class LoginViewModel: ObservableObject {
         setLoginConnectionInfo()
     }
     
+    func bioAuthentication() {
+        authenthication.handleBiometricAuthorization { result in
+            if result {
+                self.login()
+                
+            }
+        }
+    }
+    
     func setLoginConnectionInfo() {
         NetworkMonitor.shared.start()
         LoginConnectionInfo.shared = info
         authenthication.fetchCredentialsFromKeyChain()
-        authenthication.handleBiometricAuthorization { result in
-            if result {
-                self.login()
-            }
-        }
     }
 
     func loginButtonPressed() {
@@ -47,15 +51,14 @@ class LoginViewModel: ObservableObject {
 //            return
 //        }
         
-        spinner.toggle()
-        
         userManager.password = userManager.inputPassword
         NetworkManager.update()
         login()
     }
     
     func login() {
-        authenthication.authenticateUser(info: makeLoginUpdateInfo()) { response in
+        spinner.toggle()
+        authenthication.authenticateUser( info: makeLoginUpdateInfo()) { response in
             self.handleAuthenticationResponse(_: response)
         }
     }
@@ -65,9 +68,6 @@ class LoginViewModel: ObservableObject {
     }
     
     func handleAuthenticationResponse(_ response: LoginResponse) {
-        
-
-        
         switch response {
         case .successfulLogin:
             info.appUserFunction { userFunctionResponse in

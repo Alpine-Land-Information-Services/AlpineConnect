@@ -200,7 +200,7 @@ final class KeychainAuthentication {
         let context = LAContext()
         var contextError: NSError?
         if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
-            context.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Access requires authentication") { result, error in
+            context.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Authentication required for sign in.") { result, error in
                 if  contextError != nil {
                     handler(false)
                     return
@@ -221,7 +221,7 @@ final class KeychainAuthentication {
         let context = LAContext()
         var contextError: NSError?
         if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
-            context.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Access requires authentication") { result, error in
+            context.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Authentication required for sign in.") { result, error in
                 if  contextError != nil {
                     completionHandler(false)
                 } else {

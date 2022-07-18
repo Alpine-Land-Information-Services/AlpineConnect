@@ -116,9 +116,7 @@ public class Login {
         do {
             let data = try JSONEncoder().encode(info)
             let (body, response) = try await URLSession.shared.upload(for: request, from: data)
-            
-            let stringBody = String(decoding: body, as: UTF8.self)
-            
+                        
             guard let httpResponse = response as? HTTPURLResponse else {
                 fatalError("Cannot get HTTP URL Response")
             }
@@ -165,11 +163,11 @@ public class Login {
 //        }
 //    }
     
-    static func fillPrimaryUserInfo(id: UUID, isAdmin: Bool) {
-        UserManager.shared.userInfo.id = id
-        UserManager.shared.userInfo.isAdmin = isAdmin
-        saveUserToUserDefaults(UserManager.shared.userInfo)
-    }
+//    static func fillPrimaryUserInfo(id: UUID, isAdmin: Bool) {
+//        UserManager.shared.userInfo.id = id
+//        UserManager.shared.userInfo.isAdmin = isAdmin
+//        saveUserToUserDefaults(UserManager.shared.userInfo)
+//    }
     
     static func fillUserInfo(user: BackendUser) {
         UserManager.shared.userInfo.firstName = user.firstName
@@ -181,12 +179,12 @@ public class Login {
         UserManager.shared.userInfo = info
         
         if let encoded = try? JSONEncoder().encode(info) {
-            UserDefaults.standard.set(encoded, forKey: "UserInfo")
+            UserDefaults.standard.set(encoded, forKey: "LoginUserInfo")
         }
     }
     
     static func getUserFromUserDefaults() -> Bool {
-        if let info = UserDefaults.standard.object(forKey: "UserInfo") as? Data {
+        if let info = UserDefaults.standard.object(forKey: "LoginUserInfo") as? Data {
             if let loadedInfo = try? JSONDecoder().decode(UserManager.UserInfo.self, from: info) {
                 UserManager.shared.userInfo = loadedInfo
                 return true

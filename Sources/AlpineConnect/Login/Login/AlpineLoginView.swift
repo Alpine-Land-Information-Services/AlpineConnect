@@ -16,6 +16,8 @@ public struct AlpineLoginView: View {
     @ObservedObject var networkMonitor = NetworkMonitor.shared
     @ObservedObject var updater = SwiftUIUpdater()
     
+    let updateStatus = NotificationCenter.default.publisher(for: NSNotification.Name("UpdateStatus"))
+    
     public init(info: LoginConnectionInfo) {
         _viewModel = StateObject(wrappedValue: LoginViewModel(info: info))
     }
@@ -23,7 +25,7 @@ public struct AlpineLoginView: View {
     public var body: some View {
         VStack {
             logo
-                .modifier(UpdateCheckModifier(automatic: true, DBPassword: viewModel.info.connectDBPassword))
+                .modifier(UpdateCheckModifier(automatic: true, dismissAction: viewModel.bioAuthentication, DBPassword: viewModel.info.connectDBPassword))
                 .sheet(isPresented: $loginAlert.showSheet) {
                     switch loginAlert.activeAlert {
                     case .registrationRequired:
@@ -45,7 +47,7 @@ public struct AlpineLoginView: View {
         }
         .padding()
         .frame(maxWidth: .infinity)
-        .background(Image("Login-BG").resizable().ignoresSafeArea().blur(radius: 50, opaque: true).ignoresSafeArea())
+        .background(Image("Login-BG").resizable().blur(radius: 50, opaque: true).ignoresSafeArea())
         .resizableSheet(isPresented: $viewModel.showResetPassword) {
             PasswordResetView(open: $viewModel.showResetPassword)
         }
@@ -53,6 +55,9 @@ public struct AlpineLoginView: View {
             if show {
                 viewModel.spinner = false
             }
+        }
+        .onReceive(updateStatus) { _ in
+            viewModel.bioAuthentication()
         }
         .onDisappear {
             viewModel.userManager.inputPassword = ""

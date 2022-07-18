@@ -22,7 +22,7 @@ public struct UpdateButton: View {
             Text("Check Update")
         }
         .alert(isPresented: $viewModel.showAlert) {
-            viewModel.alert()
+            viewModel.alert(dismissAction: {})
         }
     }
 }

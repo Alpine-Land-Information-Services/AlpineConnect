@@ -32,6 +32,9 @@ public class Updater {
                     }
                     if appStoreAppVersion.compare(currentVersion, options: .numeric) != .orderedDescending {
                         print("Already on the latest app version: ", currentVersion, " (remote version: \(appStoreAppVersion))")
+                        DispatchQueue.main.async {
+                            NotificationCenter.default.post(name: NSNotification.Name("UpdateStatus"), object: nil)
+                        }
                         self.updateStatus = .latestVersion
                         if automatic {
                             showMessage(false)

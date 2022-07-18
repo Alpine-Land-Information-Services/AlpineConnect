@@ -19,9 +19,6 @@ public class UserManager: ObservableObject {
         
         public init() {}
         
-        public var id: UUID!
-        public var isAdmin: Bool = false
-
         public var firstName: String = ""
         public var lastName: String = ""
     }
