@@ -9,6 +9,15 @@ import SwiftUI
 
 class PasswordChangeViewModel: ObservableObject {
     
+    enum PasswordScore {
+        case blank
+        case veryWeak
+        case weak
+        case medium
+        case strong
+        case veryStrong
+    }
+    
     var required: Bool
     var status: PasswordChange.Status = .unknownError
     var message = ""
@@ -16,6 +25,8 @@ class PasswordChangeViewModel: ObservableObject {
     @Published var oldPassword: String = ""
     @Published var newPassword: String = ""
     @Published var repeatedNewPassword: String = ""
+    
+    @Published var passwordStrenght = "Blank"
     
     @Published var showAlert = false
     @Published var showSpinner = false
@@ -53,6 +64,76 @@ class PasswordChangeViewModel: ObservableObject {
         return NSPredicate(format: "SELF MATCHES %@", passwordRegex).evaluate(with: password)
     }
     
+    func checkPassStr(_ str: PasswordScore) -> (String, Bool) {
+        switch str {
+        case .blank:
+            return ("Blank", false)
+        case .veryWeak:
+            return ("Very Weak", false)
+        case .weak:
+            return ("Weak", false)
+        case .medium:
+            return ("Medium", true)
+        case .strong:
+            return ("Strong", true)
+        case .veryStrong:
+            return ("Very Strong", true)
+        }
+    }
+    
+    func checkPasswordScore(password: String) -> PasswordScore {
+        var score = 0
+        
+        if password.count < 1 {
+            return .blank
+        }
+        if password.count < 4 {
+            return .veryWeak
+        }
+        if password.count >= 8 {
+           score += 1
+        }
+        if password.count >= 12 {
+            score += 1
+        }
+        if password.rangeOfCharacter(from: NSCharacterSet.lowercaseLetters) != nil {
+            score += 1
+        }
+        if password.rangeOfCharacter(from: NSCharacterSet.uppercaseLetters) != nil {
+            score += 1
+        }
+        if password.rangeOfCharacter(from: NSCharacterSet.decimalDigits) != nil {
+            score += 1
+        }
+                                          
+        let specialChars = CharacterSet(charactersIn: #"@%!@#$%^&*()?/>.<,:;'\|}]{[_~`+=-" + "\""#)
+        if password.rangeOfCharacter(from: specialChars) != nil {
+            score += 1
+        }
+        
+        if score > 5 {
+            score = 5
+        }
+        if password.count < 12 && score == 5 {
+            score = 4
+        }
+        
+        switch score {
+        case 1:
+            return .veryWeak
+        case 2:
+            return .weak
+        case 3:
+            return .medium
+        case 4:
+            return .strong
+        case 5:
+            return .veryStrong
+        default:
+            return .blank
+        }
+    }
+    
     func changePassword() {
         guard newPassword == repeatedNewPassword else {
             sendAlert(alert: .notMatchedPasswords)
@@ -66,7 +147,7 @@ class PasswordChangeViewModel: ObservableObject {
             sendAlert(alert: .oldPasswordMatch)
             return
         }
-        guard isValidPassword(password: newPassword) else {
+        guard checkPassStr(checkPasswordScore(password: newPassword)).1 else {
             sendAlert(alert: .weakPassword)
             return
         }
@@ -92,20 +173,6 @@ class PasswordChangeViewModel: ObservableObject {
                 self.sendAlert(alert: self.status)
             }
         }
-        
-//        PasswordChange.changePassword(with: newPassword, completionHandler: { changed, errorResponse in
-//            if changed {
-//                self.sendAlert(alert: .passwordChanged)
-//                self.asyncSpinnerChange()
-//                self.userManager.password = self.newPassword
-//                KeychainAuthentication.shared.updateCredentialsOnKeyChain { _ in }
-//            }
-//            if let errorResponse = errorResponse {
-//                self.unknownErrorMessage = String(describing: errorResponse)
-//                self.sendAlert(alert: .unknownError)
-//                self.asyncSpinnerChange()
-//            }
-//        })
     }
     
     func alert() -> (String, String, String, () -> Void) {
@@ -121,7 +188,7 @@ class PasswordChangeViewModel: ObservableObject {
         case .oldPasswordMatch:
             return ("Same Password", "Try Again", "Your old password cannot be the same as the new password.", {})
         case .weakPassword:
-            return ("Weak Password", "Try Again", "Your new password does not match minumim requirements: At least 6 characters with at at least one letter, special character, and a number.", {})
+            return ("Weak Password", "Try Again", "Your new password must be at least medium strength.", {})
         case .notConnected:
             return ("Offline", "You are not connected to network, password change is only possible while online.", "OK", {})
         }

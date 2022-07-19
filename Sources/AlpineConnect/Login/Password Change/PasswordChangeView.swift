@@ -34,22 +34,13 @@ struct PasswordChangeView: View {
                     HStack {
                         CheckmarkBlock(text: "Reveal Password", checked: $viewModel.showPassword, changed: .constant(false))
                         Divider()
-                        Text("Password must contain at least 6 characters and include at least one letter, special character such as @#$%, and a number.")
+                        Text("Password must be at least medium strength.")
                             .font(.footnote)
                             .foregroundColor(.red)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    PasswordField(title: "Old Password", placeholder: "Enter old password", password: $viewModel.oldPassword, showPassword: $viewModel.showPassword)
-                    Divider()
-                        .frame(width: 60)
-                    PasswordField(title: "New Password", placeholder: "Enter new password", password: $viewModel.newPassword, showPassword: $viewModel.showPassword)
-                    Divider()
-                        .frame(width: 60)
-                    PasswordField(title: "New Password", placeholder: "Repeat new password", password: $viewModel.repeatedNewPassword, showPassword: $viewModel.showPassword)
-                        .padding(.bottom)
-                    Divider()
-                    SpinnerButton(label: "Change Password", action: viewModel.changePassword, isDisabled: viewModel.allFieldsFilled(), activated: $viewModel.showSpinner)
+                    fields
                 }
                 .alert(viewModel.alert().0, isPresented: $viewModel.showAlert, actions: {
                     Button(viewModel.alert().1, action: viewModel.alert().3)
@@ -72,6 +63,31 @@ struct PasswordChangeView: View {
             presentationMode.wrappedValue.dismiss()
         }
         .navigationViewStyle(.stack)
+    }
+    
+    var fields: some View {
+        VStack {
+            PasswordField(title: "Old Password", placeholder: "Enter old password", password: $viewModel.oldPassword, showPassword: $viewModel.showPassword)
+            Divider()
+                .frame(width: 60)
+            HStack {
+                LabelBlock(value: "Password Strength")
+                Text(viewModel.passwordStrenght)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+            PasswordField(title: "New Password", placeholder: "Enter new password", password: $viewModel.newPassword, showPassword: $viewModel.showPassword)
+            Divider()
+                .frame(width: 60)
+            PasswordField(title: "New Password", placeholder: "Repeat new password", password: $viewModel.repeatedNewPassword, showPassword: $viewModel.showPassword)
+                .padding(.bottom)
+            Divider()
+            SpinnerButton(label: "Change Password", action: viewModel.changePassword, isDisabled: viewModel.allFieldsFilled(), activated: $viewModel.showSpinner)
+        }
+        .onChange(of: viewModel.newPassword) { pass in
+            let str = viewModel.checkPasswordScore(password: pass)
+            viewModel.passwordStrenght = viewModel.checkPassStr(str).0
+        }
     }
     
     struct PasswordField: View {
