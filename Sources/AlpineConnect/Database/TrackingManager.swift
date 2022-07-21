@@ -20,11 +20,11 @@ public struct TrackerConnectionInfo {
 
 public class TrackingManager {
     
-    static let shared = TrackingManager()
+    static public let shared = TrackingManager()
     
-    var pool: ConnectionPool?
+    public var pool: ConnectionPool?
     
-    init() {
+    public init() {
         let ci = TrackerConnectionInfo.shared
         
         var connectionPoolConfiguration = ConnectionPoolConfiguration()
