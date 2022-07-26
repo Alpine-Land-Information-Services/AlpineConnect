@@ -18,7 +18,7 @@ class PasswordReset {
     }
     
     static func reset(email: String) async throws -> (String, HTTPURLResponse) {
-        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user/resetpassword?email=\(email)") else {
+        guard let url = URL(string: "https://alpinebackyard20220722084741.azurewebsites.net/user/resetpassword?email=\(email)") else {
             fatalError("Reset Password URL Error")
         }
         

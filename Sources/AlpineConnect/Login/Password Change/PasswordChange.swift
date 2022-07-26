@@ -29,7 +29,7 @@ class PasswordChange {
     
     
     static func change(info: PasswordInfo) async throws -> (String, HTTPURLResponse) {
-        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user/changepassword") else {
+        guard let url = URL(string: "https://alpinebackyard20220722084741.azurewebsites.net/user/changepassword") else {
             fatalError("Reset Password URL Error")
         }
         var request = URLRequest(url: url)

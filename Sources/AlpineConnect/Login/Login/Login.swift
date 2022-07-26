@@ -54,7 +54,7 @@ public class Login {
     }
     
     static func getBackendUser(email: String) async throws -> (BackendUser, HTTPURLResponse) {
-        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user?email=\(email)") else {
+        guard let url = URL(string: "https://alpinebackyard20220722084741.azurewebsites.net/user?email=\(email)") else {
             fatalError("Reset Password URL Error")
         }
         
@@ -105,7 +105,7 @@ public class Login {
     }
     
     static func updateUserLogin(info: UserLoginUpdate) async -> LoginResponse {
-        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user/logged") else {
+        guard let url = URL(string: "https://alpinebackyard20220722084741.azurewebsites.net/user/logged") else {
             fatalError("Registration URL Error")
         }
         
