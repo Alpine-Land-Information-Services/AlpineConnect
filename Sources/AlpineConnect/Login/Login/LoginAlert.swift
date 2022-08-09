@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import LocalAuthentication
 
 class LoginAlert: ObservableObject {
     
@@ -14,11 +15,15 @@ class LoginAlert: ObservableObject {
     @Published var showAlert = false
     @Published var showSheet = false
     
+    @Published var showNewAlert = false
+    
     var activeAlert: LoginResponse = .noAccess
     var loginResponse: LoginResponse?
     
     var authenthication = KeychainAuthentication.shared
-    var supportedBioAuthType: String? = nil
+    var supportedBioAuthType: String?
+    var biometricErrorCode: Int?
+    var bioButtonClick = false
     
     var alertTitle: String {
         if activeAlert == .enableBiometricsAlert {
@@ -47,10 +52,44 @@ class LoginAlert: ObservableObject {
         self.activeAlert = alertType
     }
     
-    func updateModelState(_ authenthication: KeychainAuthentication) {
-        supportedBioAuthType = authenthication.supportBiometricAuthType
+    func updateNewAlertType(_ type: LoginResponse) {
+        activeAlert = type
+        
+        DispatchQueue.main.async {
+            self.showNewAlert.toggle()
+        }
+    }
+    
+    func updateModelState(_ authenthication: KeychainAuthentication, fromBioClick: Bool = false) {
+        supportedBioAuthType = authenthication.supportBiometricAuthType == .faceID ? "Touch ID" : "Face ID"
+        bioButtonClick = fromBioClick
+        guard let bioError = authenthication.biometricError else {
+            updateNewAlertType(.enableBiometricsAlert)
+            return
+        }
+        
+        determineBioErrorAlert(error: bioError)
+    }
+    
+    func determineBioErrorAlert(error: NSError) {
+        switch LAError.Code(rawValue: error.code)! {
+        case .passcodeNotSet:
+            updateNewAlertType(.passcodeNotSet)
+        case .touchIDNotEnrolled:
+            updateNewAlertType(.bioNotSet)
+        default:
+            biometricErrorCode = error.code
+            updateNewAlertType(.unknownBioError)
+        }
+    }
+    
+    func continueWithLogin() {
+        authenthication.saveCredentialsToKeyChain()
+        authenthication.updateSigninState(true)
+    }
+    
+    func remindLaterForBioSetup() {
         authenthication.saveBiometricAuthRequestTimeInUserDefault()
-        updateAlertType(_: .enableBiometricsAlert)
     }
     
     func alert() -> Alert {
@@ -67,25 +106,23 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text("Empty Fields"), message: Text("All login fields must be filled."), dismissButton: .default(Text("OK"), action: {
                 return;
             }))
-        case .enableBiometricsAlert:
-            return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Set Up"), action: {
-                self.authenthication.setupBioMetricAuthentication { result in
-                    self.authenthication.saveCredentialsToKeyChain()
-                    self.authenthication.updateSigninState(true)
-                }
-            }), secondaryButton: .default(Text("Not now"), action: {
-                self.authenthication.saveCredentialsToKeyChain()
-                self.authenthication.updateSigninState(true)
-            }))
+//        case .enableBiometricsAlert:
+//            return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Set Up"), action: {
+//                self.authenthication.setupBioMetricAuthentication { result in
+//                    self.continueWithLogin()
+//                }
+//            }), secondaryButton: .default(Text("Not now"), action: {
+//                self.continueWithLogin()
+//            }))
         case .updateKeychainAlert:
             return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .default(Text("Update"), action: {
                 self.authenthication.updateCredentialsOnKeyChain { _ in
-                    if self.authenthication.askForBioMetricAuthenticationSetup() {
-                        self.supportedBioAuthType = self.authenthication.supportBiometricAuthType
-                        self.updateAlertType(_: .enableBiometricsAlert)
-                    } else {
-                        self.authenthication.updateSigninState(true)
-                    }
+//                    if self.authenthication.askForBioMetricAuthenticationSetup() {
+//                        self.supportedBioAuthType = self.authenthication.supportBiometricAuthType
+//                        self.updateAlertType(_: .enableBiometricsAlert)
+//                    } else {
+//                    }
+                    self.authenthication.updateSigninState(true)
                 }
             }), secondaryButton: .default(Text("Not now"), action: {
                 self.authenthication.updateSigninState(true)
@@ -112,7 +149,6 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text("Account Locked"),
                          message: Text("Your account is locked. \n \nContact Kris Anderson \n+1 479 431 4298"),
                          dismissButton: .default(Text("OK"), action: {}))
-            
         case .wrongPassword:
             return Alert(title: Text("Invalid Password"),
                          message: Text("Your password is incorrect."),
@@ -127,6 +163,123 @@ class LoginAlert: ObservableObject {
                          dismissButton: .default(Text("OK"), action: {}))
         default:
             return Alert(title: Text("UNKNOWN ALERT: \(activeAlert.rawValue.0 + "" + activeAlert.rawValue.1)"))
+
+        }
+    }
+    
+    
+    func newAlert() -> CustomAlert {
+        switch activeAlert {
+        case .enableBiometricsAlert:
+            let alertButtons = ThreeButtonAlert(label1: "Setup Now", action1: {
+                self.authenthication.setupBioMetricAuthentication { result in
+                    if result {
+                        self.authenthication.biometricLoginEnabled = true
+                    }
+                    self.continueWithLogin()
+                }
+            }, label2: "Not Now", action2: continueWithLogin, label3: "Remind me in 3 Days", action3: remindLaterForBioSetup)
+            let message = "This will expedite future sign in by not having to enter your password manually."
+            
+            return CustomAlert(title: "Set Up \(supportedBioAuthType ?? "")?", message: message, buttons: AnyView(alertButtons))
+        case .passcodeNotSet:
+            let alertButtons = ThreeButtonAlert(label1: "Set Up in Settings", action1: {UIApplication.shared.open(URL(string: "App-prefs:")!)}, label2: "Not Now", action2: continueWithLogin, label3: "Remind me in 3 Days", action3: remindLaterForBioSetup)
+            let clickAlertButtons = TwoButtonAlert(label1: "Set Up in Settings", action1: {UIApplication.shared.open(URL(string: "App-prefs:")!)}, label2: "Not Now", action2: {})
+            let message = "Your device does not have a passcode. Set it up in order to skip entering your password manually, and use \(supportedBioAuthType ?? "") for future sign in."
+            
+            return CustomAlert(title: "Passcode Not Setup", message: message, buttons: bioButtonClick ? AnyView(clickAlertButtons) : AnyView(alertButtons))
+        case .bioNotSet:
+            let alertButtons = ThreeButtonAlert(label1: "Enable in Settings", action1: {UIApplication.shared.open(URL(string: "App-prefs:")!)}, label2: "Not Now", action2: continueWithLogin, label3: "Remind me in 3 Days", action3: remindLaterForBioSetup)
+            let clickAlertButtons = TwoButtonAlert(label1: "Enable in Settings", action1: {UIApplication.shared.open(URL(string: "App-prefs:")!)}, label2: "Not Now", action2: {})
+            let message = "Enable \(supportedBioAuthType ?? "") on your device in order to skip entering your password for future sign in."
+            
+            return CustomAlert(title: "\(supportedBioAuthType ?? "") Not Setup", message: message, buttons: bioButtonClick ? AnyView(clickAlertButtons) : AnyView(alertButtons))
+        default:
+            let alertButtons = OneButtonAlert(label: "OK", action: {})
+            let message = "Report error code to support. Error Code: \(biometricErrorCode ?? -1000)"
+            
+            return CustomAlert(title: "Unknown Biometric Alert", message: message, buttons: AnyView(alertButtons))
+        }
+    }
+    
+    struct CustomAlert {
+        
+        var title: String
+        var message: String
+        
+        var buttons: AnyView
+    }
+    
+    struct OneButtonAlert: View {
+        
+        var label: String
+        var action: () -> ()
+        
+        var body: some View {
+            Button {
+                action()
+            } label: {
+                Text(label)
+                    .foregroundColor(.accentColor)
+            }
+        }
+    }
+    
+    struct TwoButtonAlert: View {
+        
+        var label1: String
+        var action1: () -> ()
+        
+        var label2: String
+        var action2: () -> ()
+        
+        var body: some View {
+            HStack {
+                Button {
+                    action1()
+                } label: {
+                    Text(label1)
+                        .foregroundColor(.accentColor)
+                }
+                Button(role: .cancel) {
+                    action2()
+                } label: {
+                    Text(label2)
+                        .foregroundColor(.accentColor)
+                }
+            }
+        }
+    }
+    
+    struct ThreeButtonAlert: View {
+        
+        var label1: String
+        var action1: () -> ()
+        
+        var label2: String
+        var action2: () -> ()
+        
+        var label3: String
+        var action3: () -> ()
+        
+        var body: some View {
+            VStack {
+                Button {
+                    action1()
+                } label: {
+                    Text(label1)
+                }
+                Button(role: .cancel) {
+                    action2()
+                } label: {
+                    Text(label2)
+                }
+                Button(role: .destructive) {
+                    action3()
+                } label: {
+                    Text(label3)
+                }
+            }
         }
     }
 }

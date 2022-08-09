@@ -36,9 +36,15 @@ public struct AlpineLoginView: View {
                         EmptyView()
                     }
                 }
+            
             login
                 .alert(isPresented: $loginAlert.showAlert) {
                     loginAlert.alert()
+                }
+                .alert(loginAlert.newAlert().title, isPresented: $loginAlert.showNewAlert) {
+                    loginAlert.newAlert().buttons
+                } message: {
+                    Text(loginAlert.newAlert().message)
                 }
                 .sheet(isPresented: $viewModel.register) {
                     RegisterView(open: $viewModel.register)
@@ -123,26 +129,23 @@ public struct AlpineLoginView: View {
     
     var passwordField: some View {
         
-        Group {
-            if viewModel.showPassword {
-                TextField("", text: $viewModel.userManager.inputPassword)
+        SecureField("", text: $viewModel.userManager.inputPassword)
+            .overlay {
+                Group {
+                    if viewModel.showBioIcon {
+                        Button {
+                            viewModel.bioClickAuthentication()
+                        } label: {
+                            Image(systemName: viewModel.authenthication.supportBiometricAuthType == .faceID ? "faceid" : "touchid")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 20, height: 15)
+                                .foregroundColor(.gray)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
+                }
             }
-            else {
-                SecureField("", text: $viewModel.userManager.inputPassword)
-            }
-        }
-        .overlay {
-            Button {
-                viewModel.showPassword.toggle()
-            } label: {
-                Image(systemName: viewModel.showPassword ? "eye.slash" : "eye")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 20, height: 15)
-                    .foregroundColor(.gray)
-            }
-            .frame(maxWidth: .infinity, alignment: .trailing)
-        }
     }
 }
 

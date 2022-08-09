@@ -16,6 +16,8 @@ class LoginViewModel: ObservableObject {
     
     @Published var userManager = UserManager.shared
     
+    var showBioIcon: Bool
+    
     var loginAlert = LoginAlert.shared
     var authenthication = KeychainAuthentication.shared
     
@@ -23,6 +25,8 @@ class LoginViewModel: ObservableObject {
     
     init(info: LoginConnectionInfo) {
         self.info = info
+        
+        showBioIcon = UserDefaults().bool(forKey: "biometricAuthAuthorized")
         setLoginConnectionInfo()
     }
     
@@ -30,7 +34,17 @@ class LoginViewModel: ObservableObject {
         authenthication.handleBiometricAuthorization { result in
             if result {
                 self.login()
-                
+            }
+        }
+    }
+    
+    func bioClickAuthentication() {
+        guard authenthication.biometricLoginEnabled else {
+            return
+        }
+        authenthication.handleBiometricAuthorization { result in
+            if result {
+                self.login()
             }
         }
     }
@@ -57,7 +71,9 @@ class LoginViewModel: ObservableObject {
     }
     
     func login() {
-        spinner.toggle()
+        DispatchQueue.main.async {
+            self.spinner.toggle()
+        }
         authenthication.authenticateUser( info: makeLoginUpdateInfo()) { response in
             self.handleAuthenticationResponse(_: response)
         }

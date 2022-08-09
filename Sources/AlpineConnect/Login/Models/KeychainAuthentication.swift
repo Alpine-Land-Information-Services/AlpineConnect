@@ -14,9 +14,11 @@ final class KeychainAuthentication {
     
     var userManager = UserManager.shared
     
-    var biometricLoginEnabled: Bool = false
-    var supportBiometricAuthType: String?
-        
+    var biometricLoginEnabled = false
+    var fetchedCredentials = false
+    var supportBiometricAuthType: LABiometryType = .none
+    var biometricError: NSError?
+    
     func authenticateUser(info: Login.UserLoginUpdate, completionHandler: @escaping(LoginResponse) -> Void) {
         if NetworkMonitor.shared.connected {
             Login.loginUser(info: info, completionHandler: { response in
@@ -44,6 +46,10 @@ final class KeychainAuthentication {
     }
     
     func saveCredentialsToKeyChain() {
+        guard !fetchedCredentials else {
+            return
+        }
+        
         let userAccount = "AuthenticatedUserInfo"
         let userCredentialsDict: [String: Any] = ["userName": userManager.userName, "password": userManager.password, "biometricLoginEnabled": biometricLoginEnabled]
         let credentialsData: Data = try! NSKeyedArchiver.archivedData(withRootObject: userCredentialsDict, requiringSecureCoding: false)
@@ -62,7 +68,7 @@ final class KeychainAuthentication {
     func fetchCredentialsFromKeyChain() {
         if UserDefaults().bool(forKey: "saveCredentialsOnKeychain") == false {
             deleteAllKeyChainItems()
-            return;
+            return
         } else {
             fetchKeyChain()
         }
@@ -74,6 +80,10 @@ final class KeychainAuthentication {
             self.userManager.storedUserName = dictionaryValues["userName"] as? String ?? ""
             self.biometricLoginEnabled = dictionaryValues["biometricLoginEnabled"] as? Bool ?? false
             self.userManager.storedPassword = dictionaryValues["password"] as? String ?? ""
+            
+            if self.userManager.storedPassword != "" {
+                fetchedCredentials = true
+            }
         }
     }
     
@@ -83,9 +93,7 @@ final class KeychainAuthentication {
                                     kSecAttrAccount as String: userAccount]
         let updatingUserDataDict: [String: Any] = ["userName": userManager.userName, "password": userManager.password, "biometricLoginEnabled": biometricLoginEnabled]
         let userData: Data = try! NSKeyedArchiver.archivedData(withRootObject: updatingUserDataDict, requiringSecureCoding: false)
-        let updatingField: [String: Any] = [kSecAttrAccount as String: userAccount,
-                                            kSecValueData as String: userData
-        ]
+        let updatingField: [String: Any] = [kSecAttrAccount as String: userAccount, kSecValueData as String: userData]
         updateStoredPassword(newPassword: userManager.password)
         let status = SecItemUpdate(query as CFDictionary, updatingField as CFDictionary)
         if status == noErr {
@@ -140,41 +148,62 @@ final class KeychainAuthentication {
     }
     
     func isBiometricSupportedOnDevice() -> Bool {
+        if isBiometricEnabledOnDevice() {
+            return true
+        }
+        if supportBiometricAuthType != .none {
+            return true
+        }
+        
+        return false
+    }
+    
+    func isBiometricEnabledOnDevice() -> Bool {
         let context = LAContext()
         var contextError: NSError?
+        
         if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
-            if context.biometryType == .faceID || context.biometryType == .touchID {
-                self.supportBiometricAuthType = context.biometryType == .faceID ? "FaceID" : "TouchID"
-                return true
-            } else {
-                self.supportBiometricAuthType = nil
-                return false
-            }
-        } else {
-            self.supportBiometricAuthType = nil
+            self.supportBiometricAuthType = context.biometryType
+            return true
+        }
+        else {
+            self.supportBiometricAuthType = context.biometryType
+            self.biometricError = contextError
             return false
         }
     }
     
-    func askForBioMetricAuthenticationSetup() -> Bool {
+    func askForBioMetricAuthenticationSetup(ignoreTimeCheck: Bool = false) -> Bool {
         let alreadyApprovedBioAuth = UserDefaults().bool(forKey: "biometricAuthAuthorized")
-        if isBiometricSupportedOnDevice() {
+
+        if isBiometricEnabledOnDevice() {
             if alreadyApprovedBioAuth {
                 return false
-            } else {
-                if let lastAskedDate = fetchBiometricAuthRequestTimeFromUserDefault() {
-                    let numberOfDays = Date().daysBetweenDates(startDate: lastAskedDate)
-                    if numberOfDays < 2 {
-                        return false
-                    } else {
-                        return true
-                    }
-                } else {
-                    return true
-                }
+            } else if !ignoreTimeCheck {
+                return checkIfPromptForBioSetUp()
+            }
+            else {
+                return true
             }
         } else {
-            return false
+            guard biometricError != nil && supportBiometricAuthType != .none else {
+                return false
+            }
+            
+            return true
+        }
+    }
+    
+    func checkIfPromptForBioSetUp() -> Bool {
+        if let lastAskedDate = fetchBiometricAuthRequestTimeFromUserDefault() {
+            let numberOfDays = Date().daysBetweenDates(startDate: lastAskedDate)
+            if numberOfDays < 3 {
+                return false
+            } else {
+                return true
+            }
+        } else {
+            return true
         }
     }
     
@@ -183,20 +212,40 @@ final class KeychainAuthentication {
         UserDefaults().setValue(dateData, forKey: "authorizationResponse")
     }
     
-        func fetchBiometricAuthRequestTimeFromUserDefault() -> Date? {
-            if let dateData = UserDefaults().value(forKey: "authorizationResponse") as? [String: Any],
-               let date = dateData["date"] as? Date {
-                return date
-            } else {
-                return nil
-            }
+    func fetchBiometricAuthRequestTimeFromUserDefault() -> Date? {
+        if let dateData = UserDefaults().value(forKey: "authorizationResponse") as? [String: Any],
+           let date = dateData["date"] as? Date {
+            return date
+        } else {
+            return nil
         }
+    }
     
+//    func handleBiometricButtonAuthorization(handler: @escaping ((Bool) -> Void)) {
+//        if !askForBioMetricAuthenticationSetup() {
+//            handleBiometricAuthorization { bioHandler in
+//                handler(bioHandler)
+//            }
+//            return
+//        }
+//        
+//        if biometricError != nil {
+//            LoginAlert.shared.updateModelState(self, fromBioClick: true)
+//            handler(false)
+//        }
+//        else {
+//            setupBioMetricAuthentication { setupHandler in
+//                handler(setupHandler)
+//            }
+//        }
+//    }
+ 
     func handleBiometricAuthorization(handler: @escaping ((Bool) -> Void)) {
         guard biometricLoginEnabled else {
             handler(false)
             return
         }
+        
         let context = LAContext()
         var contextError: NSError?
         if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
@@ -229,9 +278,10 @@ final class KeychainAuthentication {
                         if result {
                             DispatchQueue.main.async {
                                 self.biometricLoginEnabled = true
-                                self.updateCredentialsOnKeyChain { _ in }
                                 UserDefaults().setValue(true, forKey: "biometricAuthAuthorized")
-                                completionHandler(true)
+                                self.updateCredentialsOnKeyChain { updateCredentials in
+                                    completionHandler(updateCredentials)
+                                }
                             }
                         }
                     } else {

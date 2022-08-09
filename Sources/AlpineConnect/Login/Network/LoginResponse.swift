@@ -28,6 +28,13 @@ public enum LoginResponse {
     case authenticationAlert
     case enableBiometricsAlert
     case updateKeychainAlert
+    
+    // Biometric errors
+    
+    case passcodeNotSet
+    case bioNotSet
+    case bioNotAvailable
+    case unknownBioError
 }
 
 extension LoginResponse: RawRepresentable {
