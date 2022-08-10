@@ -164,6 +164,7 @@ final class KeychainAuthentication {
         
         if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
             self.supportBiometricAuthType = context.biometryType
+            self.biometricError = nil
             return true
         }
         else {
@@ -173,23 +174,21 @@ final class KeychainAuthentication {
         }
     }
     
-    func askForBioMetricAuthenticationSetup(ignoreTimeCheck: Bool = false) -> Bool {
+    func askForBioMetricAuthenticationSetup() -> Bool {
         let alreadyApprovedBioAuth = UserDefaults().bool(forKey: "biometricAuthAuthorized")
-
+        
         if isBiometricEnabledOnDevice() {
             if alreadyApprovedBioAuth {
                 return false
-            } else if !ignoreTimeCheck {
-                return checkIfPromptForBioSetUp()
             }
             else {
-                return true
+                return checkIfPromptForBioSetUp()
             }
-        } else {
+        }
+        else {
             guard biometricError != nil && supportBiometricAuthType != .none else {
                 return false
             }
-            
             return true
         }
     }
@@ -212,6 +211,31 @@ final class KeychainAuthentication {
         UserDefaults().setValue(dateData, forKey: "authorizationResponse")
     }
     
+    func updateBioNotNowCount(reset: Bool = false) {
+        if var counter = UserDefaults().value(forKey: "notNowCounter") as? Int {
+            if reset {
+                counter = 0
+            }
+            else {
+                counter += 1
+            }
+            UserDefaults().setValue(counter, forKey: "notNowCounter")
+        }
+        else {
+            UserDefaults().setValue(1, forKey: "notNowCounter")
+        }
+    }
+    
+    func showBioRemindLater() -> Bool {
+        if let counter = UserDefaults().value(forKey: "notNowCounter") as? Int {
+            if counter > 4 {
+                return true
+            }
+            return false
+        }
+        return false
+    }
+    
     func fetchBiometricAuthRequestTimeFromUserDefault() -> Date? {
         if let dateData = UserDefaults().value(forKey: "authorizationResponse") as? [String: Any],
            let date = dateData["date"] as? Date {
@@ -221,25 +245,6 @@ final class KeychainAuthentication {
         }
     }
     
-//    func handleBiometricButtonAuthorization(handler: @escaping ((Bool) -> Void)) {
-//        if !askForBioMetricAuthenticationSetup() {
-//            handleBiometricAuthorization { bioHandler in
-//                handler(bioHandler)
-//            }
-//            return
-//        }
-//        
-//        if biometricError != nil {
-//            LoginAlert.shared.updateModelState(self, fromBioClick: true)
-//            handler(false)
-//        }
-//        else {
-//            setupBioMetricAuthentication { setupHandler in
-//                handler(setupHandler)
-//            }
-//        }
-//    }
- 
     func handleBiometricAuthorization(handler: @escaping ((Bool) -> Void)) {
         guard biometricLoginEnabled else {
             handler(false)

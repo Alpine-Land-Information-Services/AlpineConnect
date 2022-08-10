@@ -62,6 +62,11 @@ public struct AlpineLoginView: View {
                 viewModel.spinner = false
             }
         }
+        .onChange(of: loginAlert.showNewAlert) { show in
+            if show {
+                viewModel.spinner = false
+            }
+        }
         .onReceive(updateStatus) { _ in
             viewModel.bioAuthentication()
         }
