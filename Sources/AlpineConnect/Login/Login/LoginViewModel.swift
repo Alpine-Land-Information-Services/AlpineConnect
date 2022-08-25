@@ -26,7 +26,7 @@ class LoginViewModel: ObservableObject {
     init(info: LoginConnectionInfo) {
         self.info = info
         
-        showBioIcon = UserDefaults().bool(forKey: "biometricAuthAuthorized")
+        showBioIcon = KeychainAuthentication.shared.biometricLoginEnabled
         setLoginConnectionInfo()
     }
     
@@ -65,6 +65,7 @@ class LoginViewModel: ObservableObject {
 //            return
 //        }
         
+        userManager.userName = userManager.userName.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "_")
         userManager.password = userManager.inputPassword
         NetworkManager.update()
         login()
