@@ -14,7 +14,7 @@ public class Tracker {
     
     public static let shared = Tracker()
     var timer: Timer?
-    let locationManager = LocationManager.shared
+    let locationManager = Location.shared
     
     public func start(timeIntervalInSeconds: TimeInterval = 10.0) {
         getData()
