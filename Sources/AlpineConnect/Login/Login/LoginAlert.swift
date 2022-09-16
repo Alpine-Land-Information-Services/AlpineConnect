@@ -155,7 +155,7 @@ class LoginAlert: ObservableObject {
                          message: Text("Enter a valid email address, with @ symbol and domain."),
                          dismissButton: .default(Text("OK"), action: {}))
         default:
-            return Alert(title: Text("UNKNOWN ALERT: \(activeAlert.rawValue.0 + "" + activeAlert.rawValue.1)"))
+            return Alert(title: Text("Something Went Wrong"), message: Text("Please try again. \n Error: \n \(Login.loginResponse)"))
 
         }
     }

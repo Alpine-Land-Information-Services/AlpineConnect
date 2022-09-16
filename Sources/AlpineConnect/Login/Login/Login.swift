@@ -10,6 +10,8 @@ import PostgresClientKit
 
 public class Login {
     
+    public static var loginResponse = ""
+    
     public struct BackendUser: Codable {
         
         public var id: UUID
@@ -77,6 +79,8 @@ public class Login {
             let (user, response) = try await getBackendUser(email: email)
             self.user = user
             
+            loginResponse = "\(response)"
+            
             switch response.statusCode {
             case 200:
                 if DBConnected {
@@ -121,9 +125,11 @@ public class Login {
                 fatalError("Cannot get HTTP URL Response")
             }
             
+            loginResponse = "\(httpResponse)"
+            
             switch httpResponse.statusCode {
             case 200:
-                return .successfulLogin
+                  return .successfulLogin
             default:
                 return .unknownError
             }

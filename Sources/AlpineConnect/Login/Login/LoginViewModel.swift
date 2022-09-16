@@ -16,6 +16,10 @@ class LoginViewModel: ObservableObject {
     
     @Published var userManager = UserManager.shared
     
+    var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+    }
+    
     var showBioIcon: Bool
     
     var loginAlert = LoginAlert.shared

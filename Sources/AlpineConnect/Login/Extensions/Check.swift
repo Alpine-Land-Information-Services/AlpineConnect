@@ -18,6 +18,7 @@ public class Check {
     }
     
     public static func checkPostgresError(_ error: Error) -> LoginResponse {
+        Login.loginResponse = "\(error)"
         switch error as! PostgresError {
         case .sqlError(notice: let notice):
             switch notice.code {

@@ -54,6 +54,12 @@ public struct AlpineLoginView: View {
         .padding()
         .frame(maxWidth: .infinity)
         .background(Image("Login-BG").resizable().blur(radius: 50, opaque: true).ignoresSafeArea())
+        .overlay {
+            Text(viewModel.appVersion)
+                .padding(6)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+        }
+        .ignoresSafeArea(.keyboard, edges: .all)
         .resizableSheet(isPresented: $viewModel.showResetPassword) {
             PasswordResetView(open: $viewModel.showResetPassword)
         }
