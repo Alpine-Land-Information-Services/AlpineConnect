@@ -58,8 +58,8 @@ public struct AlpineLoginView: View {
             Text(viewModel.appVersion)
                 .padding(6)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                .ignoresSafeArea(.keyboard, edges: .all)
         }
-        .ignoresSafeArea(.keyboard, edges: .all)
         .resizableSheet(isPresented: $viewModel.showResetPassword) {
             PasswordResetView(open: $viewModel.showResetPassword)
         }
