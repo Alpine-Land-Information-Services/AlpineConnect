@@ -87,12 +87,13 @@ class LoginAlert: ObservableObject {
     }
     
     func continueWithLogin() {
-        authenthication.updateBioNotNowCount()
         authenthication.saveCredentialsToKeyChain()
+        authenthication.updateBioNotNowCount()
         authenthication.updateSigninState(true)
     }
     
     func remindLaterForBioSetup() {
+        authenthication.saveCredentialsToKeyChain()
         authenthication.saveBiometricAuthRequestTimeInUserDefault()
         authenthication.updateBioNotNowCount(reset: true)
         authenthication.updateSigninState(true)
