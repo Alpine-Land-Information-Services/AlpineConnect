@@ -43,7 +43,9 @@ public class NetworkMonitor: ObservableObject {
                 }
             }
             else {
-                self.connected = false
+                DispatchQueue.main.async {
+                    self.connected = false
+                }
                 self.changeConnectionType(.offline)
             }
         }
