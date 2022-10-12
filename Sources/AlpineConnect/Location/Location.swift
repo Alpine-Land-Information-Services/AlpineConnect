@@ -37,7 +37,7 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.startUpdatingLocation()
         
-        manager.headingFilter = 15
+        manager.headingFilter = 10
         manager.startUpdatingHeading()
     }
 
