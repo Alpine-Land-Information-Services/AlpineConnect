@@ -182,6 +182,10 @@ final class KeychainAuthentication {
     func askForBioMetricAuthenticationSetup() -> Bool {
         let alreadyApprovedBioAuth = UserDefaults().bool(forKey: "biometricAuthAuthorized")
         
+        guard checkIfPromptForBioSetUp() else {
+            return false
+        }
+        
         if isBiometricEnabledOnDevice() {
             if alreadyApprovedBioAuth {
                 return false
