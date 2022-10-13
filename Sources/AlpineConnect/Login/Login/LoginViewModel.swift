@@ -55,6 +55,7 @@ class LoginViewModel: ObservableObject {
     
     func setLoginConnectionInfo() {
         NetworkMonitor.shared.start()
+        Location.shared.start()
         LoginConnectionInfo.shared = info
         authenthication.fetchCredentialsFromKeyChain()
     }
@@ -94,8 +95,13 @@ class LoginViewModel: ObservableObject {
             info.appUserFunction { userFunctionResponse in
                 switch userFunctionResponse {
                 case .successfulLogin:
-                    if self.authenthication.askForBioMetricAuthenticationSetup() {
-                        self.loginAlert.updateModelState(_: self.authenthication)
+                    if self.authenthication.askForBioMetricAuthenticationSetup() || self.inDEBUG {
+                        if self.inDEBUG {
+                            self.savePasswordForDEBUG()
+                        }
+                        else {
+                            self.loginAlert.updateModelState(_: self.authenthication)
+                        }
                     }
                     else if self.authenthication.areCredentialsSaved() {
                         if self.authenthication.credentialsChanged() {
@@ -116,5 +122,20 @@ class LoginViewModel: ObservableObject {
         default:
             loginAlert.updateAlertType(response)
         }
+    }
+}
+
+extension LoginViewModel {
+    
+    var inDEBUG: Bool {
+        #if DEBUG
+            return !UserDefaults().bool(forKey: "debugPasswordSave")
+        #else
+            return false
+        #endif
+    }
+    
+    func savePasswordForDEBUG() {
+        loginAlert.updateAlertType(.debug)
     }
 }

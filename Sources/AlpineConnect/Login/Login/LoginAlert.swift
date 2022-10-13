@@ -155,8 +155,19 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text("Invalid Email"),
                          message: Text("Enter a valid email address, with @ symbol and domain."),
                          dismissButton: .default(Text("OK"), action: {}))
+        case .userNotInApplicationTable:
+            return Alert(title: Text("Application User Missing"),
+                         message: Text("Your account was not added to application, try to sign in again. \n\nIf the issue persists, contact support."),
+                         dismissButton: .default(Text("OK"), action: {}))
+        case .debug:
+            return Alert(title: Text("Hello Developer!"),
+                         message: Text("Would you like your password saved?"),
+                         primaryButton: .default(Text("Yes"), action: {
+                UserDefaults().setValue(true, forKey: "debugPasswordSave")
+                self.continueWithLogin()}),
+                         secondaryButton: .cancel(Text("Not Now"), action: self.continueWithLogin))
         default:
-            return Alert(title: Text("Something Went Wrong"), message: Text("Please try again. \n Error: \n \(Login.loginResponse)"))
+            return Alert(title: Text("Something Went Wrong"), message: Text("Please try again. \n\n Error: \n \(Login.loginResponse)"))
 
         }
     }

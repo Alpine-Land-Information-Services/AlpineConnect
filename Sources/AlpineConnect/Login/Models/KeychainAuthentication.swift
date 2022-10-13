@@ -76,12 +76,17 @@ final class KeychainAuthentication {
     
     private func fetchKeyChain() {
         if let dictionaryValues = self.fetchKeyChainValues() {
-            self.userManager.userName = dictionaryValues["userName"] as? String ?? ""
-            self.userManager.storedUserName = dictionaryValues["userName"] as? String ?? ""
-            self.biometricLoginEnabled = dictionaryValues["biometricLoginEnabled"] as? Bool ?? false
-            self.userManager.storedPassword = dictionaryValues["password"] as? String ?? ""
-            
-            if self.userManager.storedPassword != "" {
+            DispatchQueue.main.async {
+                self.userManager.userName = dictionaryValues["userName"] as? String ?? ""
+                self.userManager.storedUserName = dictionaryValues["userName"] as? String ?? ""
+                self.biometricLoginEnabled = dictionaryValues["biometricLoginEnabled"] as? Bool ?? false
+                self.userManager.storedPassword = dictionaryValues["password"] as? String ?? ""
+                
+                if UserDefaults().bool(forKey: "debugPasswordSave") {
+                    self.userManager.inputPassword = dictionaryValues["password"] as? String ?? ""
+                }
+            }
+            if userManager.storedPassword != "" {
                 fetchedCredentials = true
             }
         }

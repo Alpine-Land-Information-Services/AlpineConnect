@@ -24,7 +24,6 @@ public class Login {
     }
     
     struct UserLoginUpdate: Codable {
-        
         var email: String
         var lat: Double?
         var lng: Double?
@@ -66,7 +65,7 @@ public class Login {
         let (body, response) = try await URLSession.shared.data(for: request)
         
         let user = try JSONDecoder().decode(BackendUser.self, from: body)
-                
+
         guard let httpResponse = response as? HTTPURLResponse else {
             fatalError("Cannot get HTTP URL Response")
         }

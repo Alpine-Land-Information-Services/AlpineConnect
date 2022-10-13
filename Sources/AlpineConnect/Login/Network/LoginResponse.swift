@@ -13,6 +13,7 @@ public enum LoginResponse {
     case invalidCredentials
     case wrongPassword
     case invalidEmail
+    case userNotInApplicationTable
     
     case passwordChangeRequired
     case registrationRequired
@@ -28,6 +29,8 @@ public enum LoginResponse {
     case authenticationAlert
     case enableBiometricsAlert
     case updateKeychainAlert
+    
+    case debug
     
     // Biometric errors
     
