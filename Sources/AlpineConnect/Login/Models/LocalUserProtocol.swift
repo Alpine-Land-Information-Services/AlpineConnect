@@ -12,8 +12,11 @@ public protocol LocalUserProtocol {
     associatedtype LocalUserInfo
     
     static var user: LocalUserInfo! { get set }
+    static var lastUser: LocalUserInfo? { get set }
+    
+    static var sameUser: Bool { get }
     
     static func getApplicationUser(completionHandler: @escaping (LoginResponse) -> ())
     static func saveUserToUserDefaults(_ info: LocalUserInfo)
-    static func getUserFromUserDefaults() -> Bool
+    static func getUserFromUserDefaults() -> LocalUserInfo?
 }
