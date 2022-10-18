@@ -15,7 +15,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/codewinsdotcom/PostgresClientKit.git", from: "1.4.3"),
-        .package(url: "https://github.com/jenyalebid/AlpineUI.git", from: "1.0.0"),
+        .package(url: "https://github.com/jenyalebid/AlpineUI.git", from: "1.1.0"),
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
     ],
