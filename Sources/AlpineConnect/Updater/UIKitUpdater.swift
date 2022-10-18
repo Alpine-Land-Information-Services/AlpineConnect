@@ -22,7 +22,7 @@ public class UIKitUpdater: NSObject {
         monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
         monitor.pathUpdateHandler = { path in
             if path.status == .satisfied {
-                self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result in
+                self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result, _ in
                     if result {
                         self.presentAlert(automatic: automatic)
                     }
@@ -58,7 +58,13 @@ public class UIKitUpdater: NSObject {
     
     func alert() -> UIAlertController {
         switch updater.updateStatus {
-        case .updatedRequired:
+        case .updateRequired:
+            let alert = UIAlertController(title: "Update Required", message: "Your application version is no longer supported. Please update to continue.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Update Now", style: .default) { (action:UIAlertAction) in
+                self.callUpdate()
+            })
+            return alert
+        case .updatedAvailble:
             let alert = UIAlertController(title: "New Version Avalible", message: "Update to the latest version for best functionality.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Update", style: .default) { (action:UIAlertAction) in
                 self.callUpdate()

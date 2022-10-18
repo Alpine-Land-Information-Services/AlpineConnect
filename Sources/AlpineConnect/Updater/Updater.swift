@@ -16,18 +16,19 @@ public class Updater {
         case error
         case notConnected
         case latestVersion
-        case updatedRequired
+        case updatedAvailble
+        case updateRequired
     }
     
     public var updateStatus = UpdateStatus.error
     
-    func checkVersion(name: String, automatic: Bool, showMessage: @escaping ((Bool) -> Void)) {
+    func checkVersion(name: String, automatic: Bool, showMessage: @escaping ((Bool, Bool) -> Void)) {
         if let currentVersion = AppInformation.getBundle(key: "CFBundleShortVersionString") {
             getAppInfo(name: name) { (info, error) in
-                if let appStoreAppVersion = info {
+                if let appStoreAppVersion = info?[0] {
                     if let error = error {
                         print("Error getting app version: ", error)
-                        showMessage(true)
+                        showMessage(true, false)
                         return
                     }
                     if appStoreAppVersion.compare(currentVersion, options: .numeric) != .orderedDescending {
@@ -37,42 +38,51 @@ public class Updater {
                         }
                         self.updateStatus = .latestVersion
                         if automatic {
-                            showMessage(false)
+                            showMessage(false, false)
                         }
                         else {
-                            showMessage(true)
+                            showMessage(true, false)
                         }
                         return
                     }
                     print("Needs update: App Store Version: \(appStoreAppVersion) > Current version: ", currentVersion)
-                    self.updateStatus = .updatedRequired
-                    showMessage(true)
+                    if let minimumVersion = info?[1] {
+                        self.updateStatus = .updateRequired
+                        if minimumVersion.compare(currentVersion, options: .numeric) == .orderedDescending {
+                            showMessage(true, true)
+                            return
+                        }
+                    }
+                    self.updateStatus = .updatedAvailble
+                    showMessage(true, false)
                 }
             }
         }
     }
     
-    private func getAppInfo(name: String, completion: @escaping (String?, Error?) -> Void) {
+    private func getAppInfo(name: String, completion: @escaping ([String?]?, Error?) -> Void) {
         TrackingManager.shared.pool?.withConnection { con_from_pool in
             do {
                 let connection = try con_from_pool.get()
                 defer { connection.close() }
                 let text = """
                         SELECT
-                        "version"
-                        FROM public."applications"
-                        WHERE "name" = '\(name)'
+                        version,
+                        minimum_version
+                        FROM public.applications
+                        WHERE name = '\(name)'
                         """
                 print("---------------->>>Alpine Updater Running<<<----------------")
                 let statement = try connection.prepareStatement(text: text)
                 defer { statement.close() }
-                var info: String?
+                var info: [String?] = []
                 let cursor = try statement.execute()
                 defer { cursor.close() }
                 do {
                     for row in cursor {
                         let columns = try row.get().columns
-                        info = try columns[0].string()
+                        info.append(try columns[0].string())
+                        info.append(try columns[1].optionalString())
                     }
                 } catch {
                     completion(nil, error)
@@ -125,6 +135,31 @@ public class Updater {
         }
         catch {
             fatalError("\(error)")
+        }
+    }
+}
+
+extension String {
+    
+    func versionCompare(_ otherVersion: String) -> ComparisonResult {
+        let versionDelimiter = "."
+
+        var versionComponents = self.components(separatedBy: versionDelimiter)
+        var otherVersionComponents = otherVersion.components(separatedBy: versionDelimiter)
+
+        let zeroDiff = versionComponents.count - otherVersionComponents.count
+
+        if zeroDiff == 0 {
+            return self.compare(otherVersion, options: .numeric)
+        } else {
+            let zeros = Array(repeating: "0", count: abs(zeroDiff))
+            if zeroDiff > 0 {
+                otherVersionComponents.append(contentsOf: zeros)
+            } else {
+                versionComponents.append(contentsOf: zeros)
+            }
+            return versionComponents.joined(separator: versionDelimiter)
+                .compare(otherVersionComponents.joined(separator: versionDelimiter), options: .numeric)
         }
     }
 }

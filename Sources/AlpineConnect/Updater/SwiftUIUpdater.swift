@@ -25,8 +25,8 @@ public class SwiftUIUpdater: ObservableObject {
         monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
         monitor.pathUpdateHandler = { path in
             if path.status == .satisfied {
-                self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result in
-                    if result {
+                self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result, updateRequired in
+                    if result || updateRequired {
                         self.alertToggle(show: true)
                     }
                 })
@@ -66,7 +66,11 @@ public class SwiftUIUpdater: ObservableObject {
     
     public func alert(dismissAction: @escaping () -> ()) -> Alert {
         switch updater.updateStatus {
-        case .updatedRequired:
+        case .updateRequired:
+            return Alert(title: Text("Update Required"),
+                         message: Text("Your application version is no longer supported. \n\nPlease update to continue."),
+                         dismissButton: .default(Text("Update Now"), action: callUpdate))
+        case .updatedAvailble:
             return Alert(title: Text("New Version Avalible"),
                          message: Text("Update to the latest version for best functionality."),
                          primaryButton: .default(Text("Update"), action: callUpdate),
