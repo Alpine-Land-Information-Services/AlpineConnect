@@ -7,6 +7,8 @@
 
 import Foundation
 import Network
+import SwiftUI
+import AlpineUI
 
 public class NetworkMonitor: ObservableObject {
     
@@ -18,7 +20,6 @@ public class NetworkMonitor: ObservableObject {
         case cellular
     }
     
-
     @Published public var connectionType = ConnectionType.offline
     @Published public var connected = false
     
@@ -55,5 +56,21 @@ public class NetworkMonitor: ObservableObject {
         DispatchQueue.main.async {
             self.connectionType = type
         }
+    }
+    
+    public func checkConnection() -> Bool {
+        if connected {
+            return true
+        }
+        
+        DispatchQueue.main.async {
+            let alert = AppAlert(title: "Offline", message: "You are not connected to network, please connect to proceed.")
+            AppControl.shared.currentAlert = alert
+            withAnimation {
+                AppControl.shared.showAlert.toggle()
+            }
+        }
+        
+        return false
     }
 }
