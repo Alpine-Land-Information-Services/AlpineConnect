@@ -25,6 +25,10 @@ public class Updater {
     func checkVersion(name: String, automatic: Bool, showMessage: @escaping ((Bool, Bool) -> Void)) {
         if let currentVersion = AppInformation.getBundle(key: "CFBundleShortVersionString") {
             getAppInfo(name: name) { (info, error) in
+                guard !(info?.isEmpty ?? true) else {
+                    showMessage(false, false)
+                    return
+                }
                 if let appStoreAppVersion = info?[0] {
                     if let error = error {
                         print("Error getting app version: ", error)
