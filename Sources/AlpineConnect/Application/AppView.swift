@@ -40,10 +40,6 @@ public struct AppView<App: View>: View {
             .popup(isPresented: control.showPopup) {
                 control.currentPopup
             }
-            .onChange(of: control.showAlert) { _ in
-                control.determineAlertType()
-            }
-        
     }
     
     var dim: some View {

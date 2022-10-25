@@ -29,15 +29,16 @@ public class SwiftUIUpdater: ObservableObject {
                     if result || updateRequired {
                         self.alertToggle(show: true)
                     }
+                    else {
+                        self.authenticationToggle()
+                    }
                 })
             }
             else {
                 self.updater.updateStatus = .notConnected
                 if automatic {
                     self.alertToggle(show: false)
-                    DispatchQueue.main.async {
-                        NotificationCenter.default.post(name: NSNotification.Name("UpdateStatus"), object: nil)
-                    }
+                    self.authenticationToggle()
                 }
                 else {
                     self.alertToggle(show: true)
@@ -45,6 +46,12 @@ public class SwiftUIUpdater: ObservableObject {
             }
         }
         monitor.cancel()
+    }
+    
+    func authenticationToggle() {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: NSNotification.Name("UpdateStatus"), object: nil)
+        }
     }
     
     

@@ -62,8 +62,27 @@ open class AppControl: ObservableObject {
     }
     
     public init() {}
-    
-    func determineAlertType() {
+}
 
+
+//MARK: Alerts
+extension AppControl {
+    
+    public func noConnectionAlert() {
+        let alert = AppAlert(title: "Offline", message: "You are not connected to network, please connect to proceed.")
+        toggleAlert(alert)
+    }
+    
+    public func toggleAlert(_ alert: AppAlert) {
+        guard !showAlert else {
+            return
+        }
+        
+        DispatchQueue.main.async {
+            self.currentAlert = alert
+            withAnimation {
+                self.showAlert.toggle()
+            }
+        }
     }
 }

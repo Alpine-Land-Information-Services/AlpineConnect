@@ -63,13 +63,7 @@ public class NetworkMonitor: ObservableObject {
             return true
         }
         
-        DispatchQueue.main.async {
-            let alert = AppAlert(title: "Offline", message: "You are not connected to network, please connect to proceed.")
-            AppControl.shared.currentAlert = alert
-            withAnimation {
-                AppControl.shared.showAlert.toggle()
-            }
-        }
+        AppControl.shared.noConnectionAlert()
         
         return false
     }
