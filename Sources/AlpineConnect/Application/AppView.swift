@@ -40,6 +40,9 @@ public struct AppView<App: View>: View {
             .popup(isPresented: control.showPopup) {
                 control.currentPopup
             }
+            .popup(isPresented: control.showBottomPopup, alignment: .bottom, direction: .bottom) {
+                control.currentBottomPopup
+            }
     }
     
     var dim: some View {

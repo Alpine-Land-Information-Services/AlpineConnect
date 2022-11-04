@@ -24,6 +24,12 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
     @Published public var lastHeading: CLHeading?
     @Published public var centerCoordinate: CLLocationCoordinate2D? // in projection, 26710
     
+    public var degrees: Double = .zero {
+        didSet {
+            objectWillChange.send()
+        }
+    }
+    
     public func start() {
         if isWorkind { return }
         isWorkind = true
@@ -60,6 +66,7 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         if let lastHeading = manager.heading {
             self.lastHeading = lastHeading
             delegate?.newHeading(lastHeading)
+            degrees = -1 * lastHeading.magneticHeading
         }
     }
 

@@ -17,10 +17,13 @@ open class AppControl: ObservableObject {
     
     @Published public var showSheet = false
     @Published public var showPopup = false
+    @Published public var showBottomPopup = false
     
     @Published public var currentAlert = AppAlert(title: "", message: "", dismiss: AlertAction(text: ""), actions: [])
     @Published public var currentSheet = AnyView(EmptyView())
     @Published public var currentPopup = AnyView(EmptyView())
+    
+    @Published public var currentBottomPopup = AnyView(EmptyView())
     
     public var dimView: Bool {
         get {
@@ -62,6 +65,12 @@ open class AppControl: ObservableObject {
     }
     
     public init() {}
+    
+    public func showBottom() {
+        withAnimation {
+            showBottomPopup.toggle()
+        }
+    }
 }
 
 
