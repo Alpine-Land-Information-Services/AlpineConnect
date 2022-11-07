@@ -20,6 +20,9 @@ public struct AppView<App: View>: View {
     
     public var body: some View {
         app
+            .popup(isPresented: $control.showBottomPopup, alignment: .bottom, direction: .bottom) {
+                control.currentBottomPopup
+            }
             .overlay {
                 if control.dimView {
                     dim
@@ -37,12 +40,10 @@ public struct AppView<App: View>: View {
                     }
                     .appAlert(isPresented: $control.showSheetAlert, alert: control.currentAlert)
             }
-            .popup(isPresented: control.showPopup) {
+            .popup(isPresented: $control.showPopup) {
                 control.currentPopup
             }
-            .popup(isPresented: control.showBottomPopup, alignment: .bottom, direction: .bottom) {
-                control.currentBottomPopup
-            }
+            .ignoresSafeArea()
     }
     
     var dim: some View {

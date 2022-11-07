@@ -31,7 +31,7 @@ class Register {
     }
     
     static func register(info: RegistrationInfo) async throws -> (String, HTTPURLResponse) {
-        guard let url = URL(string: "https://alpinebackyard.azurewebsites.net/user/register") else {
+        guard let url = URL(string: "https://alpinebackyard20220722084741.azurewebsites.net/user/register") else {
             fatalError("Registration URL Error")
         }
         
