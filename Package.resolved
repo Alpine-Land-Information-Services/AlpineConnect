@@ -5,9 +5,9 @@
         "package": "AlpineUI",
         "repositoryURL": "https://github.com/jenyalebid/AlpineUI.git",
         "state": {
-          "branch": null,
-          "revision": "2a15662416780d0a15720f86626854e236c4f760",
-          "version": "1.1.0"
+          "branch": "main",
+          "revision": "ae7927f9e71c6fd833fda6e535b02835189d7a74",
+          "version": null
         }
       },
       {
