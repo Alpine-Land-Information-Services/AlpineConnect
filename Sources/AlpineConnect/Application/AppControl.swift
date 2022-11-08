@@ -17,14 +17,14 @@ open class AppControl: ObservableObject {
     
     @Published public var showSheet = false
     @Published public var showPopup = false
-    @Published public var showBottomPopup = false
+    @Published public var showSecondaryPopup = false
     
     @Published public var currentAlert = AppAlert(title: "", message: "", dismiss: AlertAction(text: ""), actions: [])
     @Published public var currentSheet = AnyView(EmptyView())
-    @Published public var currentPopup = AnyView(EmptyView())
     
-    @Published public var currentBottomPopup = AnyView(EmptyView())
-    
+    @Published public var currentPopup = AppPopup(view: AnyView(EmptyView()))
+    @Published public var currentSecondaryPopup = AppPopup(view: AnyView(EmptyView()))
+        
     public var dimView: Bool {
         get {
             if showRegularAlert || showPopup {
@@ -66,9 +66,25 @@ open class AppControl: ObservableObject {
     
     public init() {}
     
-    public func showBottom() {
+    public func showMainPopup(_ value: Bool? = nil) {
         withAnimation {
-            showBottomPopup.toggle()
+            if let value {
+                showPopup = value
+            }
+            else {
+                showPopup.toggle()
+            }
+        }
+    }
+    
+    public func showSecondaryPopup(_ value: Bool?) {
+        withAnimation {
+            if let value {
+                showSecondaryPopup = value
+            }
+            else {
+                showSecondaryPopup.toggle()
+            }
         }
     }
 }

@@ -20,13 +20,16 @@ public struct AppView<App: View>: View {
     
     public var body: some View {
         app
-            .popup(isPresented: $control.showBottomPopup, alignment: .bottom, direction: .bottom) {
-                control.currentBottomPopup
+            .popup(isPresented: $control.showSecondaryPopup, alignment: control.currentSecondaryPopup.alignment, direction: control.currentSecondaryPopup.direction) {
+                control.currentSecondaryPopup.view
             }
             .overlay {
                 if control.dimView {
                     dim
                 }
+            }
+            .popup(isPresented: $control.showPopup, alignment: control.currentPopup.alignment, direction: control.currentPopup.direction) {
+                control.currentPopup.view
             }
             .appAlert(isPresented: $control.showRegularAlert, alert: control.currentAlert)
             .sheet(isPresented: $control.showSheet) {
@@ -40,9 +43,6 @@ public struct AppView<App: View>: View {
                     }
                     .appAlert(isPresented: $control.showSheetAlert, alert: control.currentAlert)
             }
-            .popup(isPresented: $control.showPopup) {
-                control.currentPopup
-            }
             .ignoresSafeArea()
     }
     
@@ -50,13 +50,5 @@ public struct AppView<App: View>: View {
         Color(uiColor: .black)
             .opacity(0.4)
             .ignoresSafeArea()
-    }
-}
-
-struct SwiftUIView_Previews: PreviewProvider {
-    static var previews: some View {
-        AppView {
-            EmptyView()
-        }
     }
 }
