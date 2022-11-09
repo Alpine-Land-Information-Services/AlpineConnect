@@ -21,7 +21,7 @@ public struct AppView<App: View>: View {
     public var body: some View {
         app
             .popup(isPresented: $control.showSecondaryPopup, alignment: control.currentSecondaryPopup.alignment, direction: control.currentSecondaryPopup.direction) {
-                control.currentSecondaryPopup.view
+                control.currentSecondaryPopup.content
             }
             .overlay {
                 if control.dimView {
@@ -29,7 +29,7 @@ public struct AppView<App: View>: View {
                 }
             }
             .popup(isPresented: $control.showPopup, alignment: control.currentPopup.alignment, direction: control.currentPopup.direction) {
-                control.currentPopup.view
+                control.currentPopup.content
             }
             .appAlert(isPresented: $control.showRegularAlert, alert: control.currentAlert)
             .sheet(isPresented: $control.showSheet) {

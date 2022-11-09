@@ -22,8 +22,8 @@ open class AppControl: ObservableObject {
     @Published public var currentAlert = AppAlert(title: "", message: "", dismiss: AlertAction(text: ""), actions: [])
     @Published public var currentSheet = AnyView(EmptyView())
     
-    @Published public var currentPopup = AppPopup(view: AnyView(EmptyView()))
-    @Published public var currentSecondaryPopup = AppPopup(view: AnyView(EmptyView()))
+    @Published public var currentPopup = AppPopup {AnyView(EmptyView())}
+    @Published public var currentSecondaryPopup = AppPopup {AnyView(EmptyView())}
         
     public var dimView: Bool {
         get {
