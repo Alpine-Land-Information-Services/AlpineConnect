@@ -81,7 +81,7 @@ struct RegisterView: View {
     struct SecurityQuestion: View {
         
         var number: String
-        var values: [[String]]
+        var values: [PickerOption]
         
         @Binding var selection: String
         @Binding var answer: String
