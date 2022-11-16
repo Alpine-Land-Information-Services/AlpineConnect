@@ -28,6 +28,7 @@ public class Login {
         var lat: Double?
         var lng: Double?
         var appName: String
+        var appVersion: String
         var info: String
     }
     
@@ -118,7 +119,7 @@ public class Login {
         
         do {
             let data = try JSONEncoder().encode(info)
-            let (body, response) = try await URLSession.shared.upload(for: request, from: data)
+            let (_, response) = try await URLSession.shared.upload(for: request, from: data)
                         
             guard let httpResponse = response as? HTTPURLResponse else {
                 fatalError("Cannot get HTTP URL Response")
