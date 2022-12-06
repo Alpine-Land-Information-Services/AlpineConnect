@@ -36,10 +36,9 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         manager.requestWhenInUseAuthorization()
         manager.delegate = self
         manager.requestLocation()
-//        manager.allowsBackgroundLocationUpdates = true
+        manager.allowsBackgroundLocationUpdates = true
         manager.distanceFilter = 5
-//        manager.showsBackgroundLocationIndicator = true
-//        manager.pausesLocationUpdatesAutomatically = false
+        manager.showsBackgroundLocationIndicator = true
         manager.desiredAccuracy = kCLLocationAccuracyBest
         manager.startUpdatingLocation()
         
