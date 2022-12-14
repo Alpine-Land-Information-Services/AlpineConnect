@@ -27,6 +27,10 @@ public class Tracker {
         return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     }
     
+    public static func appBuild() -> String {
+        return Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+    }
+    
     public static func appName() -> String {
         return Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "Unknown"
     }
