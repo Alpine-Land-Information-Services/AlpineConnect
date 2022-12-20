@@ -25,10 +25,15 @@ public class Login {
     
     struct UserLoginUpdate: Codable {
         var email: String
-        var lat: Double?
-        var lng: Double?
+        var password: String
+        
         var appName: String
         var appVersion: String
+        var machineName: String
+        
+        var lat: Double?
+        var lng: Double?
+
         var info: String
     }
     
@@ -109,7 +114,7 @@ public class Login {
     }
     
     static func updateUserLogin(info: UserLoginUpdate) async -> LoginResponse {
-        guard let url = URL(string: "https://alpinebackyard20220722084741.azurewebsites.net/user/logged") else {
+        guard let url = URL(string: "https://alpinebackyard20220722084741.azurewebsites.net/user/credentials") else {
             fatalError("Registration URL Error")
         }
         
@@ -119,13 +124,13 @@ public class Login {
         
         do {
             let data = try JSONEncoder().encode(info)
-            let (_, response) = try await URLSession.shared.upload(for: request, from: data)
+            let (body, response) = try await URLSession.shared.upload(for: request, from: data)
                         
             guard let httpResponse = response as? HTTPURLResponse else {
                 fatalError("Cannot get HTTP URL Response")
             }
             
-            loginResponse = "\(httpResponse)"
+            saveLoginToken(try JSONDecoder().decode(String.self, from: body))
             
             switch httpResponse.statusCode {
             case 200:
@@ -139,42 +144,15 @@ public class Login {
         }
     }
     
-//    static func createApplicationUser(user: BackendUser, completionHandler: @escaping (LoginResponse, Error?) -> ()) {
-//        NetworkManager.shared.pool?.withConnection { response in
-//            switch response {
-//            case .success:
-//                do {
-//                    let connection = try response.get()
-//
-//                    let text = """
-//                    INSERT INTO public.application_users("\(GlobalNames.shared.applicationUserIDName)", login, user_name) VALUES ($1, $2, $3)
-//                    """
-//                    print(text)
-//                    let statement = try connection.prepareStatement(text: text)
-//                    let cursor = try statement.execute(parameterValues: [user.id, user.email, user.firstName + " " + user.lastName])
-//
-//                    defer { statement.close() }
-//                    defer { cursor.close() }
-//
-//                    fillPrimaryUserInfo(id: user.id, isAdmin: false)
-//
-//                    completionHandler(.successfulLogin, nil)
-//                }
-//                catch {
-//                    completionHandler(Check.checkPostgresError(error), error)
-//                }
-//            case .failure(let error):
-//                completionHandler(Check.checkPostgresError(error), error)
-//            }
-//        }
-//    }
-    
-//    static func fillPrimaryUserInfo(id: UUID, isAdmin: Bool) {
-//        UserManager.shared.userInfo.id = id
-//        UserManager.shared.userInfo.isAdmin = isAdmin
-//        saveUserToUserDefaults(UserManager.shared.userInfo)
-//    }
-    
+    static func saveLoginToken(_ token: String) {
+        let token = UserManager.LoginToken(token)
+        UserManager.shared.token = token
+        
+        if let encoded = try? JSONEncoder().encode(token) {
+            UserDefaults.standard.set(encoded, forKey: "LoginUserToken")
+        }
+    }
+
     static func fillUserInfo(user: BackendUser) {
         UserManager.shared.userInfo.firstName = user.firstName
         UserManager.shared.userInfo.lastName = user.lastName
@@ -198,51 +176,4 @@ public class Login {
         }
         return false
     }
-    
-    //    static func checkConnectUser(isConnectedToDBUser: Bool, handler: @escaping (LoginResponseMessage) -> ()) {
-    //        TrackingManager.shared.pool?.withConnection { response in
-    //            switch response {
-    //            case .success:
-    //                do {
-    //                    let connection = try response.get()
-    //
-    //                    let text = """
-    //                    SELECT password_change_required
-    //                    FROM user_authentication WHERE email = '\(UserManager.shared.userName)'
-    //                    """
-    //                    let statement = try connection.prepareStatement(text: text)
-    //                    let cursor = try statement.execute()
-    //
-    //                    defer { statement.close() }
-    //                    defer { cursor.close() }
-    //
-    //
-    //                    if cursor.rowCount == 0 {
-    //                        if isConnectedToDBUser {
-    //                            handler(.infoChangeRequired)
-    //                        }
-    //                        else {
-    //                            handler(.registrationRequired)
-    //                        }
-    //                    }
-    //                    else {
-    //                        for row in cursor {
-    //                            let columns = try row.get().columns
-    //                            if try columns[0].bool() {
-    //                                handler(.passwordChangeRequired)
-    //                            }
-    //                            else {
-    //                                handler(.successfulLogin)
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //                catch {
-    //                    handler(checkError(error))
-    //                }
-    //            case .failure(let error):
-    //                handler(checkError(error))
-    //            }
-    //        }
-    //    }
 }
