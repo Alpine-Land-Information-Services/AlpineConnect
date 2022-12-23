@@ -6,6 +6,7 @@
 //
 
 import CoreLocation
+import UIKit
 
 open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
     
@@ -72,12 +73,44 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Swift.Error) {
         print("Location Manager Error: \(error)")
     }
+
+    public func setDeviceOrientation(_ orientation: UIDeviceOrientation) {
+        switch orientation {
+        case .portrait:
+            manager.headingOrientation = CLDeviceOrientation.portrait
+        case .portraitUpsideDown:
+            manager.headingOrientation = CLDeviceOrientation.portraitUpsideDown
+        case .landscapeLeft:
+            manager.headingOrientation = CLDeviceOrientation.landscapeLeft
+        case .landscapeRight:
+            manager.headingOrientation = CLDeviceOrientation.landscapeRight
+        default:
+            break
+        }
+    }
+
+    public func setDeviceOrientation(_ orientation: UIInterfaceOrientation) {
+        switch orientation {
+        case .portrait:
+            manager.headingOrientation = CLDeviceOrientation.portrait
+        case .portraitUpsideDown:
+            manager.headingOrientation = CLDeviceOrientation.portraitUpsideDown
+        case .landscapeLeft:
+            manager.headingOrientation = CLDeviceOrientation.landscapeLeft
+        case .landscapeRight:
+            manager.headingOrientation = CLDeviceOrientation.landscapeRight
+        default:
+            break
+        }
+    }
 }
+
 
 public protocol LocationChangeDelegate: AnyObject {
     func newLocation(_ newValue: CLLocation)
     func newHeading(_ newHeading: CLHeading)
 }
+
 
 extension LocationChangeDelegate {
     public func newHeading(_ newHeading: CLHeading) {
