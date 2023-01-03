@@ -23,10 +23,10 @@ public class UserManager: ObservableObject {
     
     public struct LoginToken: Codable {
         public init(_ token: String) {
-            self.token = token
+            self.key = token
         }
         
-        public var token: String
+        public var key: String
         public var date = Date()
     }
     
