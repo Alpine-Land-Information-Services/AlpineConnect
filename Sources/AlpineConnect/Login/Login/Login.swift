@@ -12,6 +12,17 @@ public class Login {
     
     public static var loginResponse = ""
     
+    static private var serverMode = "default" // "default" - use regular url, "test" - use testing url
+    
+    static var serverURL: String {
+        switch serverMode {
+        case "test":
+            return "https://alpinebackyard20220722084741-testing.azurewebsites.net/"
+        default:
+            return "https://alpinebackyard20220722084741.azurewebsites.net/"
+        }
+    }
+    
     public struct BackendUser: Codable {
         
         public var id: UUID
@@ -61,7 +72,7 @@ public class Login {
     }
     
     static func getBackendUser(email: String) async throws -> (BackendUser, HTTPURLResponse) {
-        guard let url = URL(string: "https://alpinebackyard20220722084741.azurewebsites.net/user?email=\(email)") else {
+        guard let url = URL(string: "\(serverURL)user?email=\(email)") else {
             fatalError("Reset Password URL Error")
         }
         
@@ -114,7 +125,7 @@ public class Login {
     }
     
     static func updateUserLogin(info: UserLoginUpdate) async -> LoginResponse {
-        guard let url = URL(string: "https://alpinebackyard20220722084741.azurewebsites.net/user/credentials") else {
+        guard let url = URL(string: "\(serverURL)user/credentials") else {
             fatalError("Registration URL Error")
         }
         
