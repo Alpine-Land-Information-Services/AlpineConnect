@@ -61,7 +61,7 @@ final class KeychainAuthentication {
         if status == noErr {
             UserDefaults().setValue(true, forKey: "saveCredentialsOnKeychain")
         } else {
-            fatalError("Key chain did not save")
+//            fatalError("Key chain did not save")
         }
     }
     
