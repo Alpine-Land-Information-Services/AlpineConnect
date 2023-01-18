@@ -14,7 +14,7 @@ public class NetworkManager {
     
     public var pool: ConnectionPool?
     
-    public init(noTimeout: Bool = true) {
+    public init(noTimeout: Bool = true, database: String? = nil) {
         let info = LoginConnectionInfo.shared
         let userManager = UserManager.shared
         
@@ -28,7 +28,7 @@ public class NetworkManager {
         
         var configuration = PostgresClientKit.ConnectionConfiguration()
         configuration.host = info.host
-        configuration.database = info.database
+        configuration.database = database ?? info.database
         configuration.user = userManager.userName
         configuration.credential = .scramSHA256(password: userManager.password)
         configuration.applicationName = info.appDBName
