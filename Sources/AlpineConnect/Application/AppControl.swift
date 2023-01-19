@@ -110,4 +110,16 @@ extension AppControl {
             }
         }
     }
+    
+    private func errorAlert(title: String, error: Error) {
+        let alert = AppAlert(title: "\(title) Error", message: "\(error.localizedDescription) \n-----\n Check error logs for detailed description.")
+        toggleAlert(alert)
+    }
+    
+    public static func makeError(onAction: String, error: Error, showToUser: Bool = true) {
+        AppError.add(onAction: onAction, log: error.log())
+        if showToUser {
+            AppControl.shared.errorAlert(title: onAction, error: error)
+        }
+    }
 }
