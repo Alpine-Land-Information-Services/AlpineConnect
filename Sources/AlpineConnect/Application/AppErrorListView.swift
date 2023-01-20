@@ -1,6 +1,6 @@
 //
 //  AppErrorListView.swift
-//  
+//  AlpineConnect
 //
 //  Created by Jenya Lebid on 1/19/23.
 //
@@ -31,6 +31,22 @@ public struct AppErrorListView: View {
                             .font(.caption)
                             .foregroundColor(Color(uiColor: .systemGray))
                     }
+                }
+            }
+        }
+        .overlay {
+            if errors.count == 0 {
+                VStack {
+                    Image(packageResource: "AllClear", ofType: ".png")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: 300, maxHeight: 300)
+                        .opacity(0.75)
+                    Text("All clear, and that's a good thing.")
+                        .foregroundColor(Color(uiColor: .systemGray))
+                        .fontWeight(.semibold)
+                        .font(.title2)
+                        .padding()
                 }
             }
         }
