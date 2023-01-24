@@ -127,4 +127,13 @@ extension AppControl {
         let alert = AppAlert(title: "Export Successful", message: "Your data has been successfully exported.")
         AppControl.shared.toggleAlert(alert)
     }
+    
+    public static func makeSimpleAlert(title: String, message: String) {
+        let alert = AppAlert(title: title, message: message)
+        AppControl.shared.toggleAlert(alert)
+    }
+    
+    public static func makeAlert(alert: AppAlert) {
+        AppControl.shared.toggleAlert(alert)
+    }
 }
