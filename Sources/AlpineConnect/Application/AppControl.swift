@@ -89,9 +89,18 @@ open class AppControl: ObservableObject {
     }
 }
 
+extension AppControl { //MARK: Popups
+    
+    static public func showSheet(view: any View) {
+        AppControl.shared.currentSheet = AnyView(view)
+        withAnimation {
+            AppControl.shared.showSheet.toggle()
+        }
+    }
+}
 
-//MARK: Alerts
-extension AppControl {
+
+extension AppControl { //MARK: Alerts
     
     public func noConnectionAlert() {
         let alert = AppAlert(title: "Offline", message: "You are not connected to network, please connect to proceed.")

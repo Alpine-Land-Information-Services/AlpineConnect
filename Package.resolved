@@ -6,26 +6,26 @@
         "repositoryURL": "https://github.com/jenyalebid/AlpineUI.git",
         "state": {
           "branch": "main",
-          "revision": "ae7927f9e71c6fd833fda6e535b02835189d7a74",
+          "revision": "f5193a55fc5fad25637434fa557e4d64f9348ab8",
           "version": null
         }
       },
       {
         "package": "Socket",
-        "repositoryURL": "https://github.com/IBM-Swift/BlueSocket.git",
+        "repositoryURL": "https://github.com/Kitura/BlueSocket.git",
         "state": {
           "branch": null,
-          "revision": "dd924c3bc2c1c144c42b8dda3896f1a03115ded4",
-          "version": "2.0.2"
+          "revision": "7b23a867008e0027bfd6f4d398d44720707bc8ca",
+          "version": "2.0.4"
         }
       },
       {
         "package": "SSLService",
-        "repositoryURL": "https://github.com/IBM-Swift/BlueSSLService",
+        "repositoryURL": "https://github.com/Kitura/BlueSSLService",
         "state": {
           "branch": null,
-          "revision": "c249988fb748749739144e7f554710552acdc0bd",
-          "version": "2.0.1"
+          "revision": "b27a94d063962dfa1bba9f79814c4ef202cf33a4",
+          "version": "2.0.2"
         }
       },
       {
@@ -33,17 +33,8 @@
         "repositoryURL": "https://github.com/codewinsdotcom/PostgresClientKit.git",
         "state": {
           "branch": null,
-          "revision": "beafedaea6dc9f04712e9a8547b77f47c406a47e",
-          "version": "1.4.3"
-        }
-      },
-      {
-        "package": "swift-argument-parser",
-        "repositoryURL": "https://github.com/apple/swift-argument-parser",
-        "state": {
-          "branch": null,
-          "revision": "6b2aa2748a7881eebb9f84fb10c01293e15b52ca",
-          "version": "0.5.0"
+          "revision": "356ffe0c43722f192d796300557b3b530a0baebc",
+          "version": "1.5.0"
         }
       }
     ]
