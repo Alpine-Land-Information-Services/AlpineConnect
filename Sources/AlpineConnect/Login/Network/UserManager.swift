@@ -33,7 +33,7 @@ public class UserManager: ObservableObject {
     public static let shared = UserManager()
     
     public var userInfo = UserInfo()
-    public var token: LoginToken!
+    public var token: LoginToken?
     
     var storedPassword: String? = nil
     var storedUserName: String? = nil
