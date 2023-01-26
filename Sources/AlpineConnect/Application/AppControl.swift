@@ -19,11 +19,11 @@ open class AppControl: ObservableObject {
     @Published public var showPopup = false
     @Published public var showSecondaryPopup = false
     
-    @Published public var currentAlert = AppAlert(title: "", message: "", dismiss: AlertAction(text: ""), actions: [])
-    @Published public var currentSheet = AnyView(EmptyView())
+    public var currentAlert = AppAlert(title: "", message: "", dismiss: AlertAction(text: ""), actions: [])
+    public var currentSheet = AnyView(EmptyView())
     
-    @Published public var currentPopup = AppPopup {AnyView(EmptyView())}
-    @Published public var currentSecondaryPopup = AppPopup {AnyView(EmptyView())}
+    public var currentPopup = AppPopup {AnyView(EmptyView())}
+    public var currentSecondaryPopup = AppPopup {AnyView(EmptyView())}
         
     public var dimView: Bool {
         get {
@@ -102,21 +102,30 @@ extension AppControl { //MARK: Popups
 
 extension AppControl { //MARK: Alerts
     
-    public func noConnectionAlert() {
+    public static func noConnectionAlert() {
         let alert = AppAlert(title: "Offline", message: "You are not connected to network, please connect to proceed.")
-        toggleAlert(alert)
+        AppControl.shared.toggleAlert(alert)
     }
     
-    public func toggleAlert(_ alert: AppAlert) {
-        guard !showAlert else {
-            return
-        }
-        
+    private func showAlertToggle() {
         DispatchQueue.main.async {
-            self.currentAlert = alert
             withAnimation {
                 self.showAlert.toggle()
             }
+        }
+    }
+    
+    public func toggleAlert(_ alert: AppAlert) {
+        if showAlert {
+            showAlertToggle()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.currentAlert = alert
+                self.showAlertToggle()
+            }
+        }
+        else {
+            currentAlert = alert
+            showAlertToggle()
         }
     }
     
@@ -144,5 +153,16 @@ extension AppControl { //MARK: Alerts
     
     public static func makeAlert(alert: AppAlert) {
         AppControl.shared.toggleAlert(alert)
+    }
+}
+
+extension AppControl {
+    
+    static public func connectionRequiredAction(_ action: @escaping () -> ()) {
+        guard NetworkMonitor.shared.connected else {
+            noConnectionAlert()
+            return
+        }
+        action()
     }
 }

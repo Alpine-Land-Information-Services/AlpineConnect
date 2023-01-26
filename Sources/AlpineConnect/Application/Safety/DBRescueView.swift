@@ -18,41 +18,41 @@ struct DBRescueView: View {
                 ForEach(viewModel.failedDB) { db in
                     VStack(alignment: .leading, spacing: 8) {
                         Text("The following database container could not be loaded into application:")
+                            .font(.callout)
+                            .fontWeight(.semibold)
+                            .foregroundColor(Color(uiColor: .systemGray))
                         Divider()
                         HStack {
                             HStack {
                                 Image(systemName: "server.rack")
                                     .font(.title)
+                                    .foregroundColor(Color.accentColor)
                                 Text(db.container.name)
                             }
                             .padding()
                             Divider()
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 200), spacing: 8, alignment: .leading)]) {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 240), spacing: 12, alignment: .leading)]) {
                                 ForEach(db.containedItems, id: \.self) { item in
                                     HStack {
                                         Image(systemName: "circle.fill")
-                                            .font(.caption)
+                                            .font(.caption2)
+                                            .foregroundColor(Color.accentColor)
                                         Text(item)
+                                            .font(.caption)
                                     }
                                 }
                             }
                             .frame(maxWidth: .infinity)
                         }
-                        Group {
+                        Divider()
+                        HStack {
                             Text("Error:")
                                 .font(.headline)
-                            ScrollView {
-                                Text(db.error)
-                                    .padding(8)
-                            }
-                            .frame(height: 200)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(
-                                RoundedRectangle(cornerRadius: 5)
-                                    .stroke()
-                            )
+                                .padding(.leading)
+                            Text(db.error.localizedDescription)
+                                .font(.callout)
                         }
-                        .padding(.leading)
+                        .padding(.top)
                         Divider()
                             .padding()
                         Text("Possible Actions:")
@@ -60,20 +60,11 @@ struct DBRescueView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
                                 TextButtonBlock(text: "Reset Container", action: {
-                                    db.resetAction()
+                                    viewModel.resetCointainer(db.container)
                                 })
-                                TextButtonBlock(text: "Upload & Reset", action: {
-                                    
+                                TextButtonBlock(text: "Upload & Create New Container", destination: {
+                                    DBUploadView(container: db)
                                 })
-                                .disabled(true)
-                                TextButtonBlock(text: "Upload & Use Backup", action: {
-                                    
-                                })
-                                .disabled(true)
-                                TextButtonBlock(text: "Upload & Quit", action: {
-                                    
-                                })
-                                .disabled(true)
                             }
                         }
                     }

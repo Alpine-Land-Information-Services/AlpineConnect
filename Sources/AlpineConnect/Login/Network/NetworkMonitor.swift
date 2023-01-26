@@ -63,7 +63,7 @@ public class NetworkMonitor: ObservableObject {
             return true
         }
         
-        AppControl.shared.noConnectionAlert()
+        AppControl.noConnectionAlert()
         
         return false
     }
