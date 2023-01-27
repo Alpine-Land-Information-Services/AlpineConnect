@@ -88,7 +88,7 @@ public class Tracker {
                 }
                 
                 connectionType = type
-                let data = TrackingData(deviceInfo: TrackingData.DeviceInfo(deviceID: Tracker.deviceID(),
+                let data = TrackingData(deviceInfo: TrackingData.DeviceInfo(email: UserManager.shared.userName, deviceID: Tracker.deviceID(),
                                                                             deviceType: Tracker.deviceType(),
                                                                             deviceName: Tracker.deviceName(),
                                                                             deviceVersion: Tracker.deviceVersion(),
@@ -112,12 +112,12 @@ public class Tracker {
                 print(#function, data)
                 let connection = try pool.get()
                 var text = """
-                    INSERT INTO public.devices(id, type, name, ios_version, last_location) VALUES ($1, $2, $3, $4, $5)
+                    INSERT INTO public.devices(id, type, name, ios_version, last_location, user_email) VALUES ($1, $2, $3, $4, $5, $6)
                     ON CONFLICT (id) DO UPDATE SET
-                    type = EXCLUDED.type, name = EXCLUDED.name, ios_version = EXCLUDED.ios_version, last_location = EXCLUDED.last_location
+                    type = EXCLUDED.type, name = EXCLUDED.name, ios_version = EXCLUDED.ios_version, last_location = EXCLUDED.last_location, user_email = EXCLUDED.user_email
                 """
                 var statement = try connection.prepareStatement(text: text)
-                var cursor = try statement.execute(parameterValues: [deviceId.uuidString, data.deviceInfo.deviceType, data.deviceInfo.deviceName, data.deviceInfo.deviceVersion, data.deviceInfo.deviceLocation?.string() ?? "0 0"])
+                var cursor = try statement.execute(parameterValues: [deviceId.uuidString, data.deviceInfo.deviceType, data.deviceInfo.deviceName, data.deviceInfo.deviceVersion, data.deviceInfo.deviceLocation?.string() ?? "0 0", data.deviceInfo.email])
                 cursor.close()
                 statement.close()
                 

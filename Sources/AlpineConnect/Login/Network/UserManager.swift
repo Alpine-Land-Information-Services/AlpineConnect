@@ -35,10 +35,12 @@ public class UserManager: ObservableObject {
     public var userInfo = UserInfo()
     public var token: LoginToken?
     
+    
     var storedPassword: String? = nil
     var storedUserName: String? = nil
     var password: String = ""
     
+    var loginUpdate: Login.UserLoginUpdate?
     
     @Published public var userName: String = ""
     @Published var inputPassword: String = ""

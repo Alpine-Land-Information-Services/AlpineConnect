@@ -12,7 +12,7 @@ public class Login {
     
     public static var loginResponse = ""
     
-    static private var serverMode = "default" // "default" - use regular url, "test" - use testing url
+    static private let serverMode = "default" // "default" - use regular url, "test" - use testing url
     
     static var serverURL: String {
         switch serverMode {
@@ -141,7 +141,7 @@ public class Login {
                 fatalError("Cannot get HTTP URL Response")
             }
             
-            saveLoginToken(try JSONDecoder().decode(String.self, from: body))
+            TokenManager.saveLoginToken(try JSONDecoder().decode(String.self, from: body))
             
             switch httpResponse.statusCode {
             case 200:
@@ -151,19 +151,11 @@ public class Login {
             }
         }
         catch {
+            AppControl.makeError(onAction: "Getting Server User", error: error, showToUser: false)
             return Check.checkPostgresError(error)
         }
     }
     
-    static func saveLoginToken(_ token: String) {
-        let token = UserManager.LoginToken(token)
-        UserManager.shared.token = token
-        
-        if let encoded = try? JSONEncoder().encode(token) {
-            UserDefaults.standard.set(encoded, forKey: "LoginUserToken")
-        }
-    }
-
     static func fillUserInfo(user: BackendUser) {
         UserManager.shared.userInfo.firstName = user.firstName
         UserManager.shared.userInfo.lastName = user.lastName

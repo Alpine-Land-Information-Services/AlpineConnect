@@ -121,7 +121,7 @@ public class Updater {
             }
             catch {
                 result(false, nil)
-                fatalError("\(error)")
+                assertionFailure("\(error)")
             }
         }
     }
@@ -135,7 +135,7 @@ public class Updater {
             cursor.close()
         }
         catch {
-            fatalError("\(error)")
+            assertionFailure("\(error)")
         }
     }
 }

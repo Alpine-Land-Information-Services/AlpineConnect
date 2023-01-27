@@ -23,8 +23,6 @@ public class NetworkMonitor: ObservableObject {
     @Published public var connectionType = ConnectionType.offline
     @Published public var connected = false
     
-    public var action: (() -> Void)?
-
     public func start() {
         let monitor = NWPathMonitor()
         monitor.start(queue: DispatchQueue(label: "NetworkMonitor"))
@@ -38,9 +36,6 @@ public class NetworkMonitor: ObservableObject {
                 }
                 DispatchQueue.main.async {
                     self.connected = true
-                }
-                if let action = self.action {
-                    action()
                 }
             }
             else {

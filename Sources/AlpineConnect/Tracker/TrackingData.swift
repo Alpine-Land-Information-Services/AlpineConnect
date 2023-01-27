@@ -24,6 +24,8 @@ public struct TrackingData {
     }
     
     public struct DeviceInfo {
+        var email: String
+        
         var deviceID: UUID?
         var deviceType: String
         var deviceName: String

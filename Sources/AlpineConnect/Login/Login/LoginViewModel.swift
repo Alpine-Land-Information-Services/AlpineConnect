@@ -86,7 +86,9 @@ class LoginViewModel: ObservableObject {
     }
     
     func makeLoginUpdateInfo() -> Login.UserLoginUpdate {
-        return Login.UserLoginUpdate(email: userManager.userName, password: userManager.password, appName: info.appDBName, appVersion: Tracker.appVersion(), machineName: Tracker.deviceName(), info: userManager.userName)
+        let login = Login.UserLoginUpdate(email: userManager.userName, password: userManager.password, appName: info.appDBName, appVersion: Tracker.appVersion(), machineName: Tracker.deviceName(), info: userManager.userName)
+        userManager.loginUpdate = login
+        return login
     }
     
     func handleAuthenticationResponse(_ response: LoginResponse) {
