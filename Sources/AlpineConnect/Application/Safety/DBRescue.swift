@@ -70,10 +70,9 @@ public class DBRescue {
     }
     
     static func RescueDB(userName: String, url: URL, handler: @escaping ((Bool, String) -> Void)) {
-        fatalError("need to fix compile error in quickZipFiles")
         DispatchQueue.global(qos: .userInitiated).async {
             do {
-                let tempUrl = URL(string: "")!//try Zip.quickZipFiles([url], fileName: "tempDB")
+                let tempUrl = try Zip.quickZipFiles([url], fileName: "tempDB")
                 let data = try Data(contentsOf: tempUrl)
 
                 DispatchQueue.main.async {
