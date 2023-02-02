@@ -141,8 +141,8 @@ extension AppControl { //MARK: Alerts
         }
     }
     
-    public static func successfulExportAlert() {
-        let alert = AppAlert(title: "Export Successful", message: "Your data has been successfully exported.")
+    public static func successfulSyncAlert() {
+        let alert = AppAlert(title: "Sync Successful", message: "Local data has been sucessfully exported and updated.")
         AppControl.shared.toggleAlert(alert)
     }
     
