@@ -20,7 +20,7 @@ public class Check {
     public static func checkPostgresError(_ error: Error) -> LoginResponse {
         Login.loginResponse = "\(error)"
         guard let error = error as? PostgresError else {
-            assertionFailure("Not a Postgres Error")
+//            assertionFailure("Not a Postgres Error")
             return .unknownError
         }
         switch error {
