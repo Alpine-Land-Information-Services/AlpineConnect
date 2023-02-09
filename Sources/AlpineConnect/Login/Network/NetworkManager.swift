@@ -40,3 +40,5 @@ public class NetworkManager {
         self.shared = NetworkManager()
     }
 }
+
+
