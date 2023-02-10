@@ -22,7 +22,7 @@ public extension Optional where Wrapped == String {
     }
     
     func toPostgres() -> String {
-        self != nil ? self! : "NULL"
+        self != nil && self != "" ? self! : "NULL"
     }
 }
 
