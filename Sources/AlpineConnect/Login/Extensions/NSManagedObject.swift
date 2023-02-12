@@ -21,7 +21,11 @@ public func ContextSaver(for context: NSManagedObjectContext?) {
 
 public extension NSManagedObject {
     
-    func save(context: NSManagedObjectContext? = nil) {
+    static var entityName: String {
+        String(describing: Self.self)
+    }
+    
+    func save(in context: NSManagedObjectContext? = nil) {
         guard let ctx = context ?? self.managedObjectContext else {
             assertionFailure()
             return
@@ -35,7 +39,7 @@ public extension NSManagedObject {
         }
     }
     
-    static func MainAsyncSave(_ context: NSManagedObjectContext) {
+    static func mainAsyncSave(in context: NSManagedObjectContext) {
         DispatchQueue.main.async {
             do {
                 try context.save()
@@ -46,21 +50,19 @@ public extension NSManagedObject {
         }
     }
     
-    func delete(context: NSManagedObjectContext? = nil) {
+    func delete(in context: NSManagedObjectContext? = nil, doSave: Bool = true) {
         guard let ctx = context ?? self.managedObjectContext else {
             assertionFailure()
             return
         }
         do {
             ctx.delete(self)
-            try ctx.save()
+            if doSave {
+                try ctx.save()
+            }
         } catch {
             print("Failure to delete object: \(error)")
         }
-    }
-    
-    static var entityName: String {
-        String(describing: Self.self)
     }
     
     static func all(in context: NSManagedObjectContext) -> [NSManagedObject] {
@@ -124,6 +126,7 @@ public extension NSManagedObject {
     static func count(entityName: String? = nil, in context: NSManagedObjectContext) -> Int {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: entityName ?? Self.entityName)
         var result = 0
+        request.returnsObjectsAsFaults = true
         context.performAndWait {
             do {
                 result = try context.fetch(request).count
