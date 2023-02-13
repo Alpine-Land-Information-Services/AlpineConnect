@@ -79,11 +79,40 @@ public extension NSManagedObject {
         return result
     }
     
+    static func disableAll(in context: NSManagedObjectContext) {
+        do {
+            for item in all(in: context) {
+                item.setValue(false, forKey: "enabled_")
+            }
+            try context.save()
+        } catch {
+            print(error)
+        }
+    }
+    
     static func findByGUID(entityName: String? = nil, _ guid: String?, in context: NSManagedObjectContext) -> Self? {
         guard guid != nil else { return nil }
         let request = NSFetchRequest<NSManagedObject>(entityName: entityName ?? Self.entityName)
         request.predicate = NSPredicate(format: "guid = %@", UUID(uuidString: guid!)! as CVarArg)
         request.returnsObjectsAsFaults = false
+        request.fetchLimit = 1
+        var result: Self?
+        context.performAndWait {
+            do {
+                result = try context.fetch(request).first as? Self
+            } catch {
+                print(error)
+            }
+        }
+        return result
+    }
+    
+    static func findByName(entityName: String? = nil,_ name: String, in context: NSManagedObjectContext) -> Self? {
+        guard !name.isEmpty else { return nil }
+        let request = NSFetchRequest<NSManagedObject>(entityName: entityName ?? Self.entityName)
+        request.predicate = NSPredicate(format: "name = %@", name)
+        request.returnsObjectsAsFaults = false
+        request.fetchLimit = 1
         var result: Self?
         context.performAndWait {
             do {
