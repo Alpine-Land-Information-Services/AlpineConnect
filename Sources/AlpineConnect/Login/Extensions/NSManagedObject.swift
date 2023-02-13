@@ -65,8 +65,8 @@ public extension NSManagedObject {
         }
     }
     
-    static func all(in context: NSManagedObjectContext) -> [NSManagedObject] {
-        let request = NSFetchRequest<NSManagedObject>(entityName: Self.entityName)
+    static func all(entityName: String? = nil, in context: NSManagedObjectContext) -> [NSManagedObject] {
+        let request = NSFetchRequest<NSManagedObject>(entityName: entityName ?? Self.entityName)
         request.returnsObjectsAsFaults = false
         var result: [NSManagedObject] = []
         context.performAndWait {
@@ -79,9 +79,9 @@ public extension NSManagedObject {
         return result
     }
     
-    static func disableAll(in context: NSManagedObjectContext) {
+    static func disableAll(entityName: String? = nil, in context: NSManagedObjectContext) {
         do {
-            for item in all(in: context) {
+            for item in all(entityName: entityName, in: context) {
                 item.setValue(false, forKey: "enabled_")
             }
             try context.save()
