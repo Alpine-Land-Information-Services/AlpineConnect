@@ -22,14 +22,19 @@ public extension Optional where Wrapped == String {
     }
     
     func toPostgres() -> String {
-        self != nil && self != "" ? self! : "NULL"
+        self != nil && self != "" ? "'\(self!)'" : "NULL"
     }
 }
 
 public extension Optional where Wrapped == NSNumber {
     
-    func topPostgres() -> String {
-        self != nil ? "\(self!)" : "NULL"
+    func topPostgres(isOptional: Bool) -> String {
+        if let self {
+            return self == 1 ? "TRUE" : "FALSE"
+        }
+        else {
+            return isOptional ? "NULL" : "FALSE"
+        }
     }
 }
 
