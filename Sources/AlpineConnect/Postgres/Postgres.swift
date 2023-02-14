@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import PostgresClientKit
 
 
 public extension Optional where Wrapped == UUID {
@@ -47,7 +48,7 @@ public extension Optional where Wrapped == Date {
 
 public extension Optional where Wrapped == Data {
     func toPostgres() -> String {
-        self != nil ? "'\(self!)'" : "NULL"
+        self != nil ? "'\(PostgresByteA(data: self!).postgresValue)'" : "NULL"
     }
 }
 

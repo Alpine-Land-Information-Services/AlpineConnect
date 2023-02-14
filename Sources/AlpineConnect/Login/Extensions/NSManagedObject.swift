@@ -152,8 +152,9 @@ public extension NSManagedObject {
         }
     }
     
-    static func count(entityName: String? = nil, in context: NSManagedObjectContext) -> Int {
+    static func count(entityName: String? = nil, predicate: NSPredicate? = nil, in context: NSManagedObjectContext) -> Int {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: entityName ?? Self.entityName)
+        request.predicate = predicate
         var result = 0
         request.returnsObjectsAsFaults = true
         context.performAndWait {
