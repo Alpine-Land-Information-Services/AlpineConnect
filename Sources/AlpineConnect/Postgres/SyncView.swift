@@ -25,8 +25,6 @@ public struct SyncView: View {
                     Divider()
                     syncMessage
                     progress
-                    Divider()
-                        .padding()
                 }
                 .padding([.horizontal, .top])
                 syncedRecords
@@ -36,8 +34,13 @@ public struct SyncView: View {
         .interactiveDismissDisabled(tracker.status != .none)
         .onChange(of: tracker.status) { newValue in
             if newValue == .none {
-                dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    dismiss()
+                }
             }
+        }
+        .onDisappear {
+            SyncTracker.clear()
         }
     }
     
@@ -49,40 +52,57 @@ public struct SyncView: View {
             Spacer()
             Image(packageResource: viewModel.image, ofType: ".png").resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 100)
+                .frame(maxWidth: 100)
         }
     }
     
     var syncMessage: some View {
         HStack {
-            ProgressView()
-                .progressViewStyle(.circular)
-                .padding(.horizontal, 6)
-            Text("Please wait... \(tracker.statusMessage)")
+            if tracker.status != .none && tracker.status != .error {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .padding(.horizontal, 6)
+            }
+            Text(viewModel.statusMessage)
                 .font(.headline)
                 .fontWeight(.bold)
-                .foregroundColor(Color(uiColor: .systemGray))
+                .foregroundColor(viewModel.statusColor)
         }
-        .padding(30)
+        .padding(20)
     }
     
     var progress: some View {
         VStack {
-            Text(tracker.currentRecord?.name ?? "---")
-                .font(.headline)
-                .foregroundColor(Color(uiColor: .systemGray))
-            ProgressView(value: tracker.currentRecordProgress, total: tracker.currentRecord?.recordsCount ?? 0)
-                .progressViewStyle(.linear)
-                .scaleEffect(x: 1, y: 2, anchor: .center)
-                .padding(.vertical)
+            if tracker.status == .error {
+                VStack {
+                    Text("Check error log and share with developer to resolve the issue.")
+                        .font(.subheadline)
+                        .foregroundColor(Color(uiColor: .systemGray))
+                        .padding(10)
+                    TextButtonBlock(text: "Dismiss", font: .headline, action: {
+                        dismiss()
+                    })
+                }
+            }
+            else {
+                Text(tracker.currentRecord?.name ?? "---")
+                    .font(.headline)
+                    .foregroundColor(Color(uiColor: .systemGray))
+                ProgressView(value: tracker.currentRecordProgress, total: tracker.currentRecord?.recordsCount ?? 0)
+                    .progressViewStyle(.linear)
+                    .scaleEffect(x: 1, y: 2, anchor: .center)
+                    .padding(.vertical)
+            }
         }
         .padding()
+        .frame(maxWidth: .infinity)
+        .frame(height: 130)
         .background(Color(.white))
         .cornerRadius(10)
     }
     
     var syncedRecords: some View {
-        VStack {
+        VStack(spacing: 0) {
             HStack {
                 Text("Completed")
                     .font(.headline)
@@ -93,10 +113,11 @@ public struct SyncView: View {
                     .fontWeight(.bold)
                     .foregroundColor(Color(uiColor: .systemGray))
             }
-            .padding(.horizontal)
+            .padding()
+            Divider()
             List {
                 ForEach(tracker.syncRecords) { record in
-                    ProgressView(record.name, value: record.recordsCount, total: record.recordsCount)
+                    ProgressView("\(record.name) - \(record.recordsCount > 0 ? "Done" : "No Change")", value: record.recordsCount, total: record.recordsCount)
                         .progressViewStyle(.linear)
                         .padding(.vertical)
                         .foregroundColor(Color(uiColor: .systemGray))

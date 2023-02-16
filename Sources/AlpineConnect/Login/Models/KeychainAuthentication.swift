@@ -25,12 +25,12 @@ final class KeychainAuthentication {
                 completionHandler(response)
             })
         } else {
-            completionHandler(offlineCheck())
+            completionHandler(offlineCheck(email: info.email))
         }
     }
     
-    func offlineCheck() -> LoginResponse {
-        guard Login.getUserFromUserDefaults() else {
+    func offlineCheck(email: String) -> LoginResponse {
+        guard CurrentUser.getUserDataFromDefaults(email: email) != nil else {
             return .networkError
         }
         if userManager.userName == userManager.storedUserName && userManager.password == userManager.storedPassword {

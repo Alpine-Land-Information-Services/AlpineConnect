@@ -157,26 +157,6 @@ public class Login {
     }
     
     static func fillUserInfo(user: BackendUser) {
-        UserManager.shared.userInfo.firstName = user.firstName
-        UserManager.shared.userInfo.lastName = user.lastName
-        saveUserToUserDefaults(UserManager.shared.userInfo)
-    }
-    
-    static func saveUserToUserDefaults(_ info: UserManager.UserInfo) {
-        UserManager.shared.userInfo = info
-        
-        if let encoded = try? JSONEncoder().encode(info) {
-            UserDefaults.standard.set(encoded, forKey: "LoginUserInfo")
-        }
-    }
-    
-    static func getUserFromUserDefaults() -> Bool {
-        if let info = UserDefaults.standard.object(forKey: "LoginUserInfo") as? Data {
-            if let loadedInfo = try? JSONDecoder().decode(UserManager.UserInfo.self, from: info) {
-                UserManager.shared.userInfo = loadedInfo
-                return true
-            }
-        }
-        return false
+        CurrentUser.makeUserData(email: user.email, name: user.firstName + " " + user.lastName, id: user.id)
     }
 }

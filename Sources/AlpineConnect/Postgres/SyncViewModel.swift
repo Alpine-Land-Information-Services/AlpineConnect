@@ -5,14 +5,32 @@
 //  Created by Jenya Lebid on 2/15/23.
 //
 
-import Foundation
+import SwiftUI
 
 class SyncViewModel: ObservableObject {
     
     let hour = Calendar.current.component(.hour, from: Date())
     
-    var name: String {
-        UserManager.shared.userInfo.firstName
+    var statusColor: Color {
+        switch SyncTracker.shared.status {
+        case .error:
+            return .red
+        case .none:
+            return .green
+        default:
+            return Color(uiColor: .systemGray)
+        }
+    }
+    
+    var statusMessage: String {
+        switch SyncTracker.shared.status {
+        case .error:
+            return "Sync Error Accurred"
+        case .none:
+            return "Process Complete"
+        default:
+            return "Please Wait... \(SyncTracker.shared.statusMessage)"
+        }
     }
     
     var totalToSync: Int {
@@ -45,18 +63,7 @@ class SyncViewModel: ObservableObject {
         }
     }
     
-    var status: String {
-        switch SyncTracker.shared.status {
-        case .importing:
-            return "Importing Records"
-        case .actions:
-            return "Making Geometry"
-        default:
-            return "Complete"
-        }
-    }
-    
     var greeting: String {
-        greetingText + ", " + name.capitalized
+        greetingText + ", " + CurrentUser.firstName.capitalized
     }
 }

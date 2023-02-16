@@ -10,22 +10,21 @@ import PostgresClientKit
 
 public protocol Syncable: NSManagedObject {
     
-    static func getPGTableName() -> String
+    static var pgTableName: String { get }
+    static var pgSelectText: String { get }
+    static var countRecords: Bool { get }
+    
     static func needUpdate() -> Bool
-    static func getSelectText() -> String
     static func processPGResult(cursor: Cursor) throws
-    static var countRecords: Bool {get}
 }
 
 public extension Syncable {
-    
     static var type: Syncable.Type {
         return self as Syncable.Type
     }
 }
 
 public extension Syncable {
-    
     static func needUpdate() -> Bool {
         true
     }
@@ -37,17 +36,23 @@ public extension Syncable {
 
 public extension Syncable {
     
-    static func sync(with connection: Connection, in context: NSManagedObjectContext) {
-        guard Self.needUpdate() else { return }
+    static func sync(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
+        guard Self.needUpdate() else {
+            SyncTracker.shared.makeRecord(name: Self.entityName, recordCount: 0)
+            return true
+        }
 
-        let text = Self.getSelectText()
+        let text = Self.pgSelectText
+        var result = false
         
         do {
             if Self.countRecords {
                 let recCount = try getRecordsCount(query: text, connection: connection)
-                if recCount == 0 { return }
                 SyncTracker.shared.makeRecord(name: Self.entityName, recordCount: recCount)
-            } else {
+                
+                guard recCount != 0 else { return true }
+            }
+            else {
                 print("---------------->>> \(Self.entityName)")
             }
             
@@ -62,11 +67,13 @@ public extension Syncable {
             try context.save()
             
             SyncTracker.shared.endRecordSync()
+            result = true
             
         } catch {
-            print(error)
-            AppControl.makeError(onAction: "\(Self.entityName) Sync", error: error)
+            AppControl.makeError(onAction: "\(Self.entityName) Import", error: error)
         }
+        
+        return result
     }
     
     static func getRecordsCount(query: String, connection: Connection) throws -> Int {

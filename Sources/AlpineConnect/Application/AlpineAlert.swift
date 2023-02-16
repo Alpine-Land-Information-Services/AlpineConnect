@@ -43,7 +43,7 @@ public struct AlpineAlert: View {
         }
         .padding()
         .frame(width: 300)
-        .background(Color("Background"))
+        .background(Color(uiColor: .systemBackground))
         .cornerRadius(10)
         .shadow(radius: 3)
     }

@@ -52,7 +52,7 @@ public extension Optional where Wrapped == Data {
     }
 }
 
-public extension Date {
+private extension Date {
     
     func toPostgresTimestamp() -> String {
         toStringTimeZonePST(dateFormat: "yyyy-MM-dd HH:mm:ss")

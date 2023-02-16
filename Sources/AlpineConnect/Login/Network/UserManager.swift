@@ -14,13 +14,6 @@ public class UserManager: ObservableObject {
         var password: String
     }
     
-    public struct UserInfo: Codable {
-        public init() {}
-        
-        public var firstName: String = ""
-        public var lastName: String = ""
-    }
-    
     public struct LoginToken: Codable {
         public init(_ token: String) {
             self.key = token
@@ -32,7 +25,6 @@ public class UserManager: ObservableObject {
     
     public static let shared = UserManager()
     
-    public var userInfo = UserInfo()
     public var token: LoginToken?
     
     
@@ -46,5 +38,4 @@ public class UserManager: ObservableObject {
     @Published var inputPassword: String = ""
     
     @Published public var userLoggedIn: Bool = false
-    @Published public var lastSync: Date? = nil
 }

@@ -13,6 +13,7 @@ public class SyncTracker: ObservableObject {
         case importing
         case exporting
         case actions
+        case error
         case none
     }
     
@@ -24,13 +25,17 @@ public class SyncTracker: ObservableObject {
     
     static public var shared = SyncTracker()
     
+    static public var isInitial: Bool {
+        CurrentUser.lastSync == nil
+    }
+    
     @Published public var status = SyncStatus.none
     @Published public var statusMessage = ""
     
     @Published var currentRecord: SyncableRecord?
     @Published var currentRecordProgress = 0.0
     
-    var syncRecords = [SyncableRecord]()
+    @Published var syncRecords = [SyncableRecord]()
     var totalReccordsToSync = 0
 
     public func progressUpdate() {
@@ -43,6 +48,9 @@ public class SyncTracker: ObservableObject {
         DispatchQueue.main.async { [self] in
             currentRecordProgress = 0
             currentRecord = SyncableRecord(name: name, recordsCount: Double(recordCount))
+            if recordCount == 0 {
+                endRecordSync()
+            }
         }
     }
     
@@ -65,5 +73,9 @@ extension SyncTracker {
         DispatchQueue.main.async {
             SyncTracker.shared.statusMessage = message
         }
+    }
+    
+    static public func clear() {
+        SyncTracker.shared = SyncTracker()
     }
 }
