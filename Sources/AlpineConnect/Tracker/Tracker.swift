@@ -24,31 +24,31 @@ public class Tracker {
     }
     
     public static func appVersion() -> String {
-        return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     }
     
     public static func appBuild() -> String {
-        return Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
     }
     
     public static func appName() -> String {
-        return Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "Unknown"
+        Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "Unknown"
     }
     
     public static func deviceID() -> UUID? {
-        return UIDevice.current.identifierForVendor
+        UIDevice.current.identifierForVendor
     }
     
     public static func deviceType() -> String {
-        return UIDevice.current.type.rawValue
+        UIDevice.current.type.rawValue
     }
     
     public static func deviceName() -> String {
-        return UIDevice.current.name
+        UIDevice.current.name
     }
     
     public static func deviceVersion() -> String {
-        return UIDevice.current.systemVersion
+        UIDevice.current.systemVersion
     }
     
 //    static func deviceLocation(location: @escaping (Bool, CLLocation?) -> Void) {

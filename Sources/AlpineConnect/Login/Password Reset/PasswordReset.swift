@@ -51,7 +51,8 @@ class PasswordReset {
             }
         }
         catch {
-            fatalError("\(error)")
+            AppControl.makeError(onAction: "Password reset", error: error)
+            return(.unknownError, error.localizedDescription)
         }
     }
 }

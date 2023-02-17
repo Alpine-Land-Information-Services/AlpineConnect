@@ -57,7 +57,6 @@ public class NetworkMonitor: ObservableObject {
         if connected {
             return true
         }
-        
         AppControl.noConnectionAlert()
         
         return false

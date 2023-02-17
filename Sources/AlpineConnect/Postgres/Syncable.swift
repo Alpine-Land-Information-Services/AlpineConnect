@@ -30,7 +30,7 @@ public extension Syncable {
     }
     
     static var countRecords: Bool {
-        get { true }
+        true
     }
 }
 

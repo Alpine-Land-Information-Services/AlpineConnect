@@ -43,15 +43,14 @@ public class ConnectDB {
 extension NSManagedObjectContext {
     
     static public func main() -> NSManagedObjectContext {
-        return ConnectDB.shared.mainContext
+        ConnectDB.shared.mainContext
     }
     
     static public func background() -> NSManagedObjectContext {
-        return ConnectDB.shared.privateContext
+        ConnectDB.shared.privateContext
     }
     
     static public func newBackground() -> NSManagedObjectContext {
-        let context = ConnectStack.persitentContainer.newBackgroundContext()
-        return context
+        ConnectStack.persitentContainer.newBackgroundContext()
     }
 }

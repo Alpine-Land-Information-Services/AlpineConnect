@@ -38,7 +38,7 @@ class PasswordChangeViewModel: ObservableObject {
     }
     
     func allFieldsFilled() -> Bool {
-        return oldPassword == "" || newPassword == "" || repeatedNewPassword == ""
+        oldPassword == "" || newPassword == "" || repeatedNewPassword == ""
     }
     
     func backToLogin() {

@@ -57,7 +57,6 @@ public struct AlpineAlert: View {
         }
     }
     
-    
     var oneAction: some View {
         HStack {
             dismiss

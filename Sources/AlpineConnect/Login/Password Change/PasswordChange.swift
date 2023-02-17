@@ -21,7 +21,6 @@ class PasswordChange {
     
     
     struct PasswordInfo: Codable {
-        
         var email: String
         var currentPassword: String
         var newPassword: String

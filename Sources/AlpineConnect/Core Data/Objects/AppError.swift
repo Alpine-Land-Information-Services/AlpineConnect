@@ -27,6 +27,6 @@ extension AppError {
 extension Error {
     
     public func log() -> String {
-        return "\(self)"
+        "\(self)"
     }
 }

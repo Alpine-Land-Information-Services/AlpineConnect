@@ -24,7 +24,6 @@ public class Login {
     }
     
     public struct BackendUser: Codable {
-        
         public var id: UUID
         public var email: String
         public var firstName: String
