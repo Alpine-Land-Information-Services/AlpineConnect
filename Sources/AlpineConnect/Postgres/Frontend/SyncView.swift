@@ -34,7 +34,7 @@ public struct SyncView: View {
         .interactiveDismissDisabled(tracker.status != .none)
         .onChange(of: tracker.status) { newValue in
             if newValue == .none {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                     dismiss()
                 }
             }
@@ -117,11 +117,29 @@ public struct SyncView: View {
             Divider()
             List {
                 ForEach(tracker.syncRecords) { record in
-                    ProgressView("\(record.name) - \(record.recordsCount > 0 ? "Done" : "No Change")", value: record.recordsCount, total: record.recordsCount)
-                        .progressViewStyle(.linear)
-                        .padding(.vertical)
-                        .foregroundColor(Color(uiColor: .systemGray))
-                        .accentColor(Color(uiColor: .systemGray))
+                    VStack(spacing: 0) {
+                        HStack {
+                            Text("\(record.type.rawValue.capitalized): \(record.name)")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(Color(uiColor: .systemGray))
+                            Spacer()
+                            Group {
+                                Text("Status:")
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(Color(uiColor: .systemGray))
+                                Text("\(record.recordsCount > 0 ? "Completed" : "No Change")")
+                                    .font(.caption)
+                                    .foregroundColor(Color(uiColor: .systemGray))
+                            }
+                        }
+                        ProgressView(value: record.recordsCount, total: record.recordsCount)
+                            .progressViewStyle(.linear)
+                            .padding(.vertical)
+                            .foregroundColor(Color(uiColor: .systemGray))
+                            .accentColor(Color(uiColor: .systemGray))
+                    }
                 }
             }
         }
@@ -144,11 +162,11 @@ struct SyncView_Previews: PreviewProvider {
                 SyncView()
             }
             .onAppear {
-                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", recordsCount: 123))
-                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", recordsCount: 123))
-                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", recordsCount: 123))
-                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", recordsCount: 123))
-                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", recordsCount: 123))
+                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .import, recordsCount: 0))
+                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 0))
+                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .import, recordsCount: 123))
+                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 123))
+                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 123))
 
             }
         }

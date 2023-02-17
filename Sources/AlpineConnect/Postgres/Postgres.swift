@@ -8,7 +8,6 @@
 import Foundation
 import PostgresClientKit
 
-
 public extension Optional where Wrapped == UUID {
     
     func toPostgres() -> String {

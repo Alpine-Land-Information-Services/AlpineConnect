@@ -1,30 +1,30 @@
 //
-//  Syncable.swift
+//  Importable.swift
 //  AlpineConnect
 //
-//  Created by mkv on 2/6/23.
+//  Created by Jenya Lebid on 2/17/23.
 //
 
 import CoreData
 import PostgresClientKit
 
-public protocol Syncable: NSManagedObject {
+public protocol Importable: NSManagedObject {
     
     static var pgTableName: String { get }
-    static var pgSelectText: String { get }
+    static var selectQuery: String { get }
     static var countRecords: Bool { get }
     
     static func needUpdate() -> Bool
     static func processPGResult(cursor: Cursor) throws
 }
 
-public extension Syncable {
-    static var type: Syncable.Type {
-        return self as Syncable.Type
+public extension Importable {
+    static var importable: Importable.Type {
+        return self as Importable.Type
     }
 }
 
-public extension Syncable {
+public extension Importable {
     static func needUpdate() -> Bool {
         true
     }
@@ -34,21 +34,21 @@ public extension Syncable {
     }
 }
 
-public extension Syncable {
+public extension Importable {
     
     static func sync(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
         guard Self.needUpdate() else {
-            SyncTracker.shared.makeRecord(name: Self.entityName, recordCount: 0)
+            SyncTracker.shared.makeRecord(name: Self.entityName, type: .import, recordCount: 0)
             return true
         }
 
-        let text = Self.pgSelectText
+        let text = Self.selectQuery
         var result = false
         
         do {
             if Self.countRecords {
                 let recCount = try getRecordsCount(query: text, connection: connection)
-                SyncTracker.shared.makeRecord(name: Self.entityName, recordCount: recCount)
+                SyncTracker.shared.makeRecord(name: Self.entityName, type: .import, recordCount: recCount)
                 
                 guard recCount != 0 else { return true }
             }

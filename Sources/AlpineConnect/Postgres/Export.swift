@@ -18,7 +18,7 @@ public class Export {
         case error(_ error: Swift.Error)
     }
     
-    static public func postgresExport(with query: String, in context: NSManagedObjectContext, result: @escaping (Result<Void, Export.Error>) -> ()) {
+    static public func doExport(with query: String, in context: NSManagedObjectContext, result: @escaping (Result<Void, Export.Error>) -> ()) {
         NetworkManager.shared.pool?.withConnection { con_from_pool in
             context.performAndWait {
                 do {

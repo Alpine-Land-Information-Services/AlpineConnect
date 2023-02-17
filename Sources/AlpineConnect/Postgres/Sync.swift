@@ -9,47 +9,101 @@ import CoreData
 
 public class Sync {
     
-    static public func doImport(checks: Bool, in context: NSManagedObjectContext, objects: [Syncable.Type], doBefore: (() -> ())?, doAfter: (() -> ())?) {
+    static public func sync(checks: Bool, exportObjects: [any Exportable.Type], importObjects: [Importable.Type], in context: NSManagedObjectContext, doBefore: (() -> ())?, doInBetween: (() -> ())?, doAfter: (() -> ())?) async {
         guard checks else { return }
-                
-        SyncTracker.shared.totalReccordsToSync = objects.filter({$0.countRecords}).count
         
-        AppControl.showSheet(view: SyncView())
-        SyncTracker.updateStatus(.importing)
+        SyncTracker.shared.totalReccordsToSync = SyncTracker.status == .exportReady ? exportObjects.count + importObjects.count : importObjects.count
+        await AppControl.showSheet(view: SyncView())
+//        SyncTracker.toggleSyncWindow(to: true)
         
-        NetworkManager.shared.pool?.withConnection { con_from_pool in
-            do {
-                let connection = try con_from_pool.get()
-                defer { connection.close() }
-                
-                if let doBefore {
-                    doBefore()
-                }
-                
-                context.performAndWait {
-                    for object in objects {
-                        guard object.sync(with: connection, in: context) else {
-                            SyncTracker.statusMessage("Import Error")
-                            SyncTracker.updateStatus(.error)
-                            return
-                        }
-                    }
-                    
-                    SyncTracker.updateStatus(.none)
-                    CurrentUser.updateSyncDate(Date())
-                    
-                    if let doAfter {
-                        doAfter()
-                    }
-                }
+        defer {
+            if SyncTracker.status != .error {
+                CurrentUser.updateSyncDate(Date())
             }
-            catch {
-                AppControl.makeError(onAction: "Data Sync", error: error)
-            }
+            SyncTracker.updateStatus(.none)
+//            SyncTracker.toggleSyncWindow(to: false)
+        }
+        
+        if let doBefore {
+            doBefore()
+        }
+        
+        if SyncTracker.status == .exportReady {
+            await doExport(in: context, objects: exportObjects)
+        }
+        
+        if let doInBetween {
+            doInBetween()
+        }
+        
+        if SyncTracker.status == .exportDone {
+            SyncTracker.updateStatus(.importReady)
+        }
+        
+        guard SyncTracker.status == .importReady else {
+            return
+        }
+        
+        await doImport(in: context, objects: importObjects)
+        
+        if let doAfter {
+            doAfter()
         }
     }
     
-    static public func doExport(checks: Bool, in context: NSManagedObjectContext, objects: [Syncable.Type], doBefore: (() -> ())?, doAfter: (() -> ())?) {
-        guard checks else { return }
+    static private func doImport(in context: NSManagedObjectContext, objects: [Importable.Type]) async {
+        guard SyncTracker.status == .importReady, objects.count > 0 else { return }
+        
+        SyncTracker.updateStatus(.importing)
+        
+        await withCheckedContinuation({ continuation in
+            NetworkManager.shared.pool?.withConnection { con_from_pool in
+                do {
+                    try context.performAndWait {
+                        let connection = try con_from_pool.get()
+                        defer { connection.close() }
+                        for object in objects {
+                            guard object.sync(with: connection, in: context) else {
+                                SyncTracker.updateStatus(.error)
+                                return
+                            }
+                        }
+                        
+                        SyncTracker.updateStatus(.importDone)
+                        continuation.resume()
+                    }
+                }
+                catch {
+                    AppControl.makeError(onAction: "Data Import", error: error)
+                }
+            }
+        })
+    }
+    
+    static private func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type]) async {
+        guard SyncTracker.status == .exportReady, objects.count > 0 else { return }
+        
+        SyncTracker.updateStatus(.exporting)
+        await withCheckedContinuation { continuation in
+            NetworkManager.shared.pool?.withConnection { con_from_pool in
+                do {
+                    try context.performAndWait {
+                        let connection = try con_from_pool.get()
+                        defer { connection.close() }
+                        for object in objects {
+                            guard object.export(with: connection, in: context) else {
+                                SyncTracker.updateStatus(.error)
+                                return
+                            }
+                        }
+                        SyncTracker.updateStatus(.exportDone)
+                        continuation.resume()
+                    }
+                }
+                catch {
+                    AppControl.makeError(onAction: "Data Export", error: error)
+                }
+            }
+        }
     }
 }
