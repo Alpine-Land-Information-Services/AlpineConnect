@@ -8,7 +8,7 @@
 import CoreData
 import PostgresClientKit
 
-public protocol Exportable: NSManagedObject {
+public protocol Exportable: Syncable {
     
     static func insertQuery(for objects: [Self], in context: NSManagedObjectContext) -> String
     static func getAllExportable(in context: NSManagedObjectContext) -> [Self]
@@ -51,7 +51,7 @@ public extension Exportable {
             result = true
 
         } catch {
-            AppControl.makeError(onAction: "\(Self.entityName) Import", error: error)
+            AppControl.makeError(onAction: "\(Self.entityName) Export", error: error)
         }
 
         return result

@@ -8,6 +8,30 @@
 import CoreData
 import PostgresClientKit
 
-public protocol Syncable: Importable, Exportable {
+public protocol Syncable: NSManagedObject {
+ 
+    static var isImportable: Bool { get }
+    static var isExportable: Bool { get }
+}
+
+public extension Syncable {
     
+    var guid: UUID {
+        self.value(forKey: "guid_") as! UUID
+    }
+}
+
+public extension Syncable {
+    
+    static var isImportable: Bool {
+        (self as? Importable.Type != nil) ? true : false
+    }
+    
+    static var isExportable: Bool {
+        (self as? any Exportable.Type != nil) ? true : false
+    }
+    
+    static var type: Syncable.Type {
+        self as Syncable.Type
+    }
 }

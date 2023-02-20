@@ -8,7 +8,7 @@
 import CoreData
 import PostgresClientKit
 
-public protocol Importable: NSManagedObject {
+public protocol Importable: Syncable {
     
     static var pgTableName: String { get }
     static var selectQuery: String { get }

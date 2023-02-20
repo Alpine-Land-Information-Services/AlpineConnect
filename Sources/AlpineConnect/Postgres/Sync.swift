@@ -9,19 +9,19 @@ import CoreData
 
 public class Sync {
     
-    static public func sync(checks: Bool, exportObjects: [any Exportable.Type], importObjects: [Importable.Type], in context: NSManagedObjectContext, doBefore: (() -> ())?, doInBetween: (() -> ())?, doAfter: (() -> ())?) async {
+    static public func sync(checks: Bool, objects: [Syncable.Type], in context: NSManagedObjectContext, doBefore: (() -> ())?, doInBetween: (() -> ())?, doAfter: (() -> ())?) async {
         guard checks else { return }
         
-        SyncTracker.shared.totalReccordsToSync = SyncTracker.status == .exportReady ? exportObjects.count + importObjects.count : importObjects.count
+        let (importable, exportable) = sortTypes(objects)
+        
+        SyncTracker.shared.totalReccordsToSync = SyncTracker.status == .exportReady ? importable.count + exportable.count : importable.count
         await AppControl.showSheet(view: SyncView())
-//        SyncTracker.toggleSyncWindow(to: true)
         
         defer {
             if SyncTracker.status != .error {
                 CurrentUser.updateSyncDate(Date())
+                SyncTracker.updateStatus(.none)
             }
-            SyncTracker.updateStatus(.none)
-//            SyncTracker.toggleSyncWindow(to: false)
         }
         
         if let doBefore {
@@ -29,7 +29,7 @@ public class Sync {
         }
         
         if SyncTracker.status == .exportReady {
-            await doExport(in: context, objects: exportObjects)
+            await doExport(in: context, objects: exportable)
         }
         
         if let doInBetween {
@@ -44,7 +44,7 @@ public class Sync {
             return
         }
         
-        await doImport(in: context, objects: importObjects)
+        await doImport(in: context, objects: importable)
         
         if let doAfter {
             doAfter()
@@ -65,16 +65,20 @@ public class Sync {
                         for object in objects {
                             guard object.sync(with: connection, in: context) else {
                                 SyncTracker.updateStatus(.error)
+                                continuation.resume()
                                 return
                             }
                         }
                         
                         SyncTracker.updateStatus(.importDone)
                         continuation.resume()
+
                     }
                 }
                 catch {
+                    SyncTracker.updateStatus(.error)
                     AppControl.makeError(onAction: "Data Import", error: error)
+                    continuation.resume()
                 }
             }
         })
@@ -93,6 +97,7 @@ public class Sync {
                         for object in objects {
                             guard object.export(with: connection, in: context) else {
                                 SyncTracker.updateStatus(.error)
+                                continuation.resume()
                                 return
                             }
                         }
@@ -102,8 +107,16 @@ public class Sync {
                 }
                 catch {
                     AppControl.makeError(onAction: "Data Export", error: error)
+                    continuation.resume()
                 }
             }
         }
+    }
+    
+    static private func sortTypes(_ objects: [Syncable.Type]) -> ([Importable.Type], [any Exportable.Type]) {
+        let importable = objects.filter({$0 is Importable.Type})
+        let exportable =  objects.filter({$0 is any Exportable.Type})
+        
+        return (importable as! [Importable.Type], exportable as! [any Exportable.Type])
     }
 }
