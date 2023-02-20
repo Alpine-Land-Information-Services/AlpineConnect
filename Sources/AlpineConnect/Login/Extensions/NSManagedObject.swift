@@ -25,6 +25,14 @@ public extension NSManagedObject {
         String(describing: Self.self)
     }
     
+    static var entityDisplayName: String {
+        var res = entityName
+        if res.hasSuffix("_V1") {
+            res = res.replacingOccurrences(of: "_V1", with: "")
+        }
+        return res
+    }
+    
     func save(in context: NSManagedObjectContext? = nil) {
         guard let ctx = context ?? self.managedObjectContext else {
             assertionFailure()

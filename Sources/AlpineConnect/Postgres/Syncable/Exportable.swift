@@ -26,7 +26,7 @@ public extension Exportable {
     
     static func export(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
         let objects = Self.getAllExportable(in: context)
-        SyncTracker.shared.makeRecord(name: Self.entityName, type: .export, recordCount: objects.count)
+        SyncTracker.shared.makeRecord(name: Self.entityDisplayName, type: .export, recordCount: objects.count)
 
         guard objects.count > 0 else {
             return true
