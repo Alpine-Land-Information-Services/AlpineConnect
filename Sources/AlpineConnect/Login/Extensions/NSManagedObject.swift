@@ -101,7 +101,7 @@ public extension NSManagedObject {
     static func findByGUID(entityName: String? = nil, _ guid: String?, in context: NSManagedObjectContext) -> Self? {
         guard guid != nil else { return nil }
         let request = NSFetchRequest<NSManagedObject>(entityName: entityName ?? Self.entityName)
-        request.predicate = NSPredicate(format: "guid = %@", UUID(uuidString: guid!)! as CVarArg)
+        request.predicate = NSPredicate(format: "guid_ = %@", UUID(uuidString: guid!)! as CVarArg)
         request.returnsObjectsAsFaults = false
         request.fetchLimit = 1
         var result: Self?

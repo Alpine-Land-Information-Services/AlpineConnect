@@ -12,7 +12,7 @@ public protocol Importable: Syncable {
     
     static var pgTableName: String { get }
     static var selectQuery: String { get }
-    static var countRecords: Bool { get }
+    static var shallCountRecords: Bool { get }
     
     static func needUpdate() -> Bool
     static func processPGResult(cursor: Cursor) throws
@@ -20,7 +20,7 @@ public protocol Importable: Syncable {
 
 public extension Importable {
     static var importable: Importable.Type {
-        return self as Importable.Type
+        self as Importable.Type
     }
 }
 
@@ -29,9 +29,7 @@ public extension Importable {
         true
     }
     
-    static var countRecords: Bool {
-        true
-    }
+    static var shallCountRecords: Bool { true }
 }
 
 public extension Importable {
@@ -46,7 +44,7 @@ public extension Importable {
         var result = false
         
         do {
-            if Self.countRecords {
+            if shallCountRecords {
                 let recCount = try getRecordsCount(query: text, connection: connection)
                 SyncTracker.shared.makeRecord(name: Self.entityDisplayName, type: .import, recordCount: recCount)
                 

@@ -18,7 +18,7 @@ public protocol Exportable: Syncable {
 
 public extension Exportable {
     static var exportable: any Exportable.Type {
-        return self as any Exportable.Type
+        self as any Exportable.Type
     }
 }
 
@@ -58,12 +58,12 @@ public extension Exportable {
     }
     
     static func getAllExportable(in context: NSManagedObjectContext) -> [Self] {
-        Self.findObjects(by: NSPredicate(format: "changed = true"), in: context) as? [Self] ?? []
+        Self.findObjects(by: NSPredicate(format: "changed_ = true"), in: context) as? [Self] ?? []
     }
     
     static func modifyExportable(_ objects: [Self]) {
         for object in objects {
-            object.setValue(false, forKey: "changed")
+            object.setValue(false, forKey: "changed_")
         }
     }
     

@@ -9,12 +9,18 @@ import CoreData
 
 public class Sync {
     
-    static public func sync(checks: Bool, objects: [Syncable.Type], in context: NSManagedObjectContext, doBefore: (() -> ())?, doInBetween: (() -> ())?, doAfter: (() -> ())?) async {
+    static public func sync(checks: Bool,
+                            objects: [Syncable.Type],
+                            in context: NSManagedObjectContext,
+                            doBefore: (() -> ())?,
+                            doInBetween: (() -> ())?,
+                            doAfter: (() -> ())?) async
+    {
         guard checks else { return }
         
         let (importable, exportable) = sortTypes(objects)
         
-        SyncTracker.shared.totalReccordsToSync = SyncTracker.status == .exportReady ? importable.count + exportable.count : importable.count
+        SyncTracker.shared.totalRecordsToSync = SyncTracker.status == .exportReady ? importable.count + exportable.count : importable.count
         await AppControl.showSheet(view: SyncView())
         
         defer {

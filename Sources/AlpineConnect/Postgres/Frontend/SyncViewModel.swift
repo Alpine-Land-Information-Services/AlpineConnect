@@ -34,7 +34,7 @@ class SyncViewModel: ObservableObject {
     }
     
     var totalToSync: Int {
-        SyncTracker.shared.totalReccordsToSync
+        SyncTracker.shared.totalRecordsToSync
     }
     
     var greetingText: String {

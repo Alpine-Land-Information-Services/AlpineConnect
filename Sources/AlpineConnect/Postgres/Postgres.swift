@@ -18,7 +18,8 @@ public extension Optional where Wrapped == UUID {
 public extension Optional where Wrapped == String {
     
     func geometryToPostgres() -> String {
-        self != nil && self != "" ? "ST_AsText(ST_GeomFromText('\(self!)',26710))" : "NULL"
+//        self != nil && self != "" ? "ST_AsText(ST_GeomFromText('\(self!)',26710))" : "NULL"
+        self != nil && self != "" ? "'\(self!)'" : "NULL"
     }
     
     func toPostgres() -> String {

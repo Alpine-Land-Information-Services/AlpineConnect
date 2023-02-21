@@ -57,6 +57,10 @@ public extension CurrentUser {
         data.lastSync
     }
     
+    static var email: String {
+        data.email
+    }
+    
     static var syncStartDate: Date? {
         data.syncStart
     }

@@ -54,7 +54,7 @@ public class SyncTracker: ObservableObject {
     @Published var currentRecordProgress = 0.0
     
     @Published var syncRecords = [SyncableRecord]()
-    var totalReccordsToSync = 0
+    var totalRecordsToSync = 0
 
     func progressUpdate() {
         DispatchQueue.main.async {

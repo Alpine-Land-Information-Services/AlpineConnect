@@ -8,18 +8,18 @@
 import CoreData
 import PostgresClientKit
 
-public protocol Syncable: NSManagedObject {
+public protocol Syncable: CDObject {
  
     static var isImportable: Bool { get }
     static var isExportable: Bool { get }
 }
 
-public extension Syncable {
-    
-    var guid: UUID {
-        self.value(forKey: "guid_") as! UUID
-    }
-}
+//public extension Syncable {
+//    
+//    var guid: UUID {
+//        self.value(forKey: "guid_") as! UUID
+//    }
+//}
 
 public extension Syncable {
     
