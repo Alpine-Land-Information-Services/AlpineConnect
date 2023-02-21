@@ -13,9 +13,7 @@ public class CurrentUser {
         var guid: UUID
         var email: String
         var name: String
-        
         var lastSync: Date?
-        var syncStart: Date?
     }
     
     static var data: UserData!
@@ -26,24 +24,18 @@ public class CurrentUser {
             return
         }
         
-        data = UserData(guid: id, email: email, name: name, lastSync: nil, syncStart: nil)
-        saveUserDataToDefaults(data)
+        data = UserData(guid: id, email: email, name: name, lastSync: nil)
+        data.saveToDefaults(key: email)
     }
     
     static func getUserDataFromDefaults(email: String) -> UserData? {
-        if let info = UserDefaults.standard.object(forKey: email) as? Data {
+        if let info = UserData.getFromDefaults(key: email) {
             if let loadedInfo = try? JSONDecoder().decode(UserData.self, from: info) {
                 self.data = loadedInfo
                 return loadedInfo
             }
         }
         return nil
-    }
-    
-    static func saveUserDataToDefaults(_ data: UserData) {
-        if let encoded = try? JSONEncoder().encode(data) {
-            UserDefaults.standard.set(encoded, forKey: data.email)
-        }
     }
 }
 
@@ -61,8 +53,8 @@ public extension CurrentUser {
         data.email
     }
     
-    static var syncStartDate: Date? {
-        data.syncStart
+    static var fullName: String {
+        data.name
     }
     
     static var firstName: String {
@@ -75,11 +67,6 @@ public extension CurrentUser {
     
     static func updateSyncDate(_ date: Date?) {
         data.lastSync = date
-        saveUserDataToDefaults(data)
-    }
-    
-    static func changeStartSyncDate(_ date: Date) {
-        data.syncStart = date
-        saveUserDataToDefaults(data)
+        data.saveToDefaults(key: data.email)
     }
 }
