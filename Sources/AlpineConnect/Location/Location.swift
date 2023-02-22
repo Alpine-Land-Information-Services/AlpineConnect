@@ -19,7 +19,8 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         get { manager.headingOrientation }
         set { manager.headingOrientation = newValue}
     }
-    var isWorkind = false
+    
+    var isWorking = false
     
     @Published public var lastLocation: CLLocation?                 // in degrees, 4326
     @Published public var lastHeading: CLHeading?
@@ -32,8 +33,8 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
     }
     
     public func start() {
-        if isWorkind { return }
-        isWorkind = true
+        if isWorking { return }
+        isWorking = true
         manager.requestWhenInUseAuthorization()
         manager.delegate = self
         manager.requestLocation()
@@ -50,7 +51,7 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
     func stop() {
         manager.stopUpdatingLocation()
         manager.stopUpdatingHeading()
-        isWorkind = false
+        isWorking = false
     }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

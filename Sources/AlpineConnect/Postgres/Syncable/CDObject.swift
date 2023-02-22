@@ -1,7 +1,7 @@
 //
 //  CDObject.swift
 //
-//  Created by  on 2/21/23.
+//  Created by mkv on 2/21/23.
 //
 
 import CoreData
