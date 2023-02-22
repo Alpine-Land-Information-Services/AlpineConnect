@@ -14,13 +14,6 @@ public protocol Syncable: CDObject {
     static var isExportable: Bool { get }
 }
 
-//public extension Syncable {
-//    
-//    var guid: UUID {
-//        self.value(forKey: "guid_") as! UUID
-//    }
-//}
-
 public extension Syncable {
     
     static var isImportable: Bool {

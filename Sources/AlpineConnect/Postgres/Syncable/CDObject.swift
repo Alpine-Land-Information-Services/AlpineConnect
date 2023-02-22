@@ -13,6 +13,6 @@ public protocol CDObject: NSManagedObject {
 public extension CDObject {
     
     var guid: UUID {
-        value(forKey: "guid_") as! UUID
+        value(forKey: "guid") as! UUID
     }
 }
