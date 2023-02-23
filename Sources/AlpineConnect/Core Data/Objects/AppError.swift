@@ -10,13 +10,14 @@ import AlpineUI
 
 extension AppError {
     
-    static public func add(onAction: String, log: String, in context: NSManagedObjectContext = .newBackground()) {
+    static public func add(onAction: String, log: String, customDescription: String?, in context: NSManagedObjectContext = .newBackground()) {
         context.perform {
             let error = NSManagedObject(entity: NSEntityDescription.entity(forEntityName: AppError.entityName, in: context)!, insertInto: context) as! AppError
             error.guid = UUID()
             error.date = Date()
             
             error.log = log
+            error.customDescription = customDescription
             error.onAction = onAction
             
             try? context.save()

@@ -137,15 +137,15 @@ extension AppControl { //MARK: Alerts
         }
     }
     
-    private func errorAlert(title: String, error: Error) {
-        let alert = AppAlert(title: "\(title) Error", message: "\(error.localizedDescription) \n-----\n Check error logs for detailed description.")
+    private func errorAlert(title: String, error: Error, customDescription: String?) {
+        let alert = AppAlert(title: "\(title) Error", message: customDescription ?? "\(error.localizedDescription) \n-----\n Check error logs for detailed description.")
         toggleAlert(alert)
     }
     
-    public static func makeError(onAction: String, error: Error, showToUser: Bool = true) {
-        AppError.add(onAction: onAction, log: error.log())
+    public static func makeError(onAction: String, error: Error, customDescription: String? = nil, showToUser: Bool = true) {
+        AppError.add(onAction: onAction, log: error.log(), customDescription: customDescription)
         if showToUser {
-            AppControl.shared.errorAlert(title: onAction, error: error)
+            AppControl.shared.errorAlert(title: onAction, error: error, customDescription: customDescription)
         }
     }
     
