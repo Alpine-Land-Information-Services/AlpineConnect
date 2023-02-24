@@ -23,8 +23,4 @@ public extension Syncable {
     static var isExportable: Bool {
         (self as? any Exportable.Type != nil) ? true : false
     }
-    
-    static var type: Syncable.Type {
-        self as Syncable.Type
-    }
 }

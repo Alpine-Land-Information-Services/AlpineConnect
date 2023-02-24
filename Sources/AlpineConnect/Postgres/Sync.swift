@@ -10,7 +10,7 @@ import CoreData
 public class Sync {
     
     static public func sync(checks: Bool,
-                            objects: [Syncable.Type],
+                            objects: [CDObject.Type],
                             in context: NSManagedObjectContext,
                             doBefore: (() -> ())?,
                             doInBetween: (() -> ())?,
@@ -119,7 +119,7 @@ public class Sync {
         }
     }
     
-    static private func sortTypes(_ objects: [Syncable.Type]) -> ([Importable.Type], [any Exportable.Type]) {
+    static private func sortTypes(_ objects: [CDObject.Type]) -> ([Importable.Type], [any Exportable.Type]) {
         let importable = objects.filter({$0 is Importable.Type})
         let exportable =  objects.filter({$0 is any Exportable.Type})
         

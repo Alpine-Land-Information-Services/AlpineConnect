@@ -149,6 +149,14 @@ extension AppControl { //MARK: Alerts
         }
     }
     
+    public static func doRestart(title: String, message: String) {
+        let alert = AppAlert(title: title, message: message,
+                             dismiss: AlertAction(text: "Quit App", role: .regular, action: {
+                     exit(0)
+                 }))
+        AppControl.shared.toggleAlert(alert)
+    }
+    
     public static func successfulSyncAlert() {
         let alert = AppAlert(title: "Sync Successful", message: "Local data has been sucessfully exported and updated.")
         AppControl.shared.toggleAlert(alert)

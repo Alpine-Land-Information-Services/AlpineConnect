@@ -9,11 +9,17 @@ import Foundation
 
 public class CurrentUser {
     
+    public enum DBType: String, Codable {
+        case production
+        case sandbox
+    }
+    
     struct UserData: Codable {
         var guid: UUID
         var email: String
         var name: String
         var lastSync: Date?
+        var dbType: DBType = .production
     }
     
     static var data: UserData!
@@ -65,8 +71,17 @@ public extension CurrentUser {
         data.name.components(separatedBy: .whitespaces)[1]
     }
     
+    static var dbType: DBType {
+        data.dbType
+    }
+    
     static func updateSyncDate(_ date: Date?) {
         data.lastSync = date
+        data.saveToDefaults(key: data.email)
+    }
+    
+    static func updateDBType(to type: DBType) {
+        data.dbType = type
         data.saveToDefaults(key: data.email)
     }
 }
