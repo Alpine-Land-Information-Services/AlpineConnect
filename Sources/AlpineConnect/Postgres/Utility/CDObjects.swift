@@ -33,4 +33,24 @@ public class CDObjects {
             return .success(())
         }
     }
+    
+    static public func fetchObject(as layer: String, with guid: UUID, in context: NSManagedObjectContext) -> CDObject? {
+        context.performAndWait {
+            let request = NSFetchRequest<NSManagedObject>(entityName: layer.appending("_V1"))
+            request.predicate = NSPredicate(format: "guid = %@", guid as CVarArg)
+            request.fetchLimit = 1
+            request.returnsObjectsAsFaults = false
+            
+            var result: CDObject?
+            
+            do {
+                result = try context.fetch(request).first as? CDObject
+            }
+            catch {
+                AppControl.makeError(onAction: "Fetching Feature", error: error, customDescription: "Could not find selected feature.")
+            }
+            
+            return result
+        }
+    }
 }
