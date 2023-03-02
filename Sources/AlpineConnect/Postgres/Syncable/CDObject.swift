@@ -6,7 +6,7 @@
 
 import CoreData
 
-public protocol CDObject: NSManagedObject {
+public protocol CDObject where Self: NSManagedObject {
     var guid: UUID { get }
 }
 

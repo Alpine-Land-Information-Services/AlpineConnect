@@ -17,10 +17,10 @@ public protocol Syncable: CDObject {
 public extension Syncable {
     
     static var isImportable: Bool {
-        (self as? Importable.Type != nil) ? true : false
+        self as? Importable.Type != nil
     }
     
     static var isExportable: Bool {
-        (self as? any Exportable.Type != nil) ? true : false
+        self as? any Exportable.Type != nil
     }
 }

@@ -37,19 +37,19 @@ public class Sync {
         if SyncTracker.status == .exportReady {
             await doExport(in: context, objects: exportable)
         }
-        
+
         if let doInBetween {
             doInBetween()
         }
-        
+
         if SyncTracker.status == .exportDone {
             SyncTracker.updateStatus(.importReady)
         }
-        
+
         guard SyncTracker.status == .importReady else {
             return
         }
-        
+
         await doImport(in: context, objects: importable)
         
         if let doAfter {
