@@ -32,7 +32,7 @@ public class CDObjects {
             }
             
             DispatchQueue.main.async {
-                NotificationCenter.default.post(name: NSNotification.Name("Connect-Refresh"), object: nil)
+                NotificationCenter.default.post(.viewUpdate(with: "Clear_Data"))
             }
             return .success(())
         }

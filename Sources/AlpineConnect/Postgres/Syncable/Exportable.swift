@@ -12,10 +12,13 @@ public protocol Exportable: Syncable {
     
     static func insertQuery(for objects: [Self], in context: NSManagedObjectContext) -> String
     static func insertQuery2(for objects: [Self], in context: NSManagedObjectContext) -> String
+    
     static func getAllExportable(in context: NSManagedObjectContext) -> [Self]
     static func modifyExportable(_ objects: [Self])
     static func additionalActionsAfterExport()
     static func export(with connection: Connection, in context: NSManagedObjectContext) -> Bool
+    
+    func checkMissingRequirements() -> Bool
 }
 
 public extension Exportable {

@@ -7,7 +7,9 @@
 import CoreData
 
 public protocol CDObject where Self: NSManagedObject {
+    
     var guid: UUID { get }
+    func update(missingRequirements: Bool, isChanged: Bool, in context: NSManagedObjectContext)
 }
 
 public extension CDObject {
@@ -30,5 +32,9 @@ public extension CDObject {
     
     static var type: CDObject.Type {
         self as CDObject.Type
+    }
+    
+    func update(missingRequirements: Bool, isChanged: Bool, in context: NSManagedObjectContext) {
+        
     }
 }
