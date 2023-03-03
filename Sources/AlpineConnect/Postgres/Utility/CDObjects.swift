@@ -9,10 +9,14 @@ import CoreData
 
 public class CDObjects {
     
-    static public func clearAll(_ objects: [CDObject.Type], in context: NSManagedObjectContext, doAfter: (() -> ())? = nil) async -> Result<Void, Error> {
+    static public var objects = [CDObject.Type]()
+    static public var notClearable = [CDObject.Type]()
+    
+    static public func clearAll(in context: NSManagedObjectContext, doAfter: (() -> ())? = nil) async -> Result<Void, Error> {
         await context.perform {
             do {
                 for object in objects {
+                    if notClearable.contains(where: { $0 == object }) { continue }
                     try object.clear(in: context)
                 }
                 
