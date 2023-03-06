@@ -47,6 +47,10 @@ public extension NSManagedObject {
         }
     }
     
+    func inContext(_ context: NSManagedObjectContext) -> Self? {
+        return try? context.existingObject(with: self.objectID) as? Self
+    }
+    
     static func mainAsyncSave(in context: NSManagedObjectContext) {
         DispatchQueue.main.async {
             do {
