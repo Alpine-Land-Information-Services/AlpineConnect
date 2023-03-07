@@ -14,7 +14,6 @@ class TokenManager {
         UserManager.shared.token
     }
     
-    
     static func saveLoginToken(_ token: String) {
         let token = UserManager.LoginToken(token)
         UserManager.shared.token = token
