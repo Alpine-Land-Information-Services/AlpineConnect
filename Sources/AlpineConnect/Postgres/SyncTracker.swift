@@ -43,6 +43,8 @@ public class SyncTracker: ObservableObject {
         CurrentUser.lastSync == nil
     }
     
+    public var syncStartDate = Date()
+    
     @Published public var showSync = false
     
     @Published public var status = SyncStatus.none

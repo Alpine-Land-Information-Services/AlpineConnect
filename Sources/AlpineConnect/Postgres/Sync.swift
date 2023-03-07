@@ -20,6 +20,7 @@ public class Sync {
         
         let (importable, exportable) = sortTypes(objects)
         
+        SyncTracker.shared.syncStartDate = Date()
         SyncTracker.shared.totalRecordsToSync = SyncTracker.status == .exportReady ? importable.count + exportable.count : importable.count
         await AppControl.showSheet(view: SyncView())
         
@@ -68,14 +69,14 @@ public class Sync {
                     try context.performAndWait {
                         let connection = try con_from_pool.get()
                         defer { connection.close() }
+                        
                         for object in objects {
                             guard object.sync(with: connection, in: context) else {
                                 SyncTracker.updateStatus(.error)
                                 continuation.resume()
                                 return
                             }
-                        }
-                        
+                        }                        
                         SyncTracker.updateStatus(.importDone)
                         continuation.resume()
 
@@ -100,6 +101,7 @@ public class Sync {
                     try context.performAndWait {
                         let connection = try con_from_pool.get()
                         defer { connection.close() }
+                        
                         for object in objects {
                             guard object.export(with: connection, in: context) else {
                                 SyncTracker.updateStatus(.error)

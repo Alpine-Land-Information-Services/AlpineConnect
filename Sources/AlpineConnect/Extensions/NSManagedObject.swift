@@ -8,18 +8,12 @@
 import CoreData
 
 
-public func ContextSaver(for context: NSManagedObjectContext?) {
-    do {
-        if context?.hasChanges ?? false {
-            try context?.save()
-        }
-    } catch {
-        print(error)
-    }
+public protocol Nameable {
+    static var entityName: String { get }
+    static var entityDisplayName: String { get }
 }
 
-
-public extension NSManagedObject {
+public extension Nameable {
     
     static var entityName: String {
         String(describing: Self.self)
@@ -32,6 +26,37 @@ public extension NSManagedObject {
         }
         return res
     }
+}
+
+
+//MARK: -
+public func ContextSaver(for context: NSManagedObjectContext?) {
+    do {
+        if context?.hasChanges ?? false {
+            try context?.save()
+        }
+    } catch {
+        print(error)
+    }
+}
+
+//MARK: -
+extension NSManagedObject: Nameable {
+}
+
+public extension NSManagedObject {
+    
+//    static var entityName: String {
+//        String(describing: Self.self)
+//    }
+//
+//    static var entityDisplayName: String {
+//        var res = entityName
+//        if res.hasSuffix("_V1") {
+//            res = res.replacingOccurrences(of: "_V1", with: "")
+//        }
+//        return res
+//    }
     
     func save(in context: NSManagedObjectContext? = nil) {
         guard let ctx = context ?? self.managedObjectContext else {
@@ -152,8 +177,9 @@ public extension NSManagedObject {
         return result
     }
     
-    static func clearData(entityName: String? = nil, in context: NSManagedObjectContext) {
+    static func clearData(entityName: String? = nil, predicate: NSPredicate? = nil, in context: NSManagedObjectContext) {
         let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: entityName ?? Self.entityName)
+        fetch.predicate = predicate
         let request = NSBatchDeleteRequest(fetchRequest: fetch)
         context.performAndWait {
             do {
