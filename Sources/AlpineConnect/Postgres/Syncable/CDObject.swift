@@ -15,9 +15,14 @@ public protocol CDObject where Self: NSManagedObject {
 public extension CDObject {
     
     var guid: UUID {
-        (self.managedObjectContext?.performAndWait {
-            value(forKey: "guid") as! UUID
-        })!
+        if let guid = (self.managedObjectContext?.performAndWait {
+                            value(forKey: "guid") as? UUID
+                        })
+        {
+            return guid
+        }
+        assertionFailure("CDObject HAS NO GUID")
+        return UUID()
     }
     
     static func clear(in context: NSManagedObjectContext) throws {

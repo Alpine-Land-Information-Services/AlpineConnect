@@ -10,7 +10,6 @@ import CoreData
 public class Sync {
     
     static public func sync(checks: Bool,
-                            objects: [CDObject.Type],
                             in context: NSManagedObjectContext,
                             doBefore: (() -> ())?,
                             doInBetween: (() -> ())?,
@@ -18,7 +17,7 @@ public class Sync {
     {
         guard checks else { return }
         
-        let (importable, exportable) = sortTypes(objects)
+        let (importable, exportable) = sortTypes(CDObjects.objects)
         
         SyncTracker.shared.syncStartDate = Date()
         SyncTracker.shared.totalRecordsToSync = SyncTracker.status == .exportReady ? importable.count + exportable.count : importable.count
@@ -69,6 +68,10 @@ public class Sync {
                     try context.performAndWait {
                         let connection = try con_from_pool.get()
                         defer { connection.close() }
+                        
+                        for worker in CDObjects.importHelperObjects {
+                            try worker.performWork(in: connection)
+                        }
                         
                         for object in objects {
                             guard object.sync(with: connection, in: context) else {
