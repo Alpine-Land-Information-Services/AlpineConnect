@@ -14,11 +14,20 @@ public class CurrentUser {
         case sandbox
     }
     
+    struct LastView: Codable {
+        var viewType: String
+        var viewID: UUID
+    }
+    
     struct UserData: Codable {
         var guid: UUID
+        
         var email: String
         var name: String
+        
         var lastSync: Date?
+        
+        var lastView: LastView?
         var dbType: DBType = .production
     }
     
@@ -75,6 +84,16 @@ public extension CurrentUser {
         data.dbType
     }
     
+    static var lastView: (String, UUID)? {
+        guard let viewType = data.lastView?.viewType, let id = data.lastView?.viewID else {
+            return nil
+        }
+        return (viewType, id)
+    }
+}
+
+public extension CurrentUser {
+    
     static func updateSyncDate(_ date: Date?) {
         data.lastSync = date
         data.saveToDefaults(key: data.email)
@@ -82,6 +101,13 @@ public extension CurrentUser {
     
     static func updateDBType(to type: DBType) {
         data.dbType = type
+        data.saveToDefaults(key: data.email)
+    }
+    
+    static func updateLastView(type: String?, id: UUID) {
+        guard let type else { return }
+        let view = LastView(viewType: type, viewID: id)
+        data.lastView = view
         data.saveToDefaults(key: data.email)
     }
 }

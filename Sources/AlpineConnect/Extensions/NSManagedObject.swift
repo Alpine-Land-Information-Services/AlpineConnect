@@ -73,7 +73,9 @@ public extension NSManagedObject {
     }
     
     func inContext(_ context: NSManagedObjectContext) -> Self? {
-        return try? context.existingObject(with: self.objectID) as? Self
+        self.managedObjectContext?.performAndWait {
+            return try? context.existingObject(with: self.objectID) as? Self
+        }
     }
     
     static func mainAsyncSave(in context: NSManagedObjectContext) {
@@ -235,8 +237,8 @@ public extension NSManagedObject {
         return result
     }
     
-    static func findObject(by predicate: NSPredicate, in context: NSManagedObjectContext) -> NSManagedObject? {
-        let request = NSFetchRequest<NSManagedObject>(entityName: Self.entityName)
+    static func findObject(for entity: String? = nil, by predicate: NSPredicate, in context: NSManagedObjectContext) -> NSManagedObject? {
+        let request = NSFetchRequest<NSManagedObject>(entityName: entity ?? Self.entityName)
         request.predicate = predicate
         request.returnsObjectsAsFaults = false
         request.fetchLimit = 1
