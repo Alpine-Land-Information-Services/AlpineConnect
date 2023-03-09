@@ -10,6 +10,7 @@ import CoreData
 public class Sync {
     
     static public func sync(checks: Bool,
+                            objectsContainer: CDObjectsContainer,
                             in context: NSManagedObjectContext,
                             doBefore: (() -> ())?,
                             doInBetween: (() -> ())?,
@@ -17,7 +18,7 @@ public class Sync {
     {
         guard checks else { return }
         
-        let (importable, exportable) = sortTypes(CDObjects.objects)
+        let (importable, exportable) = sortTypes(objectsContainer.objects)
         
         SyncTracker.shared.syncStartDate = Date()
         SyncTracker.shared.totalRecordsToSync = SyncTracker.status == .exportReady ? importable.count + exportable.count : importable.count
@@ -50,14 +51,14 @@ public class Sync {
             return
         }
 
-        await doImport(in: context, objects: importable)
+        await doImport(in: context, objects: importable, importHelperObjects: objectsContainer.importHelperObjects)
         
         if let doAfter {
             doAfter()
         }
     }
     
-    static private func doImport(in context: NSManagedObjectContext, objects: [Importable.Type]) async {
+    static private func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], importHelperObjects: [ExecutionHelper.Type]? = nil) async {
         guard SyncTracker.status == .importReady, objects.count > 0 else { return }
         
         SyncTracker.updateStatus(.importing)
@@ -69,8 +70,10 @@ public class Sync {
                         let connection = try con_from_pool.get()
                         defer { connection.close() }
                         
-                        for worker in CDObjects.importHelperObjects {
-                            try worker.performWork(in: connection)
+                        if let importHelperObjects {
+                            for helper in importHelperObjects {
+                                try helper.performWork(in: connection)
+                            }
                         }
                         
                         for object in objects {

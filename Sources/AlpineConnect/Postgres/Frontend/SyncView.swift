@@ -97,7 +97,7 @@ public struct SyncView: View {
         .padding()
         .frame(maxWidth: .infinity)
         .frame(height: 130)
-        .background(Color(.white))
+        .background(Color(UITraitCollection.current.userInterfaceStyle == .light ? .white : .systemGray3))
         .cornerRadius(10)
     }
     

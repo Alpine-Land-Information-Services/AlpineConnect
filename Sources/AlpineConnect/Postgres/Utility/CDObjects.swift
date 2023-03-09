@@ -7,17 +7,30 @@
 
 import CoreData
 
+
+public class CDObjectsContainer {
+    public var objects = [CDObject.Type]()
+    public var nonClearableObjects = [CDObject.Type]()
+    public var importHelperObjects = [ExecutionHelper.Type]()
+    
+    public init() {
+    }
+    
+    public init(objects: [CDObject.Type], nonClearableObjects: [CDObject.Type]? = nil, importHelperObjects: [ExecutionHelper.Type]? = nil) {
+        self.objects = objects
+        self.nonClearableObjects = nonClearableObjects ?? []
+        self.importHelperObjects = importHelperObjects ?? []
+    }
+}
+
+
 public class CDObjects {
     
-    static public var objects = [CDObject.Type]()
-    static public var nonClearableObjects = [CDObject.Type]()
-    static public var importHelperObjects = [ExecutionHelper.Type]()
-    
-    static public func clearAll(in context: NSManagedObjectContext, doAfter: (() -> ())? = nil) async -> Result<Void, Error> {
+    static public func clearAll(_ objectsContainer: CDObjectsContainer, in context: NSManagedObjectContext, doAfter: (() -> ())? = nil) async -> Result<Void, Error> {
         await context.perform {
             do {
-                for object in objects {
-                    if nonClearableObjects.contains(where: { $0 == object }) { continue }
+                for object in objectsContainer.objects {
+                    if objectsContainer.nonClearableObjects.contains(where: { $0 == object }) { continue }
                     try object.clear(in: context)
                 }
                 
