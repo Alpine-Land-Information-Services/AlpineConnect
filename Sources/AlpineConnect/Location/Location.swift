@@ -24,6 +24,7 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
     
     @Published public var lastLocation: CLLocation?                 // in degrees, 4326
     @Published public var lastHeading: CLHeading?
+    //TODO: is this needed?
     @Published public var centerCoordinate: CLLocationCoordinate2D? // in projection, 26710
     
     public var degrees: Double = .zero {
@@ -58,16 +59,24 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         if let location = locations.last {
             lastLocation = location
             DispatchQueue.main.async { [weak self] in
-                self?.delegate?.newLocation(self!.lastLocation!)
+                if let lastLocation = self?.lastLocation {
+                    self?.delegate?.newLocation(lastLocation)
+                }
             }
         }
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        if let lastHeading = manager.heading {
-            self.lastHeading = lastHeading
-            delegate?.newHeading(lastHeading)
-            degrees = -1 * lastHeading.magneticHeading
+        if let heading = manager.heading {
+            lastHeading = heading
+            DispatchQueue.main.async { [weak self] in
+                if let lastHeading = self?.lastHeading,
+                   let lastLocation = self?.lastLocation
+                {
+                    self?.delegate?.newHeading(lastHeading, lastLocation)
+                }
+            }
+            degrees = -1 * heading.magneticHeading
         }
     }
 
@@ -108,13 +117,13 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
 
 
 public protocol LocationChangeDelegate: AnyObject {
-    func newLocation(_ newValue: CLLocation)
-    func newHeading(_ newHeading: CLHeading)
+    func newLocation(_ newLocation: CLLocation)
+    func newHeading(_ newHeading: CLHeading, _ newLocation: CLLocation)
 }
 
 
 extension LocationChangeDelegate {
-    public func newHeading(_ newHeading: CLHeading) {
+    public func newHeading(_ newHeading: CLHeading, _ newLocation: CLLocation) {
         //default realization, so inheritors be able not to implement the method
     }
 }
