@@ -170,6 +170,10 @@ extension AppControl { //MARK: Alerts
     public static func makeAlert(alert: AppAlert) {
         AppControl.shared.toggleAlert(alert)
     }
+    
+    public static func notDoneAlert() {
+        AppControl.makeSimpleAlert(title: "Not Implemented", message: "This functionality has not yet been added, check back later.")
+    }
 }
 
 extension AppControl {

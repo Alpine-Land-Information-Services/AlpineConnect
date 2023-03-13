@@ -28,9 +28,7 @@ struct ListObjectSelectorModifier<Destination: View>: ViewModifier {
         ScrollViewReader { value in
             content
                 .onAppear {
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                        checkAndOpen(proxy: value)
-//                    }
+                    checkAndOpen(proxy: value)
                 }
                 .background(
                     NavigationLink(isActive: $open, destination: {
