@@ -12,6 +12,8 @@ public protocol Syncable: CDObject {
  
     static var isImportable: Bool { get }
     static var isExportable: Bool { get }
+    
+    var isLocal: Bool { get }
 }
 
 public extension Syncable {
@@ -22,5 +24,9 @@ public extension Syncable {
     
     static var isExportable: Bool {
         self as? any Exportable.Type != nil
+    }
+    
+    var isLocal: Bool {
+        return self.value(forKey: "syncDate_") == nil
     }
 }

@@ -9,12 +9,12 @@ import CoreData
 
 
 public class CDObjectsContainer {
+    
     public var objects = [CDObject.Type]()
     public var nonClearableObjects = [CDObject.Type]()
     public var importHelperObjects = [ExecutionHelper.Type]()
     
-    public init() {
-    }
+    public init() {}
     
     public init(objects: [CDObject.Type], nonClearableObjects: [CDObject.Type]? = nil, importHelperObjects: [ExecutionHelper.Type]? = nil) {
         self.objects = objects

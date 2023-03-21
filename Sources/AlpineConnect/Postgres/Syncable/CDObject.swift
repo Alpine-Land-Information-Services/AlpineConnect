@@ -9,7 +9,9 @@ import CoreData
 public protocol CDObject where Self: NSManagedObject {
     
     var guid: UUID { get }
+    
     func update(missingRequirements: Bool, isChanged: Bool, in context: NSManagedObjectContext)
+    func deleteObject(in context: NSManagedObjectContext?)
 }
 
 public extension CDObject {
@@ -41,5 +43,37 @@ public extension CDObject {
     
     func update(missingRequirements: Bool, isChanged: Bool, in context: NSManagedObjectContext) {
         
+    }
+    
+   func deleteObject(in context: NSManagedObjectContext? = nil) {
+       guard let context  = context ?? self.managedObjectContext else {
+           return
+       }
+       
+       if let object = self as? Syncable {
+           if object.isLocal {
+               self.setValue(true, forKey: "delete_")
+               self.delete(in: context, doSave: true)
+           }
+           else {
+               self.setValue(true, forKey: "delete_")
+               self.update(missingRequirements: false, isChanged: true, in: context)
+           }
+       }
+       else {
+           self.update(missingRequirements: false, isChanged: true, in: context)
+           self.delete(in: context, doSave: true)
+       }
+    }
+    
+    func deleteWithAlert(in context: NSManagedObjectContext? = nil, doAfter: (() -> ())? = nil) {
+        let alert = AppAlert(title: "Delete \(Self.entityDisplayName)?", message: "This action cannot be undone", dismiss: AlertAction(text: "Cancel"), actions: [AlertAction(text: "Delete", role: .destructive, action: {
+            self.deleteObject(in: context)
+            if let doAfter {
+                doAfter()
+            }
+        })])
+        
+        AppControl.makeAlert(alert: alert)
     }
 }
