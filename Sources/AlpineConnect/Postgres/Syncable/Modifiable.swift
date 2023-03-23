@@ -30,12 +30,12 @@ public extension Modifiable {
             setValue(true, forKey: "delete_")
             update(missingRequirements: false, isChanged: true, in: context)
             if object.isLocal {
-                delete(in: context, doSave: true)
+                delete(in: context, doSave: false)
             }
         }
         else {
             update(missingRequirements: false, isChanged: true, in: context)
-            delete(in: context, doSave: true)
+            delete(in: context, doSave: false)
         }
      }
 }
