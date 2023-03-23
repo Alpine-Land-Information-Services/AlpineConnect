@@ -22,7 +22,7 @@ public extension Modifiable {
     }
     
     func deleteObject(in context: NSManagedObjectContext? = nil) {
-        guard let context  = context ?? self.managedObjectContext else {
+        guard let context = context ?? self.managedObjectContext else {
             return
         }
         

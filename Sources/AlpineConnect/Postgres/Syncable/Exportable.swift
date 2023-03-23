@@ -59,7 +59,6 @@ public extension Exportable {
             
             Self.modifyExportable(objects)
             Self.additionalActionsAfterExport()
-            try context.save()
 
             SyncTracker.shared.endRecordSync()
             result = true

@@ -111,11 +111,13 @@ public class Sync {
                         for object in objects {
                             guard object.export(with: connection, in: context) else {
                                 SyncTracker.updateStatus(.error)
+                                context.rollback()
                                 continuation.resume()
                                 return
                             }
                         }
                         SyncTracker.updateStatus(.exportDone)
+                        try context.save()
                         continuation.resume()
                     }
                 }
