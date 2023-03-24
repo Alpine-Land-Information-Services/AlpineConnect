@@ -71,12 +71,12 @@ public extension Exportable {
     }
     
     static func getAllExportable(in context: NSManagedObjectContext) -> [Self] {
-        Self.findObjects(by: NSPredicate(format: "changed_ = true"), in: context) as? [Self] ?? []
+        Self.findObjects(by: NSPredicate(format: "z_changed_ = true"), in: context) as? [Self] ?? []
     }
     
     static func modifyExportable(_ objects: [Self]) {
         for object in objects {
-            object.setValue(false, forKey: "changed_")
+            object.setValue(false, forKey: "z_changed_")
         }
     }
     

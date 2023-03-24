@@ -27,6 +27,6 @@ public extension Syncable {
     }
     
     var isLocal: Bool {
-        return value(forKey: "syncDate_") == nil
+        return value(forKey: "z_syncDate_") == nil
     }
 }
