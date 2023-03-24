@@ -18,7 +18,7 @@ public protocol Modifiable: CDObject {
 public extension Modifiable {
     
     var wasDeleted: Bool {
-        value(forKey: "z_deleted_") as? Bool ?? true
+        value(forKey: "a_deleted") as? Bool ?? true
     }
     
     func deleteObject(in context: NSManagedObjectContext? = nil) {
@@ -27,7 +27,7 @@ public extension Modifiable {
         }
         
         if let object = self as? Syncable {
-            setValue(true, forKey: "z_deleted_")
+            setValue(true, forKey: "a_deleted")
             update(missingRequirements: false, isChanged: true, in: context)
             if object.isLocal {
                 delete(in: context, doSave: false)

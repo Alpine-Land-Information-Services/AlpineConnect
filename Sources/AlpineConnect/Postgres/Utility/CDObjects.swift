@@ -46,7 +46,7 @@ public class CDObjects {
             }
             
             DispatchQueue.main.async {
-                NotificationCenter.default.post(.viewUpdate(with: "Clear_Data"))
+                NotificationCenter.default.post(.viewUpdate(with: "reloadSidebar"))
             }
             return .success(())
         }
