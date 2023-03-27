@@ -7,28 +7,6 @@
 
 import CoreData
 
-
-public protocol Nameable {
-    static var entityName: String { get }
-    static var entityDisplayName: String { get }
-}
-
-public extension Nameable {
-    
-    static var entityName: String {
-        String(describing: Self.self)
-    }
-    
-    static var entityDisplayName: String {
-        var res = entityName
-        if res.hasSuffix("_V1") {
-            res = res.replacingOccurrences(of: "_V1", with: "")
-        }
-        return res
-    }
-}
-
-
 //MARK: -
 public func ContextSaver(for context: NSManagedObjectContext?) {
     do {
@@ -45,18 +23,6 @@ extension NSManagedObject: Nameable {
 }
 
 public extension NSManagedObject {
-    
-//    static var entityName: String {
-//        String(describing: Self.self)
-//    }
-//
-//    static var entityDisplayName: String {
-//        var res = entityName
-//        if res.hasSuffix("_V1") {
-//            res = res.replacingOccurrences(of: "_V1", with: "")
-//        }
-//        return res
-//    }
     
     func save(in context: NSManagedObjectContext? = nil) {
         guard let ctx = context ?? self.managedObjectContext else {
