@@ -70,9 +70,11 @@ public class Login {
         }
     }
     
-    static func getBackendUser(email: String) async throws -> (BackendUser, HTTPURLResponse) {
+    static func getBackendUser(email: String) async throws -> (BackendUser, HTTPURLResponse)? {
         guard let url = URL(string: "\(serverURL)user?email=\(email)") else {
-            fatalError("Reset Password URL Error")
+            AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot make URL")
+            loginResponse = "Cannot make backend URL"
+            return nil
         }
         
         var request = URLRequest(url: url)
@@ -83,7 +85,9 @@ public class Login {
         let user = try JSONDecoder().decode(BackendUser.self, from: body)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            fatalError("Cannot get HTTP URL Response")
+            AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot get HTTP URL response")
+            loginResponse = "Cannot get HTTP URL response"
+            return nil
         }
         
         return (user, httpResponse)
@@ -91,7 +95,9 @@ public class Login {
     
     static func getBackendStatus(email: String, DBConnected: Bool) async -> (LoginResponse) {
         do {
-            let (user, response) = try await getBackendUser(email: email)
+            guard let (user, response) = try await getBackendUser(email: email) else {
+                return .unknownError
+            }
             self.user = user
             
             loginResponse = "\(response)"
@@ -125,7 +131,8 @@ public class Login {
     
     static func updateUserLogin(info: UserLoginUpdate) async -> LoginResponse {
         guard let url = URL(string: "\(serverURL)user/credentials") else {
-            fatalError("Registration URL Error")
+            AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot make URL to get user info.")
+            return .unknownError
         }
         
         var request = URLRequest(url: url)
@@ -137,7 +144,9 @@ public class Login {
             let (body, response) = try await URLSession.shared.upload(for: request, from: data)
                         
             guard let httpResponse = response as? HTTPURLResponse else {
-                fatalError("Cannot get HTTP URL Response")
+                AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot get HHTP response.")
+                loginResponse = "Cannot get HHTP response."
+                return .unknownError
             }
             
             TokenManager.saveLoginToken(try JSONDecoder().decode(String.self, from: body))
