@@ -9,6 +9,8 @@
 public protocol Nameable {
     static var entityName: String { get }
     static var entityDisplayName: String { get }
+    var entityName: String { get }
+    var entityDisplayName: String { get }
 }
 
 public extension Nameable {
@@ -24,5 +26,13 @@ public extension Nameable {
             res = res.replacingOccurrences(of: "_V1", with: "")
         }
         return res
+    }
+    
+    var entityName: String {
+        Self.entityName
+    }
+    
+    var entityDisplayName: String {
+        Self.entityDisplayName
     }
 }

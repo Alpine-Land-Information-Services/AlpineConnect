@@ -36,3 +36,7 @@ public extension CDObject {
         self as CDObject.Type
     }
 }
+
+public func printObject(_ obj: CDObject) {
+    print("-object: \(obj.entityDisplayName) ID: \(obj.objectID.uriRepresentation().lastPathComponent) \(obj.guid)")
+}

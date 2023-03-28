@@ -13,6 +13,7 @@ public protocol Modifiable: CDObject {
     
     func update(missingRequirements: Bool, isChanged: Bool, in context: NSManagedObjectContext)
     func deleteObject(in context: NSManagedObjectContext?)
+    func getAllDependentElements() -> [Any]
 }
 
 public extension Modifiable {
@@ -22,9 +23,8 @@ public extension Modifiable {
     }
     
     func deleteObject(in context: NSManagedObjectContext? = nil) {
-        guard let context = context ?? self.managedObjectContext else {
-            return
-        }
+        guard let context = context ?? self.managedObjectContext
+        else { return }
         
         if let object = self as? Syncable {
             setValue(true, forKey: "a_deleted")
