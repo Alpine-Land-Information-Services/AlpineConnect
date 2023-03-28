@@ -13,25 +13,11 @@ public class CurrentUser {
         case production
         case sandbox
     }
-    
-    struct LastView: Codable {
-        var viewType: String
-        var viewID: UUID
+
+    static private var data = [String: Any]()
+    static private var userKey: String {
+        data["email"] as! String
     }
-    
-    struct UserData: Codable {
-        var guid: UUID
-        
-        var email: String
-        var name: String
-        
-        var lastSync: Date?
-        
-        var lastView: LastView?
-        var dbType: DBType = .production
-    }
-    
-    static var data: UserData!
     
     static func makeUserData(email: String, name: String, id: UUID) {
         if let data = getUserDataFromDefaults(email: email) {
@@ -39,75 +25,77 @@ public class CurrentUser {
             return
         }
         
-        data = UserData(guid: id, email: email, name: name, lastSync: nil)
+        data["guid"] = id.uuidString
+        data["email"] = email
+        data["name"] = name
+        
         data.saveToDefaults(key: email)
     }
     
-    static func getUserDataFromDefaults(email: String) -> UserData? {
-        if let info = UserData.getFromDefaults(key: email) {
-            if let loadedInfo = try? JSONDecoder().decode(UserData.self, from: info) {
-                self.data = loadedInfo
-                return loadedInfo
-            }
-        }
-        return nil
+    static func getUserDataFromDefaults(email: String) -> [String: Any]? {
+        Dictionary<String, Any>.getFromDefaults(key: email)
     }
 }
 
 public extension CurrentUser {
     
     static var guid: UUID {
-        data.guid
+        UUID(uuidString: data["guid"] as! String)!
     }
     
     static var lastSync: Date? {
-        data.lastSync
+        data["lastSync"] as? Date
     }
     
     static var email: String {
-        data.email
+        data["email"] as! String
     }
     
     static var fullName: String {
-        data.name
+        data["name"] as! String
     }
     
     static var firstName: String {
-        data.name.components(separatedBy: .whitespaces)[0]
+        fullName.components(separatedBy: .whitespaces)[0]
     }
     
     static var lastName: String {
-        data.name.components(separatedBy: .whitespaces)[1]
+        fullName.components(separatedBy: .whitespaces)[1]
     }
     
     static var dbType: DBType {
-        data.dbType
+        DBType(rawValue: data["dbType"] as! String)!
     }
     
     static var lastView: (String, UUID)? {
-        guard let viewType = data.lastView?.viewType, let id = data.lastView?.viewID else {
+        let lastViewType = data["lastViewType"] as? String
+        let lastViewID = data["lastViewID"] as? String
+        
+        guard let lastViewID, let lastViewType else {
             return nil
         }
-        return (viewType, id)
+
+        return (lastViewType, UUID(uuidString: lastViewID)!)
     }
 }
 
 public extension CurrentUser {
     
     static func updateSyncDate(_ date: Date?) {
-        data.lastSync = date
-        data.saveToDefaults(key: data.email)
+        data["lastSync"] = date
+        data.saveToDefaults(key: userKey)
     }
     
     static func updateDBType(to type: DBType) {
-        data.dbType = type
-        data.saveToDefaults(key: data.email)
+        data["dbType"] = type.rawValue
+        data.saveToDefaults(key: userKey)
     }
     
     static func updateLastView(type: String?, id: UUID) {
         guard let type else { return }
-        let view = LastView(viewType: type, viewID: id)
-        data.lastView = view
-        data.saveToDefaults(key: data.email)
+        
+        data["lastViewType"] = type
+        data["lastViewID"] = id.uuidString
+        data.saveToDefaults(key: userKey)
     }
 }
