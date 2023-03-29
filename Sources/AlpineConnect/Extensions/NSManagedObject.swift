@@ -25,13 +25,13 @@ extension NSManagedObject: Nameable {
 public extension NSManagedObject {
     
     func save(in context: NSManagedObjectContext? = nil) {
-        guard let ctx = context ?? self.managedObjectContext else {
+        guard let context = context ?? self.managedObjectContext else {
             assertionFailure()
             return
         }
         do {
-            if ctx.hasChanges {
-                try ctx.save()
+            if context.hasChanges {
+                try context.save()
             }
         } catch {
             print("Failure to save context: \(error)")
@@ -62,14 +62,14 @@ public extension NSManagedObject {
     }
     
     func delete(in context: NSManagedObjectContext? = nil, doSave: Bool = true) {
-        guard let ctx = context ?? self.managedObjectContext else {
+        guard let context = context ?? self.managedObjectContext else {
             assertionFailure()
             return
         }
         do {
-            ctx.delete(self)
+            context.delete(self)
             if doSave {
-                try ctx.save()
+                try context.save()
             }
         } catch {
             print("Failure to delete object: \(error)")
