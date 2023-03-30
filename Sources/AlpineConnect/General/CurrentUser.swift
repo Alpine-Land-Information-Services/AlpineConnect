@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class CurrentUser {
+open class CurrentUser {
     
     public enum DBType: String, Codable {
         case production
@@ -18,6 +18,8 @@ public class CurrentUser {
     static private var userKey: String {
         data["email"] as! String
     }
+    
+    @available(*, unavailable) public init() {}
     
     static func makeUserData(email: String, name: String, id: UUID) {
         if let data = getUserDataFromDefaults(email: email) {

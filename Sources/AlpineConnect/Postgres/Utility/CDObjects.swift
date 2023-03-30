@@ -54,7 +54,7 @@ public class CDObjects {
     
     static public func fetchObject(as layer: String, with guid: UUID, in context: NSManagedObjectContext) -> CDObject? {
         context.performAndWait {
-            let request = NSFetchRequest<NSManagedObject>(entityName: layer.appending("_V1"))
+            let request = NSFetchRequest<NSManagedObject>(entityName: layer)
             request.predicate = NSPredicate(format: "guid = %@", guid as CVarArg)
             request.fetchLimit = 1
             request.returnsObjectsAsFaults = false

@@ -7,8 +7,10 @@
 
 
 public protocol Nameable {
+    
     static var entityName: String { get }
     static var entityDisplayName: String { get }
+    
     var entityName: String { get }
     var entityDisplayName: String { get }
 }

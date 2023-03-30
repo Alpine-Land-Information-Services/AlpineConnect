@@ -194,9 +194,11 @@ public extension NSManagedObject {
         return result
     }
     
-    static func findObjects(by predicate: NSPredicate, in context: NSManagedObjectContext) -> [NSManagedObject] {
+    static func findObjects(by predicate: NSPredicate?, in context: NSManagedObjectContext) -> [NSManagedObject] {
         let request = NSFetchRequest<NSManagedObject>(entityName: Self.entityName)
-        request.predicate = predicate
+        if let predicate {
+            request.predicate = predicate
+        }
         request.returnsObjectsAsFaults = false
         var result: [NSManagedObject] = []
         context.performAndWait {

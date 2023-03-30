@@ -22,6 +22,10 @@ public extension CDObject {
         }
     }
     
+    static func createObject(in context: NSManagedObjectContext) -> Self {
+        return Self(entity: NSEntityDescription.entity(forEntityName: Self.entityName, in: context)!, insertInto: context)
+    }
+    
     static func clear(in context: NSManagedObjectContext) throws {
         let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: Self.entityName)
         let request = NSBatchDeleteRequest(fetchRequest: fetch)
@@ -29,6 +33,26 @@ public extension CDObject {
          
         if let objectIDs = deleteResult?.result as? [NSManagedObjectID] {
             NSManagedObjectContext.mergeChanges(fromRemoteContextSave: [NSDeletedObjectsKey: objectIDs], into: [context])
+        }
+    }
+    
+    static func findCDObjects(by predicate: NSPredicate?, faults: Bool = false, in context: NSManagedObjectContext) -> [Self] {
+        context.performAndWait {
+            let request = NSFetchRequest<Self>(entityName: Self.entityName)
+            if let predicate {
+                request.predicate = predicate
+            }
+            request.returnsObjectsAsFaults = faults
+            var result: [Self] = []
+            
+            do {
+                result = try context.fetch(request)
+            }
+            catch {
+                assertionFailure("CD FIND OBJECTS FAIL")
+            }
+            
+            return result
         }
     }
     
