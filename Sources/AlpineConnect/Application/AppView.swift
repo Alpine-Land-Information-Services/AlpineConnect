@@ -52,3 +52,33 @@ public struct AppView<App: View>: View {
             .ignoresSafeArea()
     }
 }
+
+//extension View {
+//    
+//    @ViewBuilder func `if` <Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+//        if condition {
+//            transform(self)
+//        } else {
+//            self
+//        }
+//    }
+//    
+//    func hideKeyboard() {
+//        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+//    }
+//    
+//    var keyboardPublisher: AnyPublisher<Bool, Never> {
+//       Publishers
+//         .Merge(
+//           NotificationCenter
+//             .default
+//             .publisher(for: UIResponder.keyboardWillShowNotification)
+//             .map { _ in true },
+//           NotificationCenter
+//             .default
+//             .publisher(for: UIResponder.keyboardWillHideNotification)
+//             .map { _ in false })
+//         .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
+//         .eraseToAnyPublisher()
+//     }
+//}

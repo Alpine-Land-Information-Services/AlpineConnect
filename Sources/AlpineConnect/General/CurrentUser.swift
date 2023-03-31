@@ -9,14 +9,14 @@ import Foundation
 
 open class CurrentUser {
     
-    public enum DBType: String, Codable {
+    public enum Database: String {
         case production
         case sandbox
     }
 
-    static private var data = [String: Any]()
+    static private var data = Dictionary.getFromDefaults(key: userKey) ?? [String: Any]()
     static private var userKey: String {
-        data["email"] as! String
+        UserManager.shared.userName
     }
     
     @available(*, unavailable) public init() {}
@@ -30,6 +30,8 @@ open class CurrentUser {
         data["guid"] = id.uuidString
         data["email"] = email
         data["name"] = name
+        data["isAdmin"] = isAdmin
+        data["database"] = Database.production.rawValue
         
         data.saveToDefaults(key: email)
     }
@@ -45,8 +47,17 @@ public extension CurrentUser {
         UUID(uuidString: data["guid"] as! String)!
     }
     
+    static var isAdmin: Bool {
+        data["isAdmin"] as! Bool
+    }
+    
     static var lastSync: Date? {
-        data["lastSync"] as? Date
+        switch database {
+        case .production:
+            return data["lastSync"] as? Date
+        case .sandbox:
+            return data["lastSyncSandbox"] as? Date
+        }
     }
     
     static var email: String {
@@ -65,39 +76,33 @@ public extension CurrentUser {
         fullName.components(separatedBy: .whitespaces)[1]
     }
     
-    static var dbType: DBType {
-        DBType(rawValue: data["dbType"] as! String)!
-    }
-    
-    static var lastView: (String, UUID)? {
-        let lastViewType = data["lastViewType"] as? String
-        let lastViewID = data["lastViewID"] as? String
-        
-        guard let lastViewID, let lastViewType else {
-            return nil
+    static var database: Database {
+        guard let db = data["database"] as? String else {
+            return .production
         }
-
-        return (lastViewType, UUID(uuidString: lastViewID)!)
+        return Database(rawValue: db)!
     }
 }
 
 public extension CurrentUser {
     
     static func updateSyncDate(_ date: Date?) {
-        data["lastSync"] = date
+        switch database {
+        case .production:
+            data["lastSync"] = date
+        case .sandbox:
+            data["lastSyncSandbox"] = date
+        }
         data.saveToDefaults(key: userKey)
     }
     
-    static func updateDBType(to type: DBType) {
-        data["dbType"] = type.rawValue
+    static func updateDatabase(to type: Database) {
+        data["database"] = type.rawValue
         data.saveToDefaults(key: userKey)
     }
     
-    static func updateLastView(type: String?, id: UUID) {
-        guard let type else { return }
-        
-        data["lastViewType"] = type
-        data["lastViewID"] = id.uuidString
+    static func setAdmin(to value: Bool) {
+        data["isAdmin"] = value
         data.saveToDefaults(key: userKey)
     }
 }
