@@ -15,5 +15,6 @@ public extension Dictionary {
     
     func saveToDefaults(key: String) {
         UserDefaults.standard.set(self, forKey: key)
+        UserDefaults.standard.synchronize()
     }
 }

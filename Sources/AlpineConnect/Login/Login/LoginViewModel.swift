@@ -65,10 +65,6 @@ class LoginViewModel: ObservableObject {
             loginAlert.updateAlertType(_: .emptyFields)
             return
         }
-//        guard Check.isValidEmail(userManager.userName) else {
-//            loginAlert.updateAlertType(.invalidEmail)
-//            return
-//        }
         
         userManager.userName = userManager.userName.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "_")
         userManager.password = userManager.inputPassword
