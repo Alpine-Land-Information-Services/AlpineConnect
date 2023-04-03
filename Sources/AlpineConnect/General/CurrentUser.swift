@@ -48,7 +48,7 @@ public extension CurrentUser {
     }
     
     static var isAdmin: Bool {
-        data["isAdmin"] as! Bool
+        data["isAdmin"] as? Bool ?? false
     }
     
     static var lastSync: Date? {
