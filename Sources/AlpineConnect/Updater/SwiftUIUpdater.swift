@@ -20,6 +20,34 @@ public class SwiftUIUpdater: ObservableObject {
         
     }
     
+//    public func checkForUpdateFromApp() {
+//        let monitor = NWPathMonitor()
+//        monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
+//        monitor.pathUpdateHandler = { path in
+//            if path.status == .satisfied {
+//                self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result, updateRequired in
+//                    if result || updateRequired {
+//                        self.alertToggle(show: true)
+//                    }
+//                    else {
+//                        self.authenticationToggle()
+//                    }
+//                })
+//            }
+//            else {
+//                self.updater.updateStatus = .notConnected
+//                if automatic {
+//                    self.alertToggle(show: false)
+//                    self.authenticationToggle()
+//                }
+//                else {
+//                    self.alertToggle(show: true)
+//                }
+//            }
+//        }
+//        monitor.cancel()
+//    }
+    
     public func checkForUpdate(automatic: Bool) {
         let monitor = NWPathMonitor()
         monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))

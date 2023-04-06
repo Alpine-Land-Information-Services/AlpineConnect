@@ -59,7 +59,7 @@ public struct AppView<App: View>: View {
 extension UIApplication {
     func addTapGestureRecognizer() {
         guard let window = (connectedScenes.first as? UIWindowScene)?.windows.first else { return }
-        let tapGesture = AnyGestureRecognizer(target: window, action: #selector(UIView.endEditing))
+        let tapGesture = TapGestureRecognizer(target: window, action: #selector(UIView.endEditing))
         tapGesture.requiresExclusiveTouchType = false
         tapGesture.cancelsTouchesInView = false
         tapGesture.delegate = self
@@ -73,27 +73,58 @@ extension UIApplication: UIGestureRecognizerDelegate {
     }
 }
 
-class AnyGestureRecognizer: UIGestureRecognizer {
+class TapGestureRecognizer: UITapGestureRecognizer {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
-        if let touchedView = touches.first?.view, touchedView is UIControl {
-            state = .cancelled
-
-        } else if let touchedView = touches.first?.view as? UITextView, touchedView.isEditable {
-            state = .cancelled
-
+        if let touch = touches.first, touch.tapCount == 1 {
+            super.touchesBegan(touches, with: event)
         } else {
-            state = .began
+            state = .cancelled
         }
     }
 
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        state = .ended
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
+        state = .cancelled
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
+        if let touch = touches.first, touch.tapCount == 1 {
+            super.touchesEnded(touches, with: event)
+        } else {
+            state = .cancelled
+        }
     }
 
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {
         state = .cancelled
     }
 }
+
+//class AnyGestureRecognizer: UIGestureRecognizer {
+//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) {
+//        guard let touch = touches.first, touch.tapCount == 1 else {
+//            state = .cancelled
+//            return
+//        }
+//
+//        if let touchedView = touches.first?.view, touchedView is UIControl {
+//            state = .cancelled
+//
+//        } else if let touchedView = touches.first?.view as? UITextView, touchedView.isEditable {
+//            state = .cancelled
+//
+//        } else {
+//            state = .began
+//        }
+//    }
+//
+//    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        state = .ended
+//    }
+//
+//    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {
+//        state = .cancelled
+//    }
+//}
 
 //extension View {
 //    

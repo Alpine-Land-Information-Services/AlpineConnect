@@ -44,7 +44,9 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         manager.allowsBackgroundLocationUpdates = true
         manager.distanceFilter = 5
         manager.showsBackgroundLocationIndicator = true
-        manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.pausesLocationUpdatesAutomatically = false
+        manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
+        manager.activityType = .otherNavigation
         manager.startUpdatingLocation()
         
         manager.headingFilter = 10
@@ -69,6 +71,7 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             lastLocation = location
+            NotificationCenter.default.post(Notification(name: Notification.Name("tempLocationUpdate"), object: location))
             DispatchQueue.main.async { [weak self] in
                 if let lastLocation = self?.lastLocation {
                     self?.delegate?.newLocation(lastLocation)
