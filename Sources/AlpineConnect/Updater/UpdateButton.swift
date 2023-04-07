@@ -10,6 +10,7 @@ import SwiftUI
 public struct UpdateButton: View {
     
     @ObservedObject var viewModel: SwiftUIUpdater
+    @ObservedObject var control = AppControl.shared
         
     public init() {
         self.viewModel = SwiftUIUpdater()
@@ -19,10 +20,17 @@ public struct UpdateButton: View {
         Button {
             viewModel.checkForUpdate(automatic: false)
         } label: {
-            Text("Check Update")
+            Text("Check for Update")
         }
-        .alert(isPresented: $viewModel.showAlert) {
-            viewModel.alert(dismissAction: {})
+        .onChange(of: viewModel.showAlert) { show in
+            if show {
+                viewModel.newAlert()
+            }
+        }
+        .onChange(of: control.showAlert) { show in
+            if !show {
+                viewModel.showAlert = false
+            }
         }
     }
 }

@@ -49,7 +49,7 @@ public struct AlpineAlert: View {
     }
     
     var dismiss: some View {
-        TextButtonBlock(text: alert.dismiss.text, width: 100, height: 50, background: .accentColor) {
+        TextButtonBlock(text: alert.dismiss.text, width: 100, height: 50, background: color(alert.dismiss.role)) {
             withAnimation {
                 isPresented.toggle()
                 alert.dismiss.action()

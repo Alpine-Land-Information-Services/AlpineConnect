@@ -20,29 +20,29 @@ public class SwiftUIUpdater: ObservableObject {
         
     }
     
-//    public func checkForUpdateFromApp() {
+//    static public func checkForUpdate() {
 //        let monitor = NWPathMonitor()
 //        monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
 //        monitor.pathUpdateHandler = { path in
 //            if path.status == .satisfied {
-//                self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result, updateRequired in
+//                Updater.shared.checkVersion(name: Tracker.appName(), automatic: false, showMessage: { result, updateRequired in
 //                    if result || updateRequired {
-//                        self.alertToggle(show: true)
-//                    }
-//                    else {
-//                        self.authenticationToggle()
+//                        switch Updater.shared.updateStatus {
+//                        case .error:
+//                            AppControl.makeSimpleAlert(title: "Something Went Wrong", message: "Please try again later.")
+//                        case .latestVersion:
+//                            AppControl.makeSimpleAlert(title: "No Updates", message: "You are on the latest version")
+//                        case .notConnected:
+//                            AppControl.makeSimpleAlert(title: "Not Connected", message: "Network connection required to check for updates.")
+//                        case .updatedAvailble:
+//                            let alert = AppAlert(title: "Update Available", message: <#T##String#>, dismiss: <#T##AlertAction#>, actions: <#T##[AlertAction]#>)
+//                        case .updateRequired:
+//                        }
 //                    }
 //                })
 //            }
 //            else {
-//                self.updater.updateStatus = .notConnected
-//                if automatic {
-//                    self.alertToggle(show: false)
-//                    self.authenticationToggle()
-//                }
-//                else {
-//                    self.alertToggle(show: true)
-//                }
+//                AppControl.makeSimpleAlert(title: "Not Connected", message: "Network connection required to check for updates.")
 //            }
 //        }
 //        monitor.cancel()
@@ -123,5 +123,23 @@ public class SwiftUIUpdater: ObservableObject {
                          message: Text("Unable to check for update, connect to network and try again."),
                          dismissButton: .default(Text("Okay")))
         }
+    }
+    
+    func newAlert() {
+        var alert = AppAlert(title: "No Updates", message: "You are already on the latest version.")
+        switch updater.updateStatus {
+        case .updateRequired:
+            alert = AppAlert(title: "Update Required", message: "Your application version is no longer supported. \n\nPlease update to continue.", dismiss: AlertAction(text: "Update Now", action: callUpdate))
+        case .updatedAvailble:
+            alert = AppAlert(title: "New Version Avalible", message: "Update to the latest version for best functionality.", dismiss: AlertAction(text: "Not Now", role: .destructive), actions: [AlertAction(text: "Update", action: callUpdate)])
+        case .latestVersion:
+            break
+        case .error:
+            alert = AppAlert(title: "Something Went Wrong", message: "Please try again later")
+        case .notConnected:
+            alert = AppAlert(title: "No Connection", message: "Network connection required to check for updates.")
+        }
+        
+        AppControl.makeAlert(alert: alert)
     }
 }
