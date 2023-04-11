@@ -67,5 +67,7 @@ public extension CDObject {
 }
 
 public func printObject(_ obj: CDObject) {
+#if DEBUG
     print(" - object: \(obj.entityDisplayName) ID: \(obj.objectID.uriRepresentation().lastPathComponent) \(obj.guid)")
+#endif
 }
