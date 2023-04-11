@@ -27,7 +27,7 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
     //TODO: is this needed?
     @Published public var centerCoordinate: CLLocationCoordinate2D? // in projection, 26710
     
-    @Published public var allowLocationOff = true
+    public var locationUsers = [UUID: String]()
     
     public var degrees: Double = .zero {
         didSet {

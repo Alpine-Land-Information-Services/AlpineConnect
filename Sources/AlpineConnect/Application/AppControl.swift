@@ -185,4 +185,20 @@ extension AppControl {
         }
         action()
     }
+    
+    static public func waitForKeyboardCloseAction(_ action: @escaping () -> ()) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.03) {
+            action()
+        }
+    }
+}
+
+extension UIApplication {
+    var isKeyboardPresented: Bool {
+        if let keyboardWindowClass = NSClassFromString("UIRemoteKeyboardWindow"), self.windows.contains(where: { $0.isKind(of: keyboardWindowClass) }) {
+            return true
+        } else {
+            return false
+        }
+    }
 }

@@ -19,7 +19,7 @@ struct LocationToggler: ViewModifier {
                 case .active:
                     Location.shared.resume()
                 default:
-                    if location.allowLocationOff {
+                    if Location.shared.locationUsers.isEmpty {
                         Location.shared.stop()
                     }
                 }
