@@ -17,9 +17,14 @@ public protocol CDObject where Self: NSManagedObject {
 public extension CDObject {
     
     var guid: UUID {
-        self.managedObjectContext!.performAndWait {
-            return value(forKey: "guid") as! UUID
+        if let guid = (self.managedObjectContext?.performAndWait { value(forKey: "guid") as? UUID }) {
+            return guid
         }
+        print(" >>> CDObject HAS NO managedObjectContext !")
+        return UUID(uuidString: "00000000-FA0E-0000-0000-000000000000")!
+//        self.managedObjectContext!.performAndWait {
+//            return value(forKey: "guid") as! UUID
+//        }
     }
     
     static func createObject(in context: NSManagedObjectContext) -> Self {
