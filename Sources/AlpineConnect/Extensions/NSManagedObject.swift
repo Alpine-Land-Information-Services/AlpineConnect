@@ -164,6 +164,23 @@ public extension NSManagedObject {
         }
     }
     
+    static func deleteData(entityName: String? = nil, predicate: NSPredicate? = nil, in context: NSManagedObjectContext) {
+        let request = NSFetchRequest<NSManagedObject>(entityName: entityName ?? Self.entityName)
+        request.predicate = predicate
+        request.returnsObjectsAsFaults = true
+        var objects: [NSManagedObject] = []
+        context.performAndWait {
+            do {
+                objects = try context.fetch(request)
+                for object in objects {
+                    context.delete(object)
+                }
+            } catch {
+                print(error)
+            }
+        }
+    }
+    
     static func count(entityName: String? = nil, predicate: NSPredicate? = nil, in context: NSManagedObjectContext) -> Int {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: entityName ?? Self.entityName)
         request.predicate = predicate

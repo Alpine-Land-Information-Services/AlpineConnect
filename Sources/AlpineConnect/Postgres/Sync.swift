@@ -26,7 +26,7 @@ public class Sync {
         
         defer {
             if SyncTracker.status != .error {
-                CurrentUser.updateSyncDate(Date())
+                CurrentUser.updateSyncDate(SyncTracker.shared.syncStartDate)
                 SyncTracker.updateStatus(.none)
             }
         }

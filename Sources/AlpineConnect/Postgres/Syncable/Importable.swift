@@ -62,7 +62,7 @@ public extension Importable {
             defer { cursor.close() }
             
             try Self.processPGResult(cursor: cursor)
-            try context.save()
+            try context.forceSave()
             
             SyncTracker.shared.endRecordSync()
             result = true
