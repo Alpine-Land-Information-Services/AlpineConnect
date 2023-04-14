@@ -20,13 +20,13 @@ public class Sync {
         
         let (importable, exportable) = sortTypes(objectsContainer.objects)
         
-        SyncTracker.shared.syncStartDate = Date()
+        SyncTracker.shared.currentSyncStartDate = Date()
         SyncTracker.shared.totalRecordsToSync = SyncTracker.status == .exportReady ? importable.count + exportable.count : importable.count
         await AppControl.showSheet(view: SyncView())
         
         defer {
             if SyncTracker.status != .error {
-                CurrentUser.updateSyncDate(SyncTracker.shared.syncStartDate)
+                CurrentUser.updateSyncDate(SyncTracker.shared.currentSyncStartDate)
                 SyncTracker.updateStatus(.none)
             }
         }
