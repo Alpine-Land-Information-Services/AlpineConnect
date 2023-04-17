@@ -7,7 +7,7 @@
 
 import CoreData
 
-extension NSManagedObjectContext {
+public extension NSManagedObjectContext {
     
     func easySave() {
         do {
