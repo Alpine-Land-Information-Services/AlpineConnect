@@ -49,7 +49,7 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         manager.activityType = .otherNavigation
         manager.startUpdatingLocation()
         
-        manager.headingFilter = 10
+        manager.headingFilter = 5
         manager.startUpdatingHeading()
     }
     
