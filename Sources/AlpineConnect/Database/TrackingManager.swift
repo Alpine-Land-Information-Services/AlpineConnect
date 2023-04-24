@@ -30,8 +30,8 @@ public class TrackingManager {
         var connectionPoolConfiguration = ConnectionPoolConfiguration()
         connectionPoolConfiguration.maximumConnections = 10
         connectionPoolConfiguration.maximumPendingRequests = 60
-        connectionPoolConfiguration.pendingRequestTimeout = 180
-        connectionPoolConfiguration.allocatedConnectionTimeout = 240
+        connectionPoolConfiguration.pendingRequestTimeout = 10
+        connectionPoolConfiguration.allocatedConnectionTimeout = 10
         connectionPoolConfiguration.dispatchQueue = DispatchQueue.global()
         connectionPoolConfiguration.metricsResetWhenLogged = false
         

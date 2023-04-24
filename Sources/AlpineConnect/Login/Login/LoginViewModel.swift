@@ -20,7 +20,7 @@ class LoginViewModel: ObservableObject {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
     }
     
-    var showBioIcon: Bool
+    var showBioIcon: Bool = false
     
     var loginAlert = LoginAlert.shared
     var authenthication = KeychainAuthentication.shared
@@ -29,9 +29,10 @@ class LoginViewModel: ObservableObject {
     
     init(info: LoginConnectionInfo) {
         self.info = info
-        
         showBioIcon = KeychainAuthentication.shared.biometricLoginEnabled
         setLoginConnectionInfo()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(offlineLogin), name: Notification.Name("CONNECT_OFFLINE"), object: nil)
     }
     
     func bioAuthentication() {
@@ -72,12 +73,24 @@ class LoginViewModel: ObservableObject {
         login()
     }
     
+    @objc
+    func offlineLogin() {
+        DispatchQueue.main.async {
+            self.spinner.toggle()
+        }
+        self.handleOfflineAuthenticationResponse()
+    }
+    
     func login() {
         DispatchQueue.main.async {
             self.spinner.toggle()
         }
-        authenthication.authenticateUser( info: makeLoginUpdateInfo()) { response in
-            self.handleAuthenticationResponse(_: response)
+        if NetworkMonitor.shared.connected {
+            Login.loginUser(info: makeLoginUpdateInfo(), completionHandler: { response in
+                self.handleOnlineAuthenticationResponse(response)
+            })
+        } else {
+            self.handleOfflineAuthenticationResponse()
         }
     }
     
@@ -87,38 +100,52 @@ class LoginViewModel: ObservableObject {
         return login
     }
     
-    func handleAuthenticationResponse(_ response: LoginResponse) {
+    func handleOfflineAuthenticationResponse() {
+        let response = authenthication.offlineCheck(email: userManager.userName)
+        switch response {
+        case .successfulLogin:
+            performLogin()
+        default:
+            loginAlert.updateAlertType(response)
+        }
+    }
+    
+    func handleOnlineAuthenticationResponse(_ response: LoginResponse) {
         switch response {
         case .successfulLogin:
             info.appUserFunction { userFunctionResponse in
                 switch userFunctionResponse {
                 case .successfulLogin:
-                    if self.authenthication.askForBioMetricAuthenticationSetup() || self.inDEBUG {
-                        if self.inDEBUG {
-                            self.savePasswordForDEBUG()
-                        }
-                        else {
-                            self.loginAlert.updateModelState(_: self.authenthication)
-                        }
-                    }
-                    else if self.authenthication.areCredentialsSaved() {
-                        if self.authenthication.credentialsChanged() {
-                            self.loginAlert.updateAlertType(_: .updateKeychainAlert)
-                        }
-                        else {
-                            self.authenthication.updateSigninState(true)
-                        }
-                    }
-                    else {
-                        self.authenthication.saveCredentialsToKeyChain()
-                        self.authenthication.updateSigninState(true)
-                    }
+                    self.performLogin()
                 default:
                     self.loginAlert.updateAlertType(userFunctionResponse)
                 }
             }
         default:
             loginAlert.updateAlertType(response)
+        }
+    }
+    
+    private func performLogin() {
+        if self.authenthication.askForBioMetricAuthenticationSetup() || self.inDEBUG {
+            if self.inDEBUG {
+                self.savePasswordForDEBUG()
+            }
+            else {
+                self.loginAlert.updateModelState(_: self.authenthication)
+            }
+        }
+        else if self.authenthication.areCredentialsSaved() {
+            if self.authenthication.credentialsChanged() {
+                self.loginAlert.updateAlertType(_: .updateKeychainAlert)
+            }
+            else {
+                self.authenthication.updateSigninState(true)
+            }
+        }
+        else {
+            self.authenthication.saveCredentialsToKeyChain()
+            self.authenthication.updateSigninState(true)
         }
     }
 }

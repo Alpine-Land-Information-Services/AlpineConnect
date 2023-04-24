@@ -24,6 +24,7 @@ public enum LoginResponse {
     case userExists
     case emptyFields
     case networkError
+    case timeout
     case unknownError
     
     case authenticationAlert

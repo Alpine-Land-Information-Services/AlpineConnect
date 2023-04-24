@@ -50,11 +50,11 @@ public class Login {
     public static var user: BackendUser!
     
     static func loginUser(info: UserLoginUpdate, completionHandler: @escaping (LoginResponse) -> ()) {
-        NetworkManager.shared.pool?.withConnection { connectionRequestResponse in
+        NetworkManager.sharedWithTimeOut.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
-            case .failure:
+            case .failure(let error):
                 Task {
-                    completionHandler(await getBackendStatus(email: UserManager.shared.userName, DBConnected: false))
+                    await completionHandler(checkError(error: error))
                 }
             case .success:
                 Task {
@@ -70,6 +70,17 @@ public class Login {
         }
     }
     
+    static func checkError(error: Error) async -> LoginResponse {
+        switch error.localizedDescription {
+        case "The operation couldn’t be completed. (PostgresClientKit.PostgresError error 18.)":
+            return .timeout
+        case "The operation couldn’t be completed. (PostgresClientKit.PostgresError error 3.)":
+            return await getBackendStatus(email: UserManager.shared.userName, DBConnected: false)
+        default:
+            return .timeout
+        }
+    }
+    
     static func getBackendUser(email: String) async throws -> (BackendUser, HTTPURLResponse)? {
         guard let url = URL(string: "\(serverURL)user?email=\(email)") else {
             AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot make URL")
@@ -78,8 +89,8 @@ public class Login {
         }
         
         var request = URLRequest(url: url)
+        request.timeoutInterval = 10
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                
         let (body, response) = try await URLSession.shared.data(for: request)
         
         let user = try JSONDecoder().decode(BackendUser.self, from: body)

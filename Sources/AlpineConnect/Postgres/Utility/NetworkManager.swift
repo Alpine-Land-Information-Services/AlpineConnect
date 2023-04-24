@@ -11,6 +11,7 @@ import PostgresClientKit
 public class NetworkManager {
     
     static public var shared = NetworkManager()
+    static public var sharedWithTimeOut = NetworkManager(noTimeout: false)
     
     public var pool: ConnectionPool?
     
@@ -20,9 +21,9 @@ public class NetworkManager {
         
         var connectionPoolConfiguration = ConnectionPoolConfiguration()
         connectionPoolConfiguration.maximumConnections = 10
-        connectionPoolConfiguration.maximumPendingRequests = noTimeout ? nil : 60
-        connectionPoolConfiguration.pendingRequestTimeout = noTimeout ? nil : 180
-        connectionPoolConfiguration.allocatedConnectionTimeout = noTimeout ? nil : 240
+        connectionPoolConfiguration.maximumPendingRequests = noTimeout ? nil : 2
+        connectionPoolConfiguration.pendingRequestTimeout = noTimeout ? nil : 10
+        connectionPoolConfiguration.allocatedConnectionTimeout = noTimeout ? nil : 10
         connectionPoolConfiguration.dispatchQueue = DispatchQueue.global()
         connectionPoolConfiguration.metricsResetWhenLogged = false
         
@@ -38,6 +39,7 @@ public class NetworkManager {
     
     static func update() {
         self.shared = NetworkManager()
+        self.sharedWithTimeOut = NetworkManager(noTimeout: false)
     }
 }
 

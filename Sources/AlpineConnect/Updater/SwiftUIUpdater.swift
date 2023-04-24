@@ -52,7 +52,7 @@ public class SwiftUIUpdater: ObservableObject {
         let monitor = NWPathMonitor()
         monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
         monitor.pathUpdateHandler = { path in
-            if path.status == .satisfied {
+            if path.status == .satisfied && (!automatic || !path.isExpensive) {
                 self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result, updateRequired in
                     if result || updateRequired {
                         self.alertToggle(show: true)

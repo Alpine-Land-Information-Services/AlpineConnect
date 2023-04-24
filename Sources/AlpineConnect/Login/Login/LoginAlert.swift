@@ -151,6 +151,13 @@ class LoginAlert: ObservableObject {
             return Alert(title: Text("Offline"),
                          message: Text("You are not connected to network. You must first login while connected in order to use application in offline mode."),
                          dismissButton: .default(Text("OK"), action: {}))
+        case .timeout:
+            return Alert(title: Text("Login Timeout"),
+                         message: Text("Your network connection is too poor for online login."),
+                         primaryButton: .default(Text("Sign In Offline"), action: {
+                NotificationCenter.default.post(Notification(name: Notification.Name("CONNECT_OFFLINE")))
+            }),
+                         secondaryButton: .default(Text("OK"), action: {}))
         case .invalidEmail:
             return Alert(title: Text("Invalid Email"),
                          message: Text("Enter a valid email address, with @ symbol and domain."),
