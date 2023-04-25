@@ -13,13 +13,15 @@ public class CDObjectsContainer {
     public var objects = [CDObject.Type]()
     public var nonClearableObjects = [CDObject.Type]()
     public var importHelperObjects = [ExecutionHelper.Type]()
+    public var exportHelperObjects = [ExecutionHelper.Type]()
     
     public init() {}
     
-    public init(objects: [CDObject.Type], nonClearableObjects: [CDObject.Type]? = nil, importHelperObjects: [ExecutionHelper.Type]? = nil) {
+    public init(objects: [CDObject.Type], nonClearables: [CDObject.Type] = [], importHelpers: [ExecutionHelper.Type] = [], exportHelpers: [ExecutionHelper.Type] = []) {
         self.objects = objects
-        self.nonClearableObjects = nonClearableObjects ?? []
-        self.importHelperObjects = importHelperObjects ?? []
+        self.nonClearableObjects = nonClearables
+        self.importHelperObjects = importHelpers
+        self.exportHelperObjects = exportHelpers
     }
 }
 

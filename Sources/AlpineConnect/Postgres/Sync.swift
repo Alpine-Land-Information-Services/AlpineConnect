@@ -36,7 +36,7 @@ public class Sync {
         }
         
         if SyncTracker.status == .exportReady {
-            await doExport(in: context, objects: exportable)
+            await doExport(in: context, objects: exportable, helpers: objectsContainer.exportHelperObjects)
         }
 
         if let doInBetween {
@@ -51,14 +51,14 @@ public class Sync {
             return
         }
 
-        await doImport(in: context, objects: importable, importHelperObjects: objectsContainer.importHelperObjects)
+        await doImport(in: context, objects: importable, helpers: objectsContainer.importHelperObjects)
         
         if let doAfter {
             doAfter()
         }
     }
     
-    static private func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], importHelperObjects: [ExecutionHelper.Type]? = nil) async {
+    static private func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
         guard SyncTracker.status == .importReady, objects.count > 0 else { return }
         
         SyncTracker.updateStatus(.importing)
@@ -70,10 +70,8 @@ public class Sync {
                         let connection = try con_from_pool.get()
                         defer { connection.close() }
                         
-                        if let importHelperObjects {
-                            for helper in importHelperObjects {
-                                try helper.performWork(in: connection)
-                            }
+                        for helper in helpers {
+                            try helper.performWork(with: connection, in: context)
                         }
                         
                         for object in objects {
@@ -97,7 +95,7 @@ public class Sync {
         })
     }
     
-    static private func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type]) async {
+    static private func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
         guard SyncTracker.status == .exportReady, objects.count > 0 else { return }
         
         SyncTracker.updateStatus(.exporting)
@@ -107,6 +105,10 @@ public class Sync {
                     try context.performAndWait {
                         let connection = try con_from_pool.get()
                         defer { connection.close() }
+                        
+                        for helper in helpers {
+                            try helper.performWork(with: connection, in: context)
+                        }
                         
                         for object in objects {
                             guard object.export(with: connection, in: context) else {
