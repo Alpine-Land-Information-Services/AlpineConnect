@@ -69,7 +69,7 @@ public class DBRescue {
          }
     }
     
-    static func RescueDB(userName: String, url: URL, handler: @escaping ((Bool, String) -> Void)) {
+    public static func RescueDB(userName: String, url: URL, handler: @escaping ((Bool, String) -> Void)) {
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 let tempUrl = try Zip.quickZipFiles([url], fileName: "tempDB")
