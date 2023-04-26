@@ -50,6 +50,17 @@ public class Login {
     public static var user: BackendUser!
     
     static func loginUser(info: UserLoginUpdate, completionHandler: @escaping (LoginResponse) -> ()) {
+        NetworkMonitor.shared.canConnectToServer { connection in
+            switch connection {
+            case true:
+               loginUserOnline(info: info, completionHandler: completionHandler)
+            case false:
+                completionHandler(.timeout)
+            }
+        }
+    }
+    
+    static func loginUserOnline(info: UserLoginUpdate, completionHandler: @escaping (LoginResponse) -> ()) {
         NetworkManager.sharedWithTimeOut.pool?.withConnection { connectionRequestResponse in
             switch connectionRequestResponse {
             case .failure(let error):

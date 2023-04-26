@@ -61,4 +61,50 @@ public class NetworkMonitor: ObservableObject {
         
         return false
     }
+    
+    func canConnectToWebsite(_ website: String = "www.alpine-lis.com", completion: @escaping (Bool) -> Void) {
+        let host = NWEndpoint.Host(website)
+        let connection = NWConnection(host: host, port: .http, using: .tcp)
+        
+        connection.stateUpdateHandler = { connection in
+            switch connection {
+            case .ready:
+                completion(true)
+            case .waiting(let error):
+                print("\(error)")
+            case .failed(let error):
+                print("\(error)")
+            default:
+                break
+            }
+        }
+        
+        connection.start(queue: .global())
+        
+        let deadline = DispatchTime.now() + .seconds(10)
+        DispatchQueue.global().asyncAfter(deadline: deadline) {
+            connection.cancel()
+            completion(false)
+        }
+    }
+    
+    func canConnectToServer(_ server: String = Login.serverURL, completion: @escaping (Bool) -> Void) {
+        guard let url = URL(string: server) else {
+            completion(false)
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.timeoutInterval = 10
+        
+        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
+            if let httpResponse = response as? HTTPURLResponse {
+                completion((200...299).contains(httpResponse.statusCode))
+            } else {
+                completion(false)
+            }
+        }
+        task.resume()
+    }
 }
