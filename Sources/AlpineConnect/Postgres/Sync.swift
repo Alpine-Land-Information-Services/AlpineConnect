@@ -31,6 +31,12 @@ public class Sync {
             }
         }
         
+        guard await NetworkMonitor.shared.canConnectToServer() else {
+            AppControl.makeSimpleAlert(title: "Connection Timeout", message: "Cannot connect to server in reasonable time, please try again later.")
+            SyncTracker.updateStatus(.error)
+            return
+        }
+        
         if let doBefore {
             doBefore()
         }
