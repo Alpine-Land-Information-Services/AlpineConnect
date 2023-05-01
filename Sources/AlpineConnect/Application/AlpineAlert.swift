@@ -76,6 +76,8 @@ public struct AlpineAlert: View {
         switch type {
         case .destructive:
             return .red
+        case .alert:
+            return .orange
         case .regular:
             return .accentColor
         case .dismiss:

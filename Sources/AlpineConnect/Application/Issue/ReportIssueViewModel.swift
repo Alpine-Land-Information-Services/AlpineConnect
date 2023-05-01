@@ -58,7 +58,7 @@ public class ReportIssueViewModel: ObservableObject {
                 self.resultText = "Error sending report.\n\(error.message)"
             }
             DispatchQueue.main.async {
-                self.showAlert = true
+                AppControl.makeSimpleAlert(title: "Report Status", message: self.resultText)
                 self.spinner = false
             }
         }

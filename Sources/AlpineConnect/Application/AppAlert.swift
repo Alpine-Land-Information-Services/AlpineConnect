@@ -27,6 +27,7 @@ public struct AlertAction {
     public enum AlertButtonRole {
         case dismiss
         case destructive
+        case alert
         case regular
     }
     

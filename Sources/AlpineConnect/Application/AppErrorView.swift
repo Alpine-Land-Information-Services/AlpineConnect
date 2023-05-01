@@ -20,11 +20,6 @@ struct AppErrorView: View {
                     Spacer()
                     Text(error.date!.toString(format: "MMM d, h:mm a"))
                         .font(.caption)
-                    
-                    Spacer()
-                    NavigationLink(destination: ReportIssueView(userName: CurrentUser.fullName, email: CurrentUser.email, title: error.onAction ?? "", text: error.log ?? "")) {
-                        Text("Report Issue")
-                    }
                 }
                 Divider()
                     .padding(6)
@@ -34,6 +29,15 @@ struct AppErrorView: View {
         }
         .navigationTitle(error.onAction!)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink(destination: ReportIssueView(userName: CurrentUser.fullName, email: CurrentUser.email, title: error.onAction ?? "", text: error.log ?? "")) {
+                    Label("Report", systemImage: "ladybug")
+                        .labelStyle(.titleAndIcon)
+                        .foregroundColor(.orange)
+                }
+            }
+        }
     }
 }
 
