@@ -138,10 +138,10 @@ extension AppControl { //MARK: Alerts
     }
     
     private func errorAlert(title: String, error: Error, customDescription: String?) {
-        let alert = AppAlert(title: "\(title) Error", message: customDescription ?? "\(error.localizedDescription) \n-----\n Check error logs for detailed description.", dismiss: AlertAction(text: "Okay"), actions: [AlertAction(text: "Report", role: .alert, action: {
+        let alert = AppAlert(title: "\(title) Error", message: "\(error.localizedDescription) \n-----\n Check error logs for detailed description.", dismiss: AlertAction(text: "Okay"), actions: [AlertAction(text: "Report", role: .alert, action: {
             AppControl.showSheet(view: {
                 NavigationView {
-                    ReportIssueView(userName: CurrentUser.fullName, email: CurrentUser.email, title: title, text: error.log())
+                    ReportIssueView(userName: CurrentUser.fullName, email: CurrentUser.email, title: title, text: error.log() + "\n" + (customDescription ?? "No additional information."))
                 }
                 .navigationViewStyle(.stack)
             }())

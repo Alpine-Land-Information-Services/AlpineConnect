@@ -9,6 +9,9 @@ import CoreData
 
 public class Sync {
     
+    static var exportQuery: String?
+    static var importQuery: String?
+    
     static public func sync(checks: Bool,
                             objectsContainer: CDObjectsContainer,
                             in context: NSManagedObjectContext,
@@ -94,7 +97,7 @@ public class Sync {
                 }
                 catch {
                     SyncTracker.updateStatus(.error)
-                    AppControl.makeError(onAction: "Data Import", error: error)
+                    AppControl.makeError(onAction: "Data Import", error: error, customDescription: importQuery)
                     continuation.resume()
                 }
             }
@@ -103,7 +106,6 @@ public class Sync {
     
     static private func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
         guard SyncTracker.status == .exportReady, objects.count > 0 else { return }
-        
         SyncTracker.updateStatus(.exporting)
         await withCheckedContinuation { continuation in
             NetworkManager.shared.pool?.withConnection { con_from_pool in

@@ -31,7 +31,7 @@ struct AppErrorView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: ReportIssueView(userName: CurrentUser.fullName, email: CurrentUser.email, title: error.onAction ?? "", text: error.log ?? "")) {
+                NavigationLink(destination: ReportIssueView(userName: CurrentUser.fullName, email: CurrentUser.email, title: error.onAction ?? "", text: error.log ?? "" + "\n" + (error.customDescription ?? "No additional information."))) {
                     Label("Report", systemImage: "ladybug")
                         .labelStyle(.titleAndIcon)
                         .foregroundColor(.orange)
