@@ -43,7 +43,9 @@ public extension Exportable {
         var result = false
 
         do {
+            defer { Sync.exportQuery = "" }
             let query1 = Self.insertQuery(for: objects, in: context)
+            Sync.exportQuery = query1
             print(query1)
             let statement = try connection.prepareStatement(text: query1)
             defer { statement.close() }
@@ -51,11 +53,13 @@ public extension Exportable {
             
             let query2 = Self.insertQuery2(for: objects, in: context)
             if !query2.isEmpty {
+                Sync.exportQuery = query2
                 print(query2)
                 let statement2 = try connection.prepareStatement(text: query2)
                 defer { statement2.close() }
                 try statement2.execute()
             }
+            Sync.exportQuery = ""
             
             Self.modifyExportable(objects)
             Self.additionalActionsAfterExport()
@@ -64,7 +68,7 @@ public extension Exportable {
             result = true
 
         } catch {
-            AppControl.makeError(onAction: "\(Self.entityName) Export", error: error)
+            AppControl.makeError(onAction: "\(Self.entityName) Export", error: error, customDescription: Sync.exportQuery)
         }
 
         return result

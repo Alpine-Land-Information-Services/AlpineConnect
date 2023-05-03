@@ -9,8 +9,8 @@ import CoreData
 
 public class Sync {
     
-    static var exportQuery: String?
-    static var importQuery: String?
+    public static var exportQuery: String?
+    public static var importQuery: String?
     
     static public func sync(checks: Bool,
                             objectsContainer: CDObjectsContainer,
@@ -132,7 +132,7 @@ public class Sync {
                     }
                 }
                 catch {
-                    AppControl.makeError(onAction: "Data Export", error: error)
+                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: exportQuery)
                     continuation.resume()
                 }
             }

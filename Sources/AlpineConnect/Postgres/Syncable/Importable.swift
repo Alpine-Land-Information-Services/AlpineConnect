@@ -44,6 +44,8 @@ public extension Importable {
         var result = false
         
         do {
+            Sync.importQuery = text
+            defer { Sync.importQuery = "" }
             if shallCountRecords {
                 let recCount = try getRecordsCount(query: text, connection: connection)
                 SyncTracker.shared.makeRecord(name: Self.entityDisplayName, type: .import, recordCount: recCount)
@@ -68,7 +70,7 @@ public extension Importable {
             result = true
             
         } catch {
-            AppControl.makeError(onAction: "\(Self.entityName) Import", error: error)
+            AppControl.makeError(onAction: "\(Self.entityName) Import", error: error, customDescription: Sync.importQuery)
         }
         
         return result
