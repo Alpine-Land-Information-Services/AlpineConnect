@@ -9,8 +9,7 @@ import CoreData
 
 public class Sync {
     
-    public static var exportQuery: String?
-    public static var importQuery: String?
+    public static var currentQuery: String?
     
     static public func sync(checks: Bool,
                             objectsContainer: CDObjectsContainer,
@@ -20,6 +19,7 @@ public class Sync {
                             doAfter: (() -> ())?) async
     {
         guard checks else { return }
+        currentQuery = ""
         
         let (importable, exportable) = sortTypes(objectsContainer.objects)
         
@@ -28,6 +28,7 @@ public class Sync {
         await AppControl.showSheet(view: SyncView())
         
         defer {
+            currentQuery = ""
             if SyncTracker.status != .error {
                 CurrentUser.updateSyncDate(SyncTracker.shared.currentSyncStartDate)
                 SyncTracker.updateStatus(.none)
@@ -92,12 +93,11 @@ public class Sync {
                         }                        
                         SyncTracker.updateStatus(.importDone)
                         continuation.resume()
-
                     }
                 }
                 catch {
                     SyncTracker.updateStatus(.error)
-                    AppControl.makeError(onAction: "Data Import", error: error, customDescription: importQuery)
+                    AppControl.makeError(onAction: "Data Import", error: error, customDescription: currentQuery)
                     continuation.resume()
                 }
             }
@@ -132,7 +132,7 @@ public class Sync {
                     }
                 }
                 catch {
-                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: exportQuery)
+                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: currentQuery)
                     continuation.resume()
                 }
             }
