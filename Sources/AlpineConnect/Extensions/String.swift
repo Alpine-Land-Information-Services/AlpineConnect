@@ -8,7 +8,7 @@
 import Foundation
 
 public func escapeForSql(_ string: String) -> String {
-    var str = string.replacingOccurrences(of: "'", with: "\'")
-    str = str.replacingOccurrences(of: "\"", with: "\\\"")
-    return  str
+    let str = string.replacingOccurrences(of: "'", with: "''")
+//    str = str.replacingOccurrences(of: "\"", with: "\\\"")
+    return str
 }
