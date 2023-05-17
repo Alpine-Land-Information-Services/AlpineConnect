@@ -6,6 +6,7 @@
 //
 
 import CoreData
+import AlpineCore
 
 
 public class CDObjectsContainer {
