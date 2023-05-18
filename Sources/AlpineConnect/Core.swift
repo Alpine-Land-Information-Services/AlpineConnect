@@ -8,3 +8,4 @@
 import AlpineCore
 
 public typealias CDObject = AlpineCore.CDObject
+public typealias FS = AlpineCore.FS
