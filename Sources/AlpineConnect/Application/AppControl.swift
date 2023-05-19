@@ -92,16 +92,18 @@ open class AppControl: ObservableObject {
 extension AppControl { //MARK: Popups
     
     static public func showSheet(view: any View) {
-        withAnimation {
-            if AppControl.shared.showSheet {
-                AppControl.shared.showSheet.toggle()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) {
-                    showSheet(view: view)
+        DispatchQueue.main.async {
+            withAnimation {
+                if AppControl.shared.showSheet {
+                    AppControl.shared.showSheet.toggle()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) {
+                        showSheet(view: view)
+                    }
                 }
-            }
-            else {
-                AppControl.shared.currentSheet = AnyView(view)
-                AppControl.shared.showSheet.toggle()
+                else {
+                    AppControl.shared.currentSheet = AnyView(view)
+                    AppControl.shared.showSheet.toggle()
+                }
             }
         }
     }
