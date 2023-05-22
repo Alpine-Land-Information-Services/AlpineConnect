@@ -29,7 +29,7 @@ public extension Optional where Wrapped == String {
 
 public extension Optional where Wrapped == NSNumber {
     
-    func topPostgres(isOptional: Bool) -> String {
+    func toPostgres(isOptional: Bool) -> String {
         if let self {
             return self == 1 ? "TRUE" : "FALSE"
         }
