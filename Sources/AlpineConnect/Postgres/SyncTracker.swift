@@ -76,7 +76,9 @@ public class SyncTracker: ObservableObject {
     
     func endRecordSync() {
         if let currentRecord {
-            syncRecords.insert(currentRecord, at: 0)
+            DispatchQueue.main.async {
+                self.syncRecords.insert(currentRecord, at: 0)
+            }
         }
     }
 }
