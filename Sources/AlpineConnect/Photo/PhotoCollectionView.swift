@@ -90,22 +90,51 @@ public struct PhotoCollectionView: View {
     }
 }
 
-struct PhotoCollectionButton: View {
-        
+//struct PhotoCollectionButton: View {
+//
+//    @StateObject var viewModel: PhotoViewModel
+//
+//    init(object: PhotoObject) {
+//        self._viewModel = StateObject(wrappedValue: PhotoViewModel(object: object))
+//    }
+//
+//    var body: some View {
+//        Button {
+//            AppControl.showSheet(view:
+//                                    PhotoCollectionView()
+//                                        .environmentObject(viewModel)
+//            )
+//        } label: {
+//            Image(systemName: "photo.on.rectangle")
+//        }
+//    }
+//}
+
+public struct PhotoCollectionBlock<Label: View>: View {
+    
     @StateObject var viewModel: PhotoViewModel
     
-    init(object: PhotoObject) {
+    var required: Bool
+    var label: Label
+
+    public init(object: PhotoObject, required: Bool = false, @ViewBuilder label: () -> Label) {
         self._viewModel = StateObject(wrappedValue: PhotoViewModel(object: object))
+        self.required = required
+        self.label = label()
     }
-    
-    var body: some View {
+
+    public var body: some View {
         Button {
-            AppControl.showSheet(view:
-                                    PhotoCollectionView()
-                                        .environmentObject(viewModel)
-            )
+            AppControl.showSheet(view: PhotoCollectionView().environmentObject(viewModel))
         } label: {
-            Image(systemName: "photo.on.rectangle")
+            label
+                .overlay {
+                    if required && viewModel.photos.isEmpty {
+                        RoundedRectangle(cornerRadius: 5)
+                            .stroke()
+                            .foregroundColor(.red)
+                    }
+                }
         }
     }
 }
