@@ -10,12 +10,15 @@ import AlpineUI
 
 public struct SyncView: View {
     
-    @StateObject var viewModel = SyncViewModel()
-    @ObservedObject var tracker = SyncTracker.shared
-    
+    @StateObject var viewModel: SyncViewModel
+    @ObservedObject var tracker: SyncTracker
+
     @Environment(\.dismiss) var dismiss
     
-    public init() {}
+    public init(for sync: SyncManager) {
+        self._tracker = ObservedObject(wrappedValue: sync.tracker)
+        self._viewModel = StateObject(wrappedValue: SyncViewModel(sync: sync))
+    }
     
     public var body: some View {
         NavigationBlock(title: "", mode: .inline) {
@@ -40,7 +43,7 @@ public struct SyncView: View {
             }
         }
         .onDisappear {
-            SyncTracker.clear()
+            viewModel.sync.clear()
         }
     }
     
@@ -146,29 +149,29 @@ public struct SyncView: View {
     }
 }
 
-struct SyncView_Previews: PreviewProvider {
-        
-    static var previews: some View {
-        SyncTest()
-    }
-    
-    struct SyncTest: View {
-        
-        var body: some View {
-            VStack {
-                
-            }
-            .sheet(isPresented: .constant(true)) {
-                SyncView()
-            }
-            .onAppear {
-                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .import, recordsCount: 0))
-                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 0))
-                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .import, recordsCount: 123))
-                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 123))
-                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 123))
-
-            }
-        }
-    }
-}
+//struct SyncView_Previews: PreviewProvider {
+//        
+//    static var previews: some View {
+//        SyncTest()
+//    }
+//    
+//    struct SyncTest: View {
+//        
+//        var body: some View {
+//            VStack {
+//                
+//            }
+//            .sheet(isPresented: .constant(true)) {
+//                SyncView(for: <#Sync#>)
+//            }
+//            .onAppear {
+//                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .import, recordsCount: 0))
+//                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 0))
+//                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .import, recordsCount: 123))
+//                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 123))
+//                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 123))
+//
+//            }
+//        }
+//    }
+//}

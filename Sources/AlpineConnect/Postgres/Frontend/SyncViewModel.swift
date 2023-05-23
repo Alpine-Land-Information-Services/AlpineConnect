@@ -11,8 +11,14 @@ class SyncViewModel: ObservableObject {
     
     let hour = Calendar.current.component(.hour, from: Date())
     
+    var sync: SyncManager
+    
+    init(sync: SyncManager) {
+        self.sync = sync
+    }
+    
     var statusColor: Color {
-        switch SyncTracker.shared.status {
+        switch sync.tracker.status {
         case .error:
             return .red
         case .none:
@@ -23,18 +29,18 @@ class SyncViewModel: ObservableObject {
     }
     
     var statusMessage: String {
-        switch SyncTracker.shared.status {
+        switch sync.tracker.status {
         case .error:
             return "Sync Error Accurred"
         case .none:
             return "Process Complete"
         default:
-            return "Please Wait... \(SyncTracker.shared.statusMessage)"
+            return "Please Wait... \(sync.tracker.statusMessage)"
         }
     }
     
     var totalToSync: Int {
-        SyncTracker.shared.totalRecordsToSync
+        sync.tracker.totalRecordsToSync
     }
     
     var greetingText: String {

@@ -37,17 +37,15 @@ public class SyncTracker: ObservableObject {
         var recordsCount: Double
     }
     
-    static public var shared = SyncTracker()
-    
     static public var isInitial: Bool {
         CurrentUser.lastSync == nil
     }
-    
+        
     public var currentSyncStartDate = Date()
     
     @Published public var showSync = false
     
-    @Published public var status = SyncStatus.none
+    @Published public var slowStatus = SyncStatus.none
     var internalStatus = SyncStatus.none
     
     @Published public var statusMessage = ""
@@ -57,7 +55,15 @@ public class SyncTracker: ObservableObject {
     
     @Published var syncRecords = [SyncableRecord]()
     var totalRecordsToSync = 0
+    
+    @Published var notExportedCount = 0
+    
+    
+    public init() {}
+}
 
+extension SyncTracker {
+    
     func progressUpdate() {
         DispatchQueue.main.async {
             self.currentRecordProgress += 1
@@ -85,10 +91,10 @@ public class SyncTracker: ObservableObject {
 
 extension SyncTracker {
     
-    static func toggleSyncWindow(to value: Bool) {
+    func toggleSyncWindow(to value: Bool) {
         DispatchQueue.main.async {
             withAnimation {
-                SyncTracker.shared.showSync = value
+                self.showSync = value
             }
         }
     }
@@ -96,24 +102,27 @@ extension SyncTracker {
 
 public extension SyncTracker {
     
-    static func updateStatus(_ status: SyncStatus) {
-        SyncTracker.shared.internalStatus = status
+    func updateStatus(_ status: SyncStatus) {
+        internalStatus = status
         DispatchQueue.main.async {
-            SyncTracker.shared.status = status
+            self.slowStatus = status
         }
     }
     
-    static func statusMessage(_ message: String) {
+    func statusMessage(_ message: String) {
         DispatchQueue.main.async {
-            SyncTracker.shared.statusMessage = message
+            self.statusMessage = message
         }
     }
-    
-    static func clear() {
-        SyncTracker.shared = SyncTracker()
-    }
-    
-    static var status: SyncStatus {
-        SyncTracker.shared.internalStatus
+
+    var status: SyncStatus {
+        internalStatus
     }
 }
+
+//extension SyncTracker {
+//
+//    func getNotExportedCount() {
+//        for object in Sync
+//    }
+//}

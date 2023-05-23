@@ -1,5 +1,5 @@
 //
-//  Sync.swift
+//  SyncManager.swift
 //  AlpineConnect
 //
 //  Created by Jenya Lebid on 2/15/23.
@@ -8,13 +8,18 @@
 import CoreData
 import AlpineCore
 
-public class Sync {
+public class SyncManager {
     
-    public static var currentQuery: String?
+    public var tracker = SyncTracker()
+    public var container: ObjectContainer
     
-    static public func sync(checks: Bool,
-                            objectsContainer: CDObjectsContainer,
-                            in context: NSManagedObjectContext,
+    public var currentQuery: String?
+    
+    public init(for container: ObjectContainer) {
+        self.container = container
+    }
+    
+    public func sync(checks: Bool, in context: NSManagedObjectContext,
                             doBefore: (() -> ())?,
                             doInBetween: (() -> ())?,
                             doAfter: (() -> ())?) async
@@ -22,23 +27,23 @@ public class Sync {
         guard checks else { return }
         currentQuery = ""
         
-        let (importable, exportable) = sortTypes(objectsContainer.objects)
+        let (importable, exportable) = sortTypes(container.objects)
         
-        SyncTracker.shared.currentSyncStartDate = Date()
-        SyncTracker.shared.totalRecordsToSync = SyncTracker.status == .exportReady ? importable.count + exportable.count : importable.count
-        await AppControl.showSheet(view: SyncView())
+        tracker.currentSyncStartDate = Date()
+        tracker.totalRecordsToSync = tracker.status == .exportReady ? importable.count + exportable.count : importable.count
+        await AppControl.showSheet(view: SyncView(for: self))
         
         defer {
             currentQuery = ""
-            if SyncTracker.status != .error {
-                CurrentUser.updateSyncDate(SyncTracker.shared.currentSyncStartDate)
-                SyncTracker.updateStatus(.none)
+            if tracker.status != .error {
+                CurrentUser.updateSyncDate(tracker.currentSyncStartDate)
+                tracker.updateStatus(.none)
             }
         }
         
         guard await NetworkMonitor.shared.canConnectToServer() else {
             AppControl.makeSimpleAlert(title: "Connection Timeout", message: "Cannot connect to server in reasonable time, please try again later.")
-            SyncTracker.updateStatus(.error)
+            tracker.updateStatus(.error)
             return
         }
         
@@ -46,33 +51,33 @@ public class Sync {
             doBefore()
         }
         
-        if SyncTracker.status == .exportReady {
-            await doExport(in: context, objects: exportable, helpers: objectsContainer.exportHelperObjects)
+        if tracker.status == .exportReady {
+            await doExport(in: context, objects: exportable, helpers: container.exportHelperObjects)
         }
 
         if let doInBetween {
             doInBetween()
         }
 
-        if SyncTracker.status == .exportDone {
-            SyncTracker.updateStatus(.importReady)
+        if tracker.status == .exportDone {
+            tracker.updateStatus(.importReady)
         }
 
-        guard SyncTracker.status == .importReady else {
+        guard tracker.status == .importReady else {
             return
         }
 
-        await doImport(in: context, objects: importable, helpers: objectsContainer.importHelperObjects)
+        await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
         
         if let doAfter {
             doAfter()
         }
     }
     
-    static private func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
-        guard SyncTracker.status == .importReady, objects.count > 0 else { return }
+    private func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
+        guard tracker.status == .importReady, objects.count > 0 else { return }
         
-        SyncTracker.updateStatus(.importing)
+        tracker.updateStatus(.importing)
         
         await withCheckedContinuation({ continuation in
             NetworkManager.shared.pool?.withConnection { con_from_pool in
@@ -87,27 +92,27 @@ public class Sync {
                         
                         for object in objects {
                             guard object.sync(with: connection, in: context) else {
-                                SyncTracker.updateStatus(.error)
+                                self.tracker.updateStatus(.error)
                                 continuation.resume()
                                 return
                             }
                         }                        
-                        SyncTracker.updateStatus(.importDone)
+                        self.tracker.updateStatus(.importDone)
                         continuation.resume()
                     }
                 }
                 catch {
-                    SyncTracker.updateStatus(.error)
-                    AppControl.makeError(onAction: "Data Import", error: error, customDescription: currentQuery)
+                    self.tracker.updateStatus(.error)
+                    AppControl.makeError(onAction: "Data Import", error: error, customDescription: self.currentQuery)
                     continuation.resume()
                 }
             }
         })
     }
     
-    static private func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
-        guard SyncTracker.status == .exportReady, objects.count > 0 else { return }
-        SyncTracker.updateStatus(.exporting)
+    private func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
+        guard tracker.status == .exportReady, objects.count > 0 else { return }
+        tracker.updateStatus(.exporting)
         await withCheckedContinuation { continuation in
             NetworkManager.shared.pool?.withConnection { con_from_pool in
                 do {
@@ -121,29 +126,36 @@ public class Sync {
                         
                         for object in objects {
                             guard object.export(with: connection, in: context) else {
-                                SyncTracker.updateStatus(.error)
+                                self.tracker.updateStatus(.error)
                                 context.rollback()
                                 continuation.resume()
                                 return
                             }
                         }
-                        SyncTracker.updateStatus(.exportDone)
+                        self.tracker.updateStatus(.exportDone)
                         try context.save()
                         continuation.resume()
                     }
                 }
                 catch {
-                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: currentQuery)
+                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery)
                     continuation.resume()
                 }
             }
         }
     }
     
-    static private func sortTypes(_ objects: [CDObject.Type]) -> ([Importable.Type], [any Exportable.Type]) {
+    private func sortTypes(_ objects: [CDObject.Type]) -> ([Importable.Type], [any Exportable.Type]) {
         let importable = objects.filter({$0 is Importable.Type})
         let exportable =  objects.filter({$0 is any Exportable.Type})
         
         return (importable as! [Importable.Type], exportable as! [any Exportable.Type])
+    }
+}
+
+public extension SyncManager {
+    
+    func clear() {
+        tracker = SyncTracker()
     }
 }

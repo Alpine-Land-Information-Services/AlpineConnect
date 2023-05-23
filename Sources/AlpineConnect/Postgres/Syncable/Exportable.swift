@@ -37,17 +37,17 @@ public extension Exportable {
     
     static func export(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
         let objects = Object.getAllExportable(in: context)
-        SyncTracker.shared.makeRecord(name: Object.entityDisplayName, type: .export, recordCount: objects.count)
+        sync.tracker.makeRecord(name: Object.entityDisplayName, type: .export, recordCount: objects.count)
 
         guard objects.count > 0 else {
             return true
         }
         var result = false
 
-        defer { Sync.currentQuery = "" }
+        defer { sync.currentQuery = "" }
         do {
             let query1 = Object.insertQuery(for: objects, in: context)
-            Sync.currentQuery = query1
+            sync.currentQuery = query1
             print(query1)
             let statement = try connection.prepareStatement(text: query1)
             defer { statement.close() }
@@ -55,29 +55,37 @@ public extension Exportable {
             
             let query2 = Object.insertQuery2(for: objects, in: context)
             if !query2.isEmpty {
-                Sync.currentQuery = query2
+                sync.currentQuery = query2
                 print(query2)
                 let statement2 = try connection.prepareStatement(text: query2)
                 defer { statement2.close() }
                 try statement2.execute()
             }
-            Sync.currentQuery = ""
+            sync.currentQuery = ""
             
             Object.modifyExportable(objects)
             Object.additionalActionsAfterExport()
 
-            SyncTracker.shared.endRecordSync()
+            sync.tracker.endRecordSync()
             result = true
 
         } catch {
-            AppControl.makeError(onAction: "\(Object.entityName) Export", error: error, customDescription: Sync.currentQuery)
+            AppControl.makeError(onAction: "\(Object.entityName) Export", error: error, customDescription: sync.currentQuery)
         }
 
         return result
     }
     
     static func getAllExportable(in context: NSManagedObjectContext) -> [Self] {
-        Self.findObjects(by: NSPredicate(format: "a_changed = true"), in: context) as? [Self] ?? []
+        var objects = [Self]()
+        do {
+            try Self.deleteAllLocal(in: context)
+            objects = Self.findObjects(by: NSPredicate(format: "a_changed = true"), in: context) as? [Self] ?? []
+        }
+        catch {
+            AppControl.makeError(onAction: "Local Objects Delete", error: error)
+        }
+        return objects
     }
     
     static func modifyExportable(_ objects: [Self]) {

@@ -30,10 +30,6 @@ public struct PhotoCollectionView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .task {
-                viewModel.photos = await viewModel.object.getPhotos()
-                viewModel.gettingPhotos = false
-            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if !interior {
@@ -135,6 +131,10 @@ public struct PhotoCollectionBlock<Label: View>: View {
                             .foregroundColor(.red)
                     }
                 }
+        }
+        .task {
+            viewModel.photos = await viewModel.object.getPhotos()
+            viewModel.gettingPhotos = false
         }
     }
 }

@@ -10,7 +10,8 @@ import CoreData
 
 public protocol Database {
     
-    static var shared: Database { get set }
+    associatedtype DB: Database
+    static var shared: DB { get set }
     
     var moc: NSManagedObjectContext { get }
     var poc: NSManagedObjectContext { get }

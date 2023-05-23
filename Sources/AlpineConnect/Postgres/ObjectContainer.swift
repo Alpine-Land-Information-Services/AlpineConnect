@@ -1,5 +1,5 @@
 //
-//  CDObjects.swift
+//  ObjectContainer.swift
 //  AlpineConnect
 //
 //  Created by Jenya Lebid on 2/24/23.
@@ -9,14 +9,12 @@ import CoreData
 import AlpineCore
 
 
-public class CDObjectsContainer {
+public class ObjectContainer {
     
     public var objects = [CDObject.Type]()
     public var nonClearableObjects = [CDObject.Type]()
     public var importHelperObjects = [ExecutionHelper.Type]()
     public var exportHelperObjects = [ExecutionHelper.Type]()
-    
-    public init() {}
     
     public init(objects: [CDObject.Type], nonClearables: [CDObject.Type] = [], importHelpers: [ExecutionHelper.Type] = [], exportHelpers: [ExecutionHelper.Type] = []) {
         self.objects = objects
@@ -26,10 +24,9 @@ public class CDObjectsContainer {
     }
 }
 
-
 public class CDObjects {
     
-    static public func clearAll(_ objectsContainer: CDObjectsContainer, in context: NSManagedObjectContext, doAfter: (() -> ())? = nil) async -> Result<Void, Error> {
+    static public func clearAll(_ objectsContainer: ObjectContainer, in context: NSManagedObjectContext, doAfter: (() -> ())? = nil) async -> Result<Void, Error> {
         await context.perform {
             do {
                 for object in objectsContainer.objects {
