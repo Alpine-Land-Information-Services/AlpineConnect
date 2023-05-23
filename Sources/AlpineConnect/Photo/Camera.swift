@@ -54,7 +54,7 @@ public class Camera {
         }
     }
     
-    static func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
+    public static func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
         let size = image.size
         let widthRatio  = targetSize.width  / size.width
         let heightRatio = targetSize.height / size.height

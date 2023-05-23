@@ -8,9 +8,7 @@
 import Foundation
 
 class PhotoViewModel: ObservableObject {
-    
-    var cameraVC = ImagePickerController()
-    
+        
     @Published var photos = [Camera.Photo]()
     @Published var showGallery = false
     
@@ -19,9 +17,14 @@ class PhotoViewModel: ObservableObject {
 
     var object: PhotoObject
     
+    lazy var cameraVC: ImagePickerController = {
+        let controller = ImagePickerController()
+        controller.viewModel = self
+        return controller
+    }()
+    
     init(object: PhotoObject) {
         self.object = object
-        cameraVC.viewModel = self
     }
     
     func takePhoto() {
@@ -32,8 +35,8 @@ class PhotoViewModel: ObservableObject {
     func addPhoto(photo: Camera.Photo) {
         Task {
             await object.addPhoto(photo)
-            photos.append(photo)
             DispatchQueue.main.async {
+                self.photos.append(photo)
                 self.takingPhoto = false
             }
         }
