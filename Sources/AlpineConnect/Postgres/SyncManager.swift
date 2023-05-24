@@ -10,13 +10,15 @@ import AlpineCore
 
 public class SyncManager {
     
-    public var tracker = SyncTracker()
+    public var tracker: SyncTracker
     public var container: ObjectContainer
     
     public var currentQuery: String?
     
     public init(for container: ObjectContainer) {
         self.container = container
+        tracker = SyncTracker()
+        tracker.manager = self
     }
     
     public func sync(checks: Bool, in context: NSManagedObjectContext,
@@ -157,5 +159,6 @@ public extension SyncManager {
     
     func clear() {
         tracker = SyncTracker()
+        tracker.manager = self
     }
 }

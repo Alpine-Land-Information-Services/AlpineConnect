@@ -37,17 +37,17 @@ public extension Exportable {
     
     static func export(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
         let objects = Object.getAllExportable(in: context)
-        sync.tracker.makeRecord(name: Object.displayName, type: .export, recordCount: objects.count)
+        syncManager.tracker.makeRecord(name: Object.displayName, type: .export, recordCount: objects.count)
 
         guard objects.count > 0 else {
             return true
         }
         var result = false
 
-        defer { sync.currentQuery = "" }
+        defer { syncManager.currentQuery = "" }
         do {
             let query1 = Object.insertQuery(for: objects, in: context)
-            sync.currentQuery = query1
+            syncManager.currentQuery = query1
             print(query1)
             let statement = try connection.prepareStatement(text: query1)
             defer { statement.close() }
@@ -55,22 +55,22 @@ public extension Exportable {
             
             let query2 = Object.insertQuery2(for: objects, in: context)
             if !query2.isEmpty {
-                sync.currentQuery = query2
+                syncManager.currentQuery = query2
                 print(query2)
                 let statement2 = try connection.prepareStatement(text: query2)
                 defer { statement2.close() }
                 try statement2.execute()
             }
-            sync.currentQuery = ""
+            syncManager.currentQuery = ""
             
             Object.modifyExportable(objects)
             Object.additionalActionsAfterExport()
 
-            sync.tracker.endRecordSync()
+            syncManager.tracker.endRecordSync()
             result = true
 
         } catch {
-            AppControl.makeError(onAction: "\(Object.entityName) Export", error: error, customDescription: sync.currentQuery)
+            AppControl.makeError(onAction: "\(Object.entityName) Export", error: error, customDescription: syncManager.currentQuery)
         }
 
         return result

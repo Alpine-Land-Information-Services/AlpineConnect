@@ -14,7 +14,7 @@ public protocol Syncable: CDObject {
     static var isImportable: Bool { get }
     static var isExportable: Bool { get }
     
-    static var sync: SyncManager { get }
+    static var syncManager: SyncManager { get }
     static var syncTracker: SyncTracker { get }
     
     var isLocal: Bool { get }
@@ -23,7 +23,7 @@ public protocol Syncable: CDObject {
 public extension Syncable {
     
     static var syncTracker: SyncTracker {
-        sync.tracker
+        syncManager.tracker
     }
     
     static var isImportable: Bool {

@@ -36,19 +36,19 @@ public extension Importable {
     
     static func sync(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
         guard Self.needUpdate() else {
-            sync.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: 0)
+            syncManager.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: 0)
             return true
         }
 
         let text = Self.selectQuery
         var result = false
         
-        defer { sync.currentQuery = "" }
+        defer { syncManager.currentQuery = "" }
         do {
-            sync.currentQuery = text
+            syncManager.currentQuery = text
             if shallCountRecords {
                 let recCount = try getRecordsCount(query: text, connection: connection)
-                sync.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: recCount)
+                syncManager.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: recCount)
                 
                 guard recCount != 0 else { return true }
             }
@@ -66,11 +66,11 @@ public extension Importable {
             try Self.processPGResult(cursor: cursor)
             try context.forceSave()
             
-            sync.tracker.endRecordSync()
+            syncManager.tracker.endRecordSync()
             result = true
             
         } catch {
-            AppControl.makeError(onAction: "\(Self.entityName) Import", error: error, customDescription: sync.currentQuery)
+            AppControl.makeError(onAction: "\(Self.entityName) Import", error: error, customDescription: syncManager.currentQuery)
         }
         
         return result
@@ -93,7 +93,7 @@ public extension Importable {
     
     static func loop(with cursor: Cursor, actions: (_ row: Result<Row, Error>) throws -> ()) throws {
         for row in cursor {
-            sync.tracker.progressUpdate()
+            syncManager.tracker.progressUpdate()
             try actions(row)
         }
     }

@@ -19,6 +19,16 @@ public protocol Modifiable: CDObject {
 
 public extension Modifiable {
     
+    func trash(_ value: Bool) {
+        guard let context = managedObjectContext else {
+            return
+        }
+        context.performAndWait {
+            setValue(value, forKey: "a_deleted")
+            update(missingRequirements: false, isChanged: true, in: context)
+        }
+    }
+    
     var wasDeleted: Bool {
         value(forKey: "a_deleted") as? Bool ?? true
     }

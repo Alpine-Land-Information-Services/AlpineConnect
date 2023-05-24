@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import CoreData
+import AlpineCore
 
 public class SyncTracker: ObservableObject {
     
@@ -56,10 +58,12 @@ public class SyncTracker: ObservableObject {
     @Published var syncRecords = [SyncableRecord]()
     var totalRecordsToSync = 0
     
-    @Published var notExportedCount = 0
+    @Published public var notExported = [UUID]()
     
+    weak var manager: SyncManager!
+    var count = 0
     
-    public init() {}
+    internal init() {}
 }
 
 extension SyncTracker {
@@ -120,9 +124,38 @@ public extension SyncTracker {
     }
 }
 
-//extension SyncTracker {
-//
-//    func getNotExportedCount() {
-//        for object in Sync
-//    }
-//}
+extension SyncTracker {
+    
+    public func addToNotExported(_ guid: UUID) {
+        DispatchQueue.main.async {
+            self.notExported.appendIfNotExists(guid)
+        }
+    }
+
+    public func removeFromNotExported(_ guid: UUID) {
+        DispatchQueue.main.async {
+            self.notExported.removeIfExists(guid)
+        }
+    }
+
+    public func fillNotExported(for objects: [CDObject.Type], in context: NSManagedObjectContext) async {
+        do {
+            let notExported = try await getNotExported(for: objects, in: context)
+            DispatchQueue.main.async {
+                self.notExported = notExported
+            }
+        }
+        catch {
+            AppControl.makeError(onAction: "Fetching Object Count", error: error)
+        }
+    }
+    
+    private func getNotExported(for objects: [CDObject.Type], in context: NSManagedObjectContext) async throws -> [UUID] {
+        var ids = [UUID]()
+        for object in objects {
+            ids.append(contentsOf: try await object.getNotExportedCount(in: context))
+        }
+        
+        return ids
+    }
+}
