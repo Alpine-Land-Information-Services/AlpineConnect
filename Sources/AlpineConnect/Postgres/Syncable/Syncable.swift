@@ -15,16 +15,11 @@ public protocol Syncable: CDObject {
     static var isExportable: Bool { get }
     
     static var syncManager: SyncManager { get }
-    static var syncTracker: SyncTracker { get }
     
     var isLocal: Bool { get }
 }
 
 public extension Syncable {
-    
-    static var syncTracker: SyncTracker {
-        syncManager.tracker
-    }
     
     static var isImportable: Bool {
         self as? Importable.Type != nil

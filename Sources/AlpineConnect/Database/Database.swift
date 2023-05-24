@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-public protocol Database {
+public protocol Database: AnyObject {
     
     associatedtype DB: Database
     static var shared: DB { get set }
@@ -17,6 +17,8 @@ public protocol Database {
     var poc: NSManagedObjectContext { get }
     
     var container: NSPersistentContainer { get }
+    
+    func getNotExported()
 }
 
 public extension Database {

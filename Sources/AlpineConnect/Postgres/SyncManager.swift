@@ -15,12 +15,16 @@ public class SyncManager {
     
     public var currentQuery: String?
     
-    public init(for container: ObjectContainer) {
+    weak public var database: (any Database)!
+    
+    public init(for container: ObjectContainer, database: any Database) {
         self.container = container
         tracker = SyncTracker()
         tracker.manager = self
+        self.database = database
+        database.getNotExported()
     }
-    
+
     public func sync(checks: Bool, in context: NSManagedObjectContext,
                             doBefore: (() -> ())?,
                             doInBetween: (() -> ())?,
@@ -75,8 +79,11 @@ public class SyncManager {
             doAfter()
         }
     }
+}
+
+private extension SyncManager {
     
-    private func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
+    func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
         guard tracker.status == .importReady, objects.count > 0 else { return }
         
         tracker.updateStatus(.importing)
@@ -98,7 +105,7 @@ public class SyncManager {
                                 continuation.resume()
                                 return
                             }
-                        }                        
+                        }
                         self.tracker.updateStatus(.importDone)
                         continuation.resume()
                     }
@@ -112,7 +119,7 @@ public class SyncManager {
         })
     }
     
-    private func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
+    func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
         guard tracker.status == .exportReady, objects.count > 0 else { return }
         tracker.updateStatus(.exporting)
         await withCheckedContinuation { continuation in
@@ -147,7 +154,7 @@ public class SyncManager {
         }
     }
     
-    private func sortTypes(_ objects: [CDObject.Type]) -> ([Importable.Type], [any Exportable.Type]) {
+    func sortTypes(_ objects: [CDObject.Type]) -> ([Importable.Type], [any Exportable.Type]) {
         let importable = objects.filter({$0 is Importable.Type})
         let exportable =  objects.filter({$0 is any Exportable.Type})
         
@@ -160,5 +167,6 @@ public extension SyncManager {
     func clear() {
         tracker = SyncTracker()
         tracker.manager = self
+        database.getNotExported()
     }
 }
