@@ -37,7 +37,7 @@ public extension Exportable {
     
     static func export(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
         let objects = Object.getAllExportable(in: context)
-        sync.tracker.makeRecord(name: Object.entityDisplayName, type: .export, recordCount: objects.count)
+        sync.tracker.makeRecord(name: Object.displayName, type: .export, recordCount: objects.count)
 
         guard objects.count > 0 else {
             return true

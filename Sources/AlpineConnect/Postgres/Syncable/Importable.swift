@@ -36,7 +36,7 @@ public extension Importable {
     
     static func sync(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
         guard Self.needUpdate() else {
-            sync.tracker.makeRecord(name: Self.entityDisplayName, type: .import, recordCount: 0)
+            sync.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: 0)
             return true
         }
 
@@ -48,7 +48,7 @@ public extension Importable {
             sync.currentQuery = text
             if shallCountRecords {
                 let recCount = try getRecordsCount(query: text, connection: connection)
-                sync.tracker.makeRecord(name: Self.entityDisplayName, type: .import, recordCount: recCount)
+                sync.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: recCount)
                 
                 guard recCount != 0 else { return true }
             }
