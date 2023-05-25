@@ -86,25 +86,22 @@ public struct PhotoCollectionView: View {
     }
 }
 
-//struct PhotoCollectionButton: View {
-//
-//    @StateObject var viewModel: PhotoViewModel
-//
-//    init(object: PhotoObject) {
-//        self._viewModel = StateObject(wrappedValue: PhotoViewModel(object: object))
-//    }
-//
-//    var body: some View {
-//        Button {
-//            AppControl.showSheet(view:
-//                                    PhotoCollectionView()
-//                                        .environmentObject(viewModel)
-//            )
-//        } label: {
-//            Image(systemName: "photo.on.rectangle")
-//        }
-//    }
-//}
+public struct PhotoCollectionButton: View {
+
+    @StateObject var viewModel: PhotoViewModel
+
+    public init(object: PhotoObject) {
+        self._viewModel = StateObject(wrappedValue: PhotoViewModel(object: object))
+    }
+
+    public var body: some View {
+        Button {
+            AppControl.showSheet(view: PhotoCollectionView().environmentObject(viewModel))
+        } label: {
+            Image(systemName: "photo.on.rectangle")
+        }
+    }
+}
 
 public struct PhotoCollectionBlock<Label: View>: View {
     
@@ -131,10 +128,6 @@ public struct PhotoCollectionBlock<Label: View>: View {
                             .foregroundColor(.red)
                     }
                 }
-        }
-        .task {
-            viewModel.photos = await viewModel.object.getPhotos()
-            viewModel.gettingPhotos = false
         }
     }
 }

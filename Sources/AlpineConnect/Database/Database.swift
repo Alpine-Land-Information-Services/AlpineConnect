@@ -7,11 +7,15 @@
 
 import Foundation
 import CoreData
+import AlpineCore
 
 public protocol Database: AnyObject {
     
     associatedtype DB: Database
     static var shared: DB { get set }
+    
+    associatedtype Stack: CDStack
+    var stack: Stack { get }
     
     var moc: NSManagedObjectContext { get }
     var poc: NSManagedObjectContext { get }

@@ -39,10 +39,6 @@ public class SyncTracker: ObservableObject {
         var recordsCount: Double
     }
     
-    static public var isInitial: Bool {
-        CurrentUser.lastSync == nil
-    }
-        
     public var currentSyncStartDate = Date()
     
     @Published public var showSync = false
@@ -106,6 +102,14 @@ extension SyncTracker {
 
 public extension SyncTracker {
     
+    var isInitial: Bool {
+        CurrentUser.lastSync == nil
+    }
+    
+    var status: SyncStatus {
+        internalStatus
+    }
+    
     func updateStatus(_ status: SyncStatus) {
         internalStatus = status
         DispatchQueue.main.async {
@@ -117,10 +121,6 @@ public extension SyncTracker {
         DispatchQueue.main.async {
             self.statusMessage = message
         }
-    }
-
-    var status: SyncStatus {
-        internalStatus
     }
 }
 

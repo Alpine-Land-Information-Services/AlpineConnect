@@ -25,6 +25,7 @@ class PhotoViewModel: ObservableObject {
     
     init(object: PhotoObject) {
         self.object = object
+        loadPhotos()
     }
     
     func takePhoto() {
@@ -42,11 +43,15 @@ class PhotoViewModel: ObservableObject {
         }
     }
     
-    func reloadPhotos() {
+    func loadPhotos() {
+        gettingPhotos = true
+
         Task {
-            gettingPhotos = true
-            photos = await object.getPhotos()
-            gettingPhotos = false
+            let photos = await object.getPhotos()
+            DispatchQueue.main.async {
+                self.photos = photos
+                self.gettingPhotos = false
+            }
         }
     }
     

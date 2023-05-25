@@ -6,6 +6,7 @@
 //
 
 import CoreData
+import AlpineCore
 import PostgresClientKit
 
 public protocol Importable: Syncable {
