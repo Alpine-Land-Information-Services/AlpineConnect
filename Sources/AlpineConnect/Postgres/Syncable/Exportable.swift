@@ -9,86 +9,45 @@ import CoreData
 import PostgresClientKit
 
 public protocol Exportable: Syncable {
+        
+    static var exportBatchSize: Int { get }
+    static var exportPredicate: NSPredicate { get }
     
-    associatedtype Object: Exportable
-    
-    static func insertQuery(for objects: [Object], in context: NSManagedObjectContext) -> String
-    static func insertQuery2(for objects: [Object], in context: NSManagedObjectContext) -> String
-    
-    static func getAllExportable(in context: NSManagedObjectContext) -> [Object]
-    static func modifyExportable(_ objects: [Object])
+    static func getInsertQueries(for objects: [any Exportable], in context: NSManagedObjectContext) -> [String]
+    static func modifyAfterExport(_ objects: [any Exportable])
     static func additionalActionsAfterExport()
-    static func export(with connection: Connection, in context: NSManagedObjectContext) -> Bool
     
     func checkMissingRequirements() -> Bool
+    
+    //    static func export(with connection: Connection, in context: NSManagedObjectContext) -> Bool
+    //    static func getAllExportable(in context: NSManagedObjectContext) -> [Object]
+    
+    //    static func insertQuery(for objects: [Object], in context: NSManagedObjectContext) -> String
+    //    static func insertQuery2(for objects: [Object], in context: NSManagedObjectContext) -> String
 }
 
 public extension Exportable {
+    
     static var exportable: any Exportable.Type {
         self as any Exportable.Type
     }
     
-    static func insertQuery2(for objects: [Self], in context: NSManagedObjectContext) -> String {
-        ""
+    static var exportBatchSize: Int {
+        10
+    }
+    
+    static var exportPredicate: NSPredicate {
+        NSPredicate(format: "a_changed = true")
     }
 }
 
 public extension Exportable {
     
-    static func export(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
-        let objects = Object.getAllExportable(in: context)
-        syncManager.tracker.makeRecord(name: Object.displayName, type: .export, recordCount: objects.count)
-
-        guard objects.count > 0 else {
-            return true
-        }
-        var result = false
-
-        defer { syncManager.currentQuery = "" }
-        do {
-            let query1 = Object.insertQuery(for: objects, in: context)
-            syncManager.currentQuery = query1
-            print(query1)
-            let statement = try connection.prepareStatement(text: query1)
-            defer { statement.close() }
-            try statement.execute()
-            
-            let query2 = Object.insertQuery2(for: objects, in: context)
-            if !query2.isEmpty {
-                syncManager.currentQuery = query2
-                print(query2)
-                let statement2 = try connection.prepareStatement(text: query2)
-                defer { statement2.close() }
-                try statement2.execute()
-            }
-            syncManager.currentQuery = ""
-            
-            Object.modifyExportable(objects)
-            Object.additionalActionsAfterExport()
-
-            syncManager.tracker.endRecordSync()
-            result = true
-
-        } catch {
-            AppControl.makeError(onAction: "\(Object.entityName) Export", error: error, customDescription: syncManager.currentQuery)
-        }
-
-        return result
+    static func convert<Object: Exportable>(from objects: [any Exportable]) -> [Object] {
+        objects.compactMap({$0 as? Object})
     }
     
-    static func getAllExportable(in context: NSManagedObjectContext) -> [Self] {
-        var objects = [Self]()
-        do {
-            try Self.deleteAllLocal(in: context)
-            objects = Self.findObjects(by: NSPredicate(format: "a_changed = true"), in: context) as? [Self] ?? []
-        }
-        catch {
-            AppControl.makeError(onAction: "Local Objects Delete", error: error)
-        }
-        return objects
-    }
-    
-    static func modifyExportable(_ objects: [Self]) {
+    static func modifyAfterExport(_ objects: [any Exportable]) {
         for object in objects {
             object.setValue(false, forKey: "a_changed")
         }
@@ -96,3 +55,73 @@ public extension Exportable {
     
     static func additionalActionsAfterExport() {}
 }
+
+public extension Exportable {
+    
+    static func getAllExportable(in context: NSManagedObjectContext) -> [Self] {
+        Self.findObjects(by: NSPredicate(format: "a_changed = true"), in: context) as? [Self] ?? []
+//        var objects = [Self]()
+//        do {
+//            try Self.deleteAllLocal(in: context)
+//            objects =
+//        }
+//        catch {
+//            AppControl.makeError(onAction: "Local Objects Delete", error: error)
+//        }
+//        return objects
+    }
+}
+
+//public extension Exportable {
+//
+//    func export(with connection: Connection, in context: NSManagedObjectContext) throws {
+//
+//        let objects = Object.getAllExportable(in: context)
+//        syncManager.tracker.makeRecord(name: Object.displayName, type: .export, recordCount: objects.count)
+//        let totalObjectsCount = Object.getCount(for: nil, in: context)
+//
+//        guard objects.count > 0 else {
+//            return true
+//        }
+//
+//        var result = false
+//        defer { syncManager.currentQuery = "" }
+//
+//        do {
+//
+//
+//            Self.additionalActionsAfterExport()
+//
+//            syncManager.tracker.endRecordSync()
+//            result = true
+//
+//        } catch {
+//            AppControl.makeError(onAction: "\(Object.entityName) Export", error: error, customDescription: syncManager.currentQuery)
+//        }
+//
+//        return result
+//    }
+//}
+//
+//private extension Exportable {
+//
+//    static func export(_ objects: [Object], with connection: Connection, in context: NSManagedObjectContext) throws {
+//        for query in Self.getInsertQueries(for: objects, in: context) {
+//            try execute(query, with: connection)
+//        }
+//
+//        let obj = type(of: objects.first!)
+//
+//        Self.modifyExportable(type(of: Self))
+//    }
+//
+//    static func execute(_ query: String, with connection: Connection) throws {
+//        let statement = try connection.prepareStatement(text: query)
+//        defer { statement.close() }
+//
+//        print(query)
+//        syncManager.currentQuery = query
+//
+//        try statement.execute()
+//    }
+//}

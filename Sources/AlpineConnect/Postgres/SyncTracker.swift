@@ -64,9 +64,9 @@ public class SyncTracker: ObservableObject {
 
 extension SyncTracker {
     
-    func progressUpdate() {
+    func progressUpdate(adding number: Double = 1) {
         DispatchQueue.main.async {
-            self.currentRecordProgress += 1
+            self.currentRecordProgress += number
         }
     }
     

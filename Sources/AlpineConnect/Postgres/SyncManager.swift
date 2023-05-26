@@ -123,32 +123,32 @@ private extension SyncManager {
         guard tracker.status == .exportReady, objects.count > 0 else { return }
         tracker.updateStatus(.exporting)
         await withCheckedContinuation { continuation in
-            NetworkManager.shared.pool?.withConnection { con_from_pool in
-                do {
-                    try context.performAndWait {
-                        let connection = try con_from_pool.get()
+            NetworkManager.shared.pool?.withConnection { result in
+                context.performAndWait {
+                    do {
+                        let connection = try result.get()
                         defer { connection.close() }
-                        
+
                         for helper in helpers {
                             try helper.performWork(with: connection, in: context)
                         }
-                        
+
                         for object in objects {
-                            guard object.export(with: connection, in: context) else {
-                                self.tracker.updateStatus(.error)
-                                context.rollback()
-                                continuation.resume()
-                                return
-                            }
+                            try Exporter(for: object, using: self).export(with: connection, in: context)
                         }
+
                         self.tracker.updateStatus(.exportDone)
-                        try context.save()
+                        try context.parent?.performAndWait {
+                            try context.parent?.save()
+                        }
                         continuation.resume()
                     }
-                }
-                catch {
-                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery)
-                    continuation.resume()
+                    catch {
+                        self.tracker.updateStatus(.error)
+                        AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery)
+                        context.parent?.rollback()
+                        continuation.resume()
+                    }
                 }
             }
         }
@@ -170,3 +170,31 @@ public extension SyncManager {
         database.getNotExported()
     }
 }
+
+//        await withCheckedContinuation { continuation in
+//            NetworkManager.shared.pool?.withConnection { con_from_pool in
+//                do {
+//                    try context.performAndWait {
+//                        let connection = try con_from_pool.get()
+//                        defer { connection.close() }
+//
+//                        for helper in helpers {
+//                            try helper.performWork(with: connection, in: context)
+//                        }
+//
+//                        for object in objects {
+//                            try Exporter(for: object, using: self).export(with: connection, in: context)
+//                        }
+//                        self.tracker.updateStatus(.exportDone)
+//                        continuation.resume()
+//                    }
+//                }
+//                catch {
+//                    self.tracker.updateStatus(.error)
+//                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery)
+//
+//                    context.rollback()
+//                    continuation.resume()
+//                }
+//            }
+//        }
