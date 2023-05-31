@@ -12,11 +12,15 @@ import PostgresClientKit
 class Exporter {
     
     var objectType: any Exportable.Type
-    var syncManager: SyncManager
+    weak var syncManager: SyncManager!
     
     init(for objectType: any Exportable.Type, using syncManager: SyncManager) {
         self.objectType = objectType
         self.syncManager = syncManager
+    }
+    
+    deinit {
+        print("Releasing Exporter for \(objectType.entityName)")
     }
     
     func export(with connection: Connection, in context: NSManagedObjectContext) throws {
