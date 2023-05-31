@@ -48,8 +48,8 @@ public struct CameraView: View {
                         .progressViewStyle(.circular)
                 }
             }
-            .disabled(viewModel.takingPhoto)
         }
+        .disabled(viewModel.takingPhoto)
     }
     
     var galleryButton: some View {

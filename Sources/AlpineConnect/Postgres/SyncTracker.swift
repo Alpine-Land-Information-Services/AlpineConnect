@@ -17,6 +17,7 @@ public class SyncTracker: ObservableObject {
         case exportDone
         
         case importReady
+        case importPreparing
         case importing
         case importDone
         

@@ -25,7 +25,6 @@ class PhotoViewModel: ObservableObject {
     
     init(object: PhotoObject) {
         self.object = object
-//        loadPhotos()
     }
     
     func takePhoto() {
@@ -44,8 +43,12 @@ class PhotoViewModel: ObservableObject {
     }
     
     func loadPhotos() {
+        guard photos.isEmpty else {
+            return
+        }
+        
         gettingPhotos = true
-
+        
         Task {
             let photos = await object.getPhotos()
             DispatchQueue.main.async {
@@ -62,8 +65,7 @@ class PhotoViewModel: ObservableObject {
     
     func clearMemory() {
         DispatchQueue.main.async {
-            self.photos = [Camera.Photo]()
-            self.gettingPhotos = true
+            self.photos = []
         }
     }
 }

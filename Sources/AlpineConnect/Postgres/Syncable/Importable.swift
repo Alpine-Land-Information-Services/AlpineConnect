@@ -65,7 +65,7 @@ public extension Importable {
             defer { cursor.close() }
             
             try Self.processPGResult(cursor: cursor)
-            try context.forceSave()
+            try context.persistentSave()
             
             syncManager.tracker.endRecordSync()
             result = true

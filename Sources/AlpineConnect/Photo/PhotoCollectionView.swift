@@ -6,17 +6,115 @@
 //
 
 import SwiftUI
+import CoreData
+
+//public struct PhotoCollectionView<Object: CDObject>: View {
+//
+//    @EnvironmentObject var viewModel: PhotoViewModel
+//
+//    var interior = false
+//
+//    var fetchRequest: FetchRequest<Object>
+//    var objects: FetchedResults<Object> { fetchRequest.wrappedValue }
+//
+//    init(for object: Object.Type) {
+//        let request: NSFetchRequest<Object> = Object.fetchRequest() as! NSFetchRequest<Object>
+//        request.predicate = NSPredicate(format: "a_deleted = FALSE")
+//        request.sortDescriptors = [NSSortDescriptor(key: "a_dateCreated", ascending: false)]
+//        self.fetchRequest = FetchRequest<Object>(fetchRequest: request)
+//    }
+//
+//    let columns = [
+//        GridItem(.adaptive(minimum: 200))
+//    ]
+//
+//    public var body: some View {
+//        NavigationView {
+//            ScrollView {
+//                if !viewModel.gettingPhotos {
+//                    photoGrid
+//                }
+//                else {
+//                    ProgressView("Loading Photos...")
+//                        .progressViewStyle(.circular)
+//                        .padding(.vertical, 200)
+//                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+//                }
+//            }
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarTrailing) {
+//                    if !interior {
+//                        PhotoButton()
+//                            .environmentObject(viewModel)
+//                    }
+//                }
+//            }
+//            .background((Color(uiColor: .systemGray6)))
+//            .navigationTitle("\(viewModel.object.name) Photos")
+//        }
+//        .navigationViewStyle(.stack)
+//        .onAppear() {
+//            viewModel.loadPhotos()
+//        }
+//        .onWillDisappear {
+//            viewModel.clearMemory()
+//        }
+//    }
+//
+//    var photoGrid: some View {
+//        LazyVGrid(columns: columns, spacing: 10) {
+//            ForEach(objects) { photo in
+//                let container = Camera.containerSize(image: photo.image)
+//
+//                NavigationLink(destination: {
+//                    Camera.PhotoView(photo: photo.image)
+//                }, label: {
+//                    VStack {
+//                        Image(uiImage: photo.image)
+//                            .resizable()
+//                            .scaledToFit()
+//                            .padding(2)
+//                        Spacer()
+//                        HStack {
+//                            Text(photo.date.toString(format: "MMM d, HH:mm"))
+//                                .font(.caption)
+//                                .foregroundColor(Color(uiColor: .label))
+//                            Spacer()
+//                            Button {
+//                                viewModel.deletePhoto(photo)
+//                            } label: {
+//                                Image(systemName: "trash")
+//                                    .foregroundColor(.red)
+//                                    .font(.caption)
+//                            }
+//                            .buttonStyle(.plain)
+//                        }
+//                        .padding(4)
+//                    }
+//                })
+//                .frame(width: container.width, height: container.height + 30)
+//                .background(
+//                    Color(uiColor: .systemGray6)
+//                        .shadow(radius: 2))
+//                .padding()
+//            }
+//
+//        }
+//    }
+//}
+
+
 
 public struct PhotoCollectionView: View {
-    
+
     @EnvironmentObject var viewModel: PhotoViewModel
-        
+
     var interior = false
-    
+
     let columns = [
         GridItem(.adaptive(minimum: 200))
     ]
-        
+
     public var body: some View {
         NavigationView {
             ScrollView {
@@ -35,6 +133,7 @@ public struct PhotoCollectionView: View {
                     if !interior {
                         PhotoButton()
                             .environmentObject(viewModel)
+                            .disabled(viewModel.gettingPhotos)
                     }
                 }
             }
@@ -45,16 +144,18 @@ public struct PhotoCollectionView: View {
         .onAppear() {
             viewModel.loadPhotos()
         }
-        .onWillDisappear {
-            viewModel.clearMemory()
+        .onDisappear {
+            if !interior {
+                viewModel.clearMemory()
+            }
         }
     }
-    
+
     var photoGrid: some View {
         LazyVGrid(columns: columns, spacing: 10) {
             ForEach(viewModel.photos) { photo in
                 let container = Camera.containerSize(image: photo.image)
-                
+
                 NavigationLink(destination: {
                     Camera.PhotoView(photo: photo.image)
                 }, label: {

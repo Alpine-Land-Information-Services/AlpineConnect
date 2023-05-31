@@ -72,6 +72,11 @@ public class SyncManager {
         guard tracker.status == .importReady else {
             return
         }
+        
+        tracker.updateStatus(.importPreparing)
+        tracker.statusMessage("Preparing for Import")
+        let nanoseconds = UInt64(5 * 1_000_000_000)
+        try? await Task.sleep(nanoseconds: nanoseconds)
 
         await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
         
@@ -114,8 +119,8 @@ public class SyncManager {
 private extension SyncManager {
     
     func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
-        guard tracker.status == .importReady, objects.count > 0 else { return }
-        
+        guard tracker.status == .importPreparing, objects.count > 0 else { return }
+        tracker.statusMessage("Importing")
         tracker.updateStatus(.importing)
         
         await withCheckedContinuation({ continuation in
@@ -152,6 +157,8 @@ private extension SyncManager {
     func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
         guard tracker.status == .exportReady, objects.count > 0 else { return }
         tracker.updateStatus(.exporting)
+        tracker.statusMessage("Exporting")
+
         await withCheckedContinuation { continuation in
             NetworkManager.shared.pool?.withConnection { result in
                 context.performAndWait {
@@ -168,15 +175,13 @@ private extension SyncManager {
                         }
 
                         self.tracker.updateStatus(.exportDone)
-//                        try context.parent?.performAndWait {
-//                            try context.parent?.save()
-//                        }
+                        try context.persistentSave()
                         continuation.resume()
                     }
                     catch {
                         self.tracker.updateStatus(.error)
                         AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery)
-                        context.parent?.rollback()
+                        context.rollback()
                         continuation.resume()
                     }
                 }

@@ -31,15 +31,9 @@ class Exporter {
             return
         }
 
-        let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.exportPredicate, with: objectType.exportBatchSize, in: context)
-        while let objects = try batchFetcher.fetchObjectBatch() as? [any Exportable] {
+        let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.exportPredicate, with: objectType.exportBatchSize)
+        while let objects = try batchFetcher.fetchObjectBatch(in: context) as? [any Exportable] {
             try export(objects, with: connection, in: context)
-            try context.save()
-            try context.parent?.performAndWait {
-                try context.parent?.save()
-                try context.parent?.parent?.save()
-            }
-//            context.reset()
         }
         
         defer { syncManager.currentQuery = "" }
