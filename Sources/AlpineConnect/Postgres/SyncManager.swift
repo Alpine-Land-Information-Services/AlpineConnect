@@ -138,9 +138,9 @@ private extension SyncManager {
                         }
 
                         self.tracker.updateStatus(.exportDone)
-                        try context.parent?.performAndWait {
-                            try context.parent?.save()
-                        }
+//                        try context.parent?.performAndWait {
+//                            try context.parent?.save()
+//                        }
                         continuation.resume()
                     }
                     catch {

@@ -42,6 +42,12 @@ public struct PhotoCollectionView: View {
             .navigationTitle("\(viewModel.object.name) Photos")
         }
         .navigationViewStyle(.stack)
+        .onAppear() {
+            viewModel.loadPhotos()
+        }
+        .onWillDisappear {
+            viewModel.clearMemory()
+        }
     }
     
     var photoGrid: some View {

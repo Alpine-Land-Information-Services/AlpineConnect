@@ -31,7 +31,11 @@ class Exporter {
         while let objects = try batchFetcher.fetchObjectBatch() as? [any Exportable] {
             try export(objects, with: connection, in: context)
             try context.save()
-            context.reset()
+            try context.parent?.performAndWait {
+                try context.parent?.save()
+                try context.parent?.parent?.save()
+            }
+//            context.reset()
         }
         
         defer { syncManager.currentQuery = "" }

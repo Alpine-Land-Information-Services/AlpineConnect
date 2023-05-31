@@ -25,7 +25,7 @@ class PhotoViewModel: ObservableObject {
     
     init(object: PhotoObject) {
         self.object = object
-        loadPhotos()
+//        loadPhotos()
     }
     
     func takePhoto() {
@@ -58,5 +58,12 @@ class PhotoViewModel: ObservableObject {
     func deletePhoto(_ photo: Camera.Photo) {
         object.deletePhoto(photo)
         photos.removeAll(where: {$0.id == photo.id})
+    }
+    
+    func clearMemory() {
+        DispatchQueue.main.async {
+            self.photos = [Camera.Photo]()
+            self.gettingPhotos = true
+        }
     }
 }
