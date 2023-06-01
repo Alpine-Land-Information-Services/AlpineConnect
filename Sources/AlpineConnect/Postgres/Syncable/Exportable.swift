@@ -13,17 +13,13 @@ public protocol Exportable: Syncable {
     static var exportBatchSize: Int { get }
     static var exportPredicate: NSPredicate { get }
     
+    static var isSavedIndependently : Bool { get }
+    
     static func getInsertQueries(for objects: [any Exportable]) -> [String]
     static func modifyAfterExport(_ objects: [any Exportable])
     static func additionalActionsAfterExport()
     
     func checkMissingRequirements() -> Bool
-    
-    //    static func export(with connection: Connection, in context: NSManagedObjectContext) -> Bool
-    //    static func getAllExportable(in context: NSManagedObjectContext) -> [Object]
-    
-    //    static func insertQuery(for objects: [Object], in context: NSManagedObjectContext) -> String
-    //    static func insertQuery2(for objects: [Object], in context: NSManagedObjectContext) -> String
 }
 
 public extension Exportable {
@@ -34,6 +30,10 @@ public extension Exportable {
     
     static var exportBatchSize: Int {
         10
+    }
+    
+    static var isSavedIndependently: Bool {
+        false
     }
     
     static var exportPredicate: NSPredicate {

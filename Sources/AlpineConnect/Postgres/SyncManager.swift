@@ -73,10 +73,21 @@ public class SyncManager {
             return
         }
         
-        tracker.updateStatus(.importPreparing)
-        tracker.statusMessage("Preparing for Import")
+        do {
+            tracker.updateStatus(.importPreparing)
+            tracker.statusMessage("Saving Changes")
+            try context.performAndWait {
+                try context.persistentSave()
+            }
+        }
+        catch {
+            self.tracker.updateStatus(.error)
+            AppControl.makeError(onAction: "Saving Export", error: error)
+        }
+        
+        tracker.statusMessage("Successful Export - Preparing For Import")
         try? await Task.sleep(nanoseconds: UInt64(5 * 1_000_000_000))
-
+        
         await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
         
         if let doAfter {
@@ -145,13 +156,14 @@ private extension SyncManager {
                     }
                     
                     self.tracker.updateStatus(.exportDone)
-//                    try context.persistentSave()
                     continuation.resume()
                 }
                 catch {
                     self.tracker.updateStatus(.error)
                     AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery)
-                    context.rollback()
+                    context.performAndWait {
+                        context.rollback()
+                    }
                     continuation.resume()
                 }
             }
@@ -174,25 +186,25 @@ public extension SyncManager {
         database.getNotExported()
     }
     
-    func testExport(in context: NSManagedObjectContext, objects: [NSManagedObject.Type]) {
-        NetworkManager.shared.pool?.withConnection { result in
-            do {
-                let connection = try result.get()
-                defer { connection.close() }
-
-                for object in objects {
-                    try ExporterTest(for: object).export(with: connection, in: context)
-                    print("finished export for \(object.entityName)")
-                    sleep(3)
-                }
-            }
-            catch {
-                print(error.localizedDescription)
-            }
-            
-            print("FINISHED ALL READY FOR SLEEP")
-            sleep(4)
-        }
-    }
+//    func testExport(in context: NSManagedObjectContext, objects: [NSManagedObject.Type]) {
+//        NetworkManager.shared.pool?.withConnection { result in
+//            do {
+//                let connection = try result.get()
+//                defer { connection.close() }
+//
+//                for object in objects {
+//                    try ExporterTest(for: object).export(with: connection, in: context)
+//                    print("finished export for \(object.entityName)")
+//                    sleep(3)
+//                }
+//            }
+//            catch {
+//                print(error.localizedDescription)
+//            }
+//            
+//            print("FINISHED ALL READY FOR SLEEP")
+//            sleep(4)
+//        }
+//    }
 }
 

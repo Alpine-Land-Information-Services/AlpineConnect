@@ -35,7 +35,7 @@ class SyncViewModel: ObservableObject {
         case .none:
             return "Process Complete"
         default:
-            return "Please Wait... \(sync.tracker.statusMessage)"
+            return "\(sync.tracker.statusMessage)..."
         }
     }
     
