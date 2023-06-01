@@ -8,13 +8,13 @@
 import Foundation
 
 class PhotoViewModel: ObservableObject {
-        
+    
     @Published var photos = [Camera.Photo]()
     @Published var showGallery = false
     
     @Published var takingPhoto = false
     @Published var gettingPhotos = true
-
+    
     var object: PhotoObject
     
     lazy var cameraVC: ImagePickerController = {
@@ -43,12 +43,8 @@ class PhotoViewModel: ObservableObject {
     }
     
     func loadPhotos() {
-        guard photos.isEmpty else {
-            return
-        }
-        
+        guard photos.isEmpty else { return }
         gettingPhotos = true
-        
         Task {
             let photos = await object.getPhotos()
             DispatchQueue.main.async {
