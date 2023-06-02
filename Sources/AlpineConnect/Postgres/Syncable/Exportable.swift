@@ -13,7 +13,7 @@ public protocol Exportable: Syncable {
     static var exportBatchSize: Int { get }
     static var exportPredicate: NSPredicate { get }
     
-    static var isSavedIndependently : Bool { get }
+    static var isSavedIndependently: Bool { get }
     
     static func getInsertQueries(for objects: [any Exportable]) -> [String]
     static func modifyAfterExport(_ objects: [any Exportable])

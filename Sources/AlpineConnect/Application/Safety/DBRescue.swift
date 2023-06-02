@@ -79,7 +79,6 @@ public class DBRescue {
                     defer { try? FileManager.default.removeItem(at: tempUrl) }
                     SendArchiveData(userName: userName, data: data, handler: { finished, text in
                         handler(finished, text)
-                        print("Database Sent")
                     })
                 }
             }
@@ -93,38 +92,36 @@ public class DBRescue {
     static func SendArchiveData(userName: String, data: Data, handler: @escaping ((Bool, String) -> Void)) {
         TrackingManager.shared.pool?.withConnection { con_from_pool in
             do {
+                let id = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
                 let appName = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "Unknown"
+                let dataValue = PostgresByteA.init(data: data)
+                let uploadDate = DatetoStringTimeZonePST()
+
                 let connection = try con_from_pool.get()
                 defer { connection.close() }
-                let query1 = """
-                    INSERT INTO public.recovery_files(
-                    id
-                    , application
-                    , user_name
-                    , data
-                    , upload_date)
-                    VALUES (
-                      '\(UIDevice.current.identifierForVendor ?? UUID())'
-                    , '\(appName)'
-                    , '\(userName)'
-                    , '\(PostgresByteA.init(data: data).postgresValue)'
-                    , '\(DatetoStringTimeZonePST())')
 
+                let query = """
+                    INSERT INTO public.recovery_files(
+                    id, application, user_name, data, upload_date)
+                    VALUES ($1, $2, $3, $4, $5)
                     ON CONFLICT (id, application) DO UPDATE SET
                     application = EXCLUDED.application,
                     user_name = EXCLUDED.user_name,
                     data = EXCLUDED.data,
                     upload_date = EXCLUDED.upload_date
                     """
-                let statement1 = try connection.prepareStatement(text: query1)
-                defer { statement1.close() }
-                try statement1.execute()
+                
+                let statement = try connection.prepareStatement(text: query)
+                defer { statement.close() }
 
+                try statement.execute(parameterValues: [id, appName, userName, dataValue, uploadDate])
+
+                AppControl.makeSimpleAlert(title: "Database Sent", message: "Your local database was successfully sent.")
                 handler(true, "Export Successful")
             }
             catch {
+                AppControl.makeError(onAction: "Sending Database", error: error)
                 handler(false, "\(error)")
-                print(error)
             }
         }
     }
