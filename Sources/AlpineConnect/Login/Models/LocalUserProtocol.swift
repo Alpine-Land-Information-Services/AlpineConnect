@@ -16,7 +16,7 @@ public protocol LocalUserProtocol {
     
     static var sameUser: Bool { get }
     
-    static func getApplicationUser(completionHandler: @escaping (LoginResponse) -> ())
+    //static func getApplicationUser(completionHandler: @escaping (LoginResponse) -> ())
     static func saveUserToUserDefaults(_ info: LocalUserInfo)
     static func getUserFromUserDefaults() -> LocalUserInfo?
 }

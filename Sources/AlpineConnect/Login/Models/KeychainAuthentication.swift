@@ -19,9 +19,9 @@ final class KeychainAuthentication {
     var supportBiometricAuthType: LABiometryType = .none
     var biometricError: NSError?
     
-    func authenticateUser(info: Login.UserLoginUpdate, completionHandler: @escaping(LoginResponse) -> Void) {
+    func authenticateUser(info: Login.UserLoginUpdate, completionHandler: @escaping(LoginResponse) -> Void) async {
         if NetworkMonitor.shared.connected {
-            Login.loginUser(info: info, completionHandler: { response in
+            await Login.loginUser(info: info, completionHandler: { response in
                 completionHandler(response)
             })
         } else {

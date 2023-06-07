@@ -37,6 +37,7 @@ class TokenManager {
     }
     
     static func getNewToken() {
+        /*
         guard let loginUpdate = UserManager.shared.loginUpdate else {
             return
         }
@@ -48,6 +49,7 @@ class TokenManager {
                 noTokenAlert()
             }
         }
+         */
     }
     
     static func noTokenAlert() {
