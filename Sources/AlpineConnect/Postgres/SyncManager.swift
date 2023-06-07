@@ -88,7 +88,7 @@ public class SyncManager {
         tracker.statusMessage("Successful Export - Preparing For Import")
         try? await Task.sleep(nanoseconds: UInt64(5 * 1_000_000_000))
         
-        await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
+        await doImport(in: database.type.newBackground, objects: importable, helpers: container.importHelperObjects)
         
         if let doAfter {
             doAfter()

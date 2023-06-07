@@ -24,7 +24,7 @@ class Exporter {
     }
 
     func export(with connection: Connection, in context: NSManagedObjectContext) throws {
-        let context = objectType.isSavedIndependently ? syncManager.database.container.newBackgroundContext() : context
+        let context = objectType.isSavedIndependently ? syncManager.database.type.newBackground : context
         
         var totalObjectsCount = 0
         try context.performAndWait {

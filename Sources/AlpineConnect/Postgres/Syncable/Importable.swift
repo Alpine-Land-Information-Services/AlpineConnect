@@ -15,7 +15,7 @@ public protocol Importable: Syncable {
     static var selectQuery: String { get }
     static var shallCountRecords: Bool { get }
     
-    static func needUpdate() -> Bool
+    static func needUpdate(in context: NSManagedObjectContext) -> Bool
     static func processPGResult(cursor: Cursor, in context: NSManagedObjectContext) throws
 }
 
@@ -26,7 +26,8 @@ public extension Importable {
 }
 
 public extension Importable {
-    static func needUpdate() -> Bool {
+    
+    static func needUpdate(in context: NSManagedObjectContext) -> Bool {
         true
     }
     
@@ -36,7 +37,7 @@ public extension Importable {
 public extension Importable {
     
     static func sync(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
-        guard Self.needUpdate() else {
+        guard Self.needUpdate(in: context) else {
             syncManager.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: 0)
             return true
         }
