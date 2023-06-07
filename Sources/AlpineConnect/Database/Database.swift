@@ -26,6 +26,10 @@ public protocol Database: AnyObject {
 }
 
 public extension Database {
+    
+    var type: Self.Type {
+        return Self.self
+    }
 
     static var main: NSManagedObjectContext {
         Self.shared.moc
@@ -36,6 +40,8 @@ public extension Database {
     }
     
     static var newBackground: NSManagedObjectContext {
-        Self.shared.container.newBackgroundContext()
+        let context = Self.shared.container.newBackgroundContext()
+        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        return context
     }
 }

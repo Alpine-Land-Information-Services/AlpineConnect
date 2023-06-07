@@ -16,7 +16,7 @@ public protocol Importable: Syncable {
     static var shallCountRecords: Bool { get }
     
     static func needUpdate() -> Bool
-    static func processPGResult(cursor: Cursor) throws
+    static func processPGResult(cursor: Cursor, in context: NSManagedObjectContext) throws
 }
 
 public extension Importable {
@@ -64,7 +64,7 @@ public extension Importable {
             let cursor = try statement.execute()
             defer { cursor.close() }
             
-            try Self.processPGResult(cursor: cursor)
+            try Self.processPGResult(cursor: cursor, in: context)
             try context.persistentSave()
             
             syncManager.tracker.endRecordSync()
