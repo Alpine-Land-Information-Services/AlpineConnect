@@ -140,6 +140,14 @@ extension AppControl { //MARK: Alerts
     }
     
     private func errorAlert(title: String, error: Error, customDescription: String?) {
+        if error.log().contains("socketError(cause:")
+            || error.log().contains("connectionClosed")
+        {
+            let alert = AppAlert(title: "\(title) Error", message: "Internet connection is poor. Please try again.", dismiss: AlertAction(text: "Okay"), actions: [])
+            toggleAlert(alert)
+            return
+        }
+        
         let alert = AppAlert(title: "\(title) Error", message: "\(error.localizedDescription) \n-----\n Check error logs for detailed description.", dismiss: AlertAction(text: "Okay"), actions: [AlertAction(text: "Report", role: .alert, action: {
             AppControl.showSheet(view: {
                 NavigationView {
