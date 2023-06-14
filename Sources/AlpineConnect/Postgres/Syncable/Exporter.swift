@@ -28,6 +28,7 @@ class Exporter {
         
         var totalObjectsCount = 0
         try context.performAndWait {
+            try objectType.deleteAllLocal(in: context)
             totalObjectsCount = try objectType.getCount(using: objectType.exportPredicate, in: context)
         }
         syncManager.tracker.makeRecord(name: objectType.displayName, type: .export, recordCount: totalObjectsCount)
