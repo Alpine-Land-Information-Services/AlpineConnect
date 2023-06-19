@@ -143,7 +143,7 @@ extension AppControl { //MARK: Alerts
         if error.log().contains("socketError(cause:")
             || error.log().contains("connectionClosed")
         {
-            let alert = AppAlert(title: "\(title) Error", message: "Internet connection is poor. Please try again.", dismiss: AlertAction(text: "Okay"), actions: [])
+            let alert = AppAlert(title: "\(title) Error", message: "Server error. Please try again.", dismiss: AlertAction(text: "Okay"), actions: [])
             toggleAlert(alert)
             return
         }
