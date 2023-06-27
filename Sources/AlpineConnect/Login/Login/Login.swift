@@ -102,22 +102,36 @@ public class Login {
         request.addValue("LCaie7G1yOnABg65HWqetAtw31ZWc4Ihpxm5UB7Y6lJugvbV1AHvKJdAgdZEoyGc?c=2023-04-10T21:14:36?e=2023-10-07T21:14:36", forHTTPHeaderField: "ApiKey")
         do {
             let (data, response) = try await URLSession.shared.upload(for: request, from: Data())
-            print(response)
-            do {
-                let decoder = JSONDecoder()
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-                decoder.dateDecodingStrategy = .formatted(dateFormatter)
-                let userResponce = try decoder.decode(UserResponse.self, from: data)
-                print(userResponce)
-                TokenManager.saveLoginToken(userResponce.sessionToken)
-                completionHandler(.successfulLogin)
-            } catch {
-                print(error)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                completionHandler(.unknownError)
+                return
+            }
+            if httpResponse.statusCode == 200 {
+                do {
+                    let decoder = JSONDecoder()
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                    decoder.dateDecodingStrategy = .formatted(dateFormatter)
+                    let userResponce = try decoder.decode(UserResponse.self, from: data)
+                    print(userResponce)
+                    TokenManager.saveLoginToken(userResponce.sessionToken)
+                    completionHandler(.successfulLogin)
+                } catch {
+                    Login.loginResponse = error.localizedDescription
+                    completionHandler(.unknownError)
+                }
+            }
+            else if httpResponse.statusCode == 401 {
+                completionHandler(.wrongPassword)
+            }
+            else {
+                Login.loginResponse = httpResponse.debugDescription
+                completionHandler(.unknownError)
             }
         }
         catch {
-            print(error)
+            Login.loginResponse = error.localizedDescription
+            completionHandler(.unknownError)
         }
     }
     /*
