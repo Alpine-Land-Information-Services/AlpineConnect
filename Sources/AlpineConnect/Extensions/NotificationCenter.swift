@@ -7,14 +7,7 @@
 
 import Foundation
 
-public extension NotificationCenter {
-    static func post(_ name: NSNotification.Name, _ userInfo: [AnyHashable : Any]? = nil) {
-        NotificationCenter.default.post(name: name, object: nil, userInfo: userInfo)
-    }
+public extension Notification.Name {
     
-    static func postMainAsync(_ name: NSNotification.Name, _ userInfo: [AnyHashable : Any]? = nil) {
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(name: name, object: nil, userInfo: userInfo)
-        }
-    }
+    static let AC_UserLocationUpdate = Notification.Name("AC_UserLocationUpdate")
 }

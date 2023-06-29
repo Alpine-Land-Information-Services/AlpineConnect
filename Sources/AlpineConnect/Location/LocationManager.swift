@@ -72,7 +72,7 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             lastLocation = location
-            NotificationCenter.default.post(Notification(name: Notification.Name("User-Location-Update"), object: location))
+            NotificationCenter.default.post(Notification(name: .AC_UserLocationUpdate, object: location))
         }
     }
     
