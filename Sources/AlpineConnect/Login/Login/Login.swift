@@ -115,6 +115,7 @@ public class Login {
                     let userResponce = try decoder.decode(UserResponse.self, from: data)
                     print(userResponce)
                     TokenManager.saveLoginToken(userResponce.sessionToken)
+                    CurrentUser.makeUserData(email: userResponce.user.email, name: "\(userResponce.user.firstName) \(userResponce.user.lastName)", id: UUID())
                     completionHandler(.successfulLogin)
                 } catch {
                     Login.loginResponse = error.localizedDescription
