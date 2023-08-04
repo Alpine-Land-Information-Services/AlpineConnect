@@ -15,12 +15,16 @@ open class AppControl: ObservableObject {
     @Published public var showRegularAlert = false
     @Published public var showSheetAlert = false
     
+    @Published public var showCover = false
+    
     @Published public var showSheet = false
     @Published public var showPopup = false
     @Published public var showSecondaryPopup = false
     
     public var currentAlert = AppAlert(title: "", message: "", dismiss: AlertAction(text: ""), actions: [])
     public var currentSheet = AnyView(EmptyView())
+    
+    public var currentCover = AnyView(EmptyView())
     
     public var currentPopup = AppPopup {AnyView(EmptyView())}
     public var currentSecondaryPopup = AppPopup {AnyView(EmptyView())}
@@ -104,6 +108,15 @@ extension AppControl { //MARK: Popups
                     AppControl.shared.currentSheet = AnyView(view)
                     AppControl.shared.showSheet.toggle()
                 }
+            }
+        }
+    }
+    
+    static public func showCover(view: any View) {
+        DispatchQueue.main.async {
+            withAnimation {
+                AppControl.shared.currentCover = AnyView(view)
+                AppControl.shared.showCover.toggle()
             }
         }
     }

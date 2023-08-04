@@ -34,8 +34,8 @@ public class CDObjects {
                     try object.clear(in: context)
                 }
                 
-                try context.save()
-                context.reset()
+                try context.persistentSave()
+//                context.reset()
             }
             catch {
                 return .failure(error)
