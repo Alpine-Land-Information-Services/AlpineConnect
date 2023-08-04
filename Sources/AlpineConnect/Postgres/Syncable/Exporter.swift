@@ -72,10 +72,9 @@ private extension Exporter {
     }
 
     func execute(_ query: String, with connection: Connection) throws {
+        syncManager.currentQuery = query
         let statement = try connection.prepareStatement(text: query)
         defer {statement.close()}
-
-        syncManager.currentQuery = query
         try statement.execute()
         try connection.commitTransaction()
     }
