@@ -38,7 +38,7 @@ class LoginViewModel: ObservableObject {
     func bioAuthentication() {
         authenthication.handleBiometricAuthorization { result in
             if result {
-                self.login()
+                self.doLogin()
             }
         }
     }
@@ -49,7 +49,7 @@ class LoginViewModel: ObservableObject {
         }
         authenthication.handleBiometricAuthorization { result in
             if result {
-                self.login()
+                self.doLogin()
             }
         }
     }
@@ -66,11 +66,18 @@ class LoginViewModel: ObservableObject {
             loginAlert.updateAlertType(_: .emptyFields)
             return
         }
-        
-        userManager.userName = userManager.userName.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "_")
-        userManager.password = userManager.inputPassword
-        NetworkManager.update()
-        login()
+        doLogin(manual: true)
+    }
+    
+    func doLogin(manual: Bool = false) {
+        DispatchQueue.main.async { [self] in
+            if manual {
+                userManager.userName = userManager.userName.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: " ", with: "_")
+                userManager.password = userManager.inputPassword
+            }
+            NetworkManager.update()
+            login()
+        }
     }
     
     @objc
@@ -82,15 +89,15 @@ class LoginViewModel: ObservableObject {
     }
     
     func login() {
-        DispatchQueue.main.async {
-            self.spinner.toggle()
-        }
-        if NetworkMonitor.shared.connected {
-            Login.loginUser(info: makeLoginUpdateInfo(), completionHandler: { response in
-                self.handleOnlineAuthenticationResponse(response)
-            })
-        } else {
-            self.handleOfflineAuthenticationResponse()
+        DispatchQueue.main.async { [self] in
+            spinner.toggle()
+            if NetworkMonitor.shared.connected {
+                Login.loginUser(info: makeLoginUpdateInfo(), completionHandler: { response in
+                    self.handleOnlineAuthenticationResponse(response)
+                })
+            } else {
+                self.handleOfflineAuthenticationResponse()
+            }
         }
     }
     
