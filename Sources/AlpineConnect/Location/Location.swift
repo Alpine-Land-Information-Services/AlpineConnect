@@ -33,6 +33,17 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         }
     }
     
+    public func isEnabled() async -> Bool {
+        switch manager.authorizationStatus {
+            case .notDetermined, .restricted, .denied:
+                return false
+            case .authorizedAlways, .authorizedWhenInUse:
+                return true
+            @unknown default:
+                return true
+        }
+    }
+    
     public func start() {
         guard !isWorking else { return }
         isWorking = true

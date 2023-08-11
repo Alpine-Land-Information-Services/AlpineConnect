@@ -76,6 +76,10 @@ public extension CurrentUser {
         fullName.components(separatedBy: .whitespaces)[1]
     }
     
+    static var defaultsGroup: Int {
+        data["defaultsGroup"] as? Int ?? 0
+    }
+    
     static var database: Database {
         guard let db = data["database"] as? String else {
             return .production
@@ -103,6 +107,11 @@ public extension CurrentUser {
     
     static func setAdmin(to value: Bool) {
         data["isAdmin"] = value
+        data.saveToDefaults(key: userKey)
+    }
+    
+    static func setDefaultsGroup(to value: Int) {
+        data["defaultsGroup"] = value
         data.saveToDefaults(key: userKey)
     }
 }
