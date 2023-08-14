@@ -13,6 +13,7 @@ public class SyncTracker: ObservableObject {
     
     public enum SyncStatus {
         case exportReady
+        case exportPreparing
         case exporting
         case exportDone
         
@@ -22,6 +23,7 @@ public class SyncTracker: ObservableObject {
         case importDone
         
         case actions
+        case saving
         
         case error
         case none

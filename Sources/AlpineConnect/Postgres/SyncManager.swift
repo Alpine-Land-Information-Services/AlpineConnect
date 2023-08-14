@@ -10,12 +10,24 @@ import AlpineCore
 
 public class SyncManager {
     
+    public enum SyncType {
+        case importOnly
+        case exportOnly
+        
+        case importFirst
+        case exportFirst
+    }
+    
     public var tracker: SyncTracker
     public var container: ObjectContainer
     
     public var currentQuery: String?
     
     weak public var database: (any Database)!
+    
+    var context: NSManagedObjectContext {
+        database.type.syncBackground
+    }
     
     public init(for container: ObjectContainer, database: any Database) {
         self.container = container
@@ -25,18 +37,12 @@ public class SyncManager {
         database.getNotExported()
     }
     
-    public func sync(checks: Bool, in context: NSManagedObjectContext,
-                     doBefore: (() -> ())?,
-                     doInBetween: (() -> ())?,
-                     doAfter: (() -> ())?) async
-    {
-        guard checks else { return }
+    public func sync(type: SyncType, doBefore: (() -> ())?, doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), doAfter: (() -> ())?) async {
         currentQuery = ""
-        
         let (importable, exportable) = sortTypes(container.objects)
         
         tracker.currentSyncStartDate = Date()
-        tracker.totalRecordsToSync = tracker.status == .exportReady ? importable.count + exportable.count : importable.count
+        tracker.totalRecordsToSync = getRecordCount(for: type, importable: importable, exportable: exportable)
         await AppControl.showSheet(view: SyncView(for: self))
         
         defer {
@@ -57,38 +63,20 @@ public class SyncManager {
             doBefore()
         }
         
-        if tracker.status == .exportReady {
-            await doExport(in: context, objects: exportable, helpers: container.exportHelperObjects)
+        switch type {
+        case .exportFirst:
+            await exportFirst(doInBetween: doInBetween, importable: importable, exportable: exportable)
+        case .importFirst:
+            await importFirst(doInBetween: doInBetween, importable: importable, exportable: exportable)
+        case .importOnly:
+            await importOnly(doInBetween: doInBetween, importable: importable)
+        case .exportOnly:
+            await exportOnly(doInBetween: doInBetween, exportable: exportable)
         }
         
-        if let doInBetween {
-            doInBetween()
-        }
-        
-        if tracker.status == .exportDone {
-            tracker.updateStatus(.importReady)
-        }
-        
-        guard tracker.status == .importReady else {
+        guard tracker.status != .error else {
             return
         }
-        
-        do {
-            tracker.updateStatus(.importPreparing)
-            tracker.statusMessage("Saving Changes")
-            try context.performAndWait {
-                try context.persistentSave()
-            }
-        }
-        catch {
-            self.tracker.updateStatus(.error)
-            AppControl.makeError(onAction: "Saving Export", error: error)
-        }
-        
-        tracker.statusMessage("Successful Export - Preparing For Import")
-        try? await Task.sleep(nanoseconds: UInt64(5 * 1_000_000_000))
-        
-        await doImport(in: database.type.syncBackground, objects: importable, helpers: container.importHelperObjects)
         
         if let doAfter {
             doAfter()
@@ -98,8 +86,116 @@ public class SyncManager {
 
 private extension SyncManager {
     
+    func getRecordCount(for type: SyncType, importable: [Importable.Type], exportable: [Exportable.Type]) -> Int {
+        switch type {
+        case .exportFirst, .importFirst:
+            return exportable.count + importable.count
+        case .exportOnly:
+            return exportable.count
+        case .importOnly:
+            return importable.count
+        }
+    }
+    
+    func exportOnly(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), exportable: [Exportable.Type]) async {
+        tracker.updateStatus(.exportReady)
+        await executeExport(doInBetween: doInBetween, exportable: exportable)
+    }
+    
+    func importOnly(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type]) async {
+        tracker.updateStatus(.importReady)
+        await exectuteImport(doInBetween: doInBetween, importable: importable)
+    }
+    
+    func exportFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
+        tracker.updateStatus(.exportReady)
+        await executeExport(doInBetween: doInBetween, exportable: exportable)
+        
+        guard tracker.status == .exportDone else {
+            return
+        }
+        
+        tracker.updateStatus(.importReady)
+        await exectuteImport(doInBetween: doInBetween, importable: importable)
+    }
+    
+    func importFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
+        tracker.updateStatus(.importReady)
+        await exectuteImport(doInBetween: doInBetween, importable: importable)
+
+        guard tracker.status == .importDone else {
+            return
+        }
+        
+        tracker.updateStatus(.exportReady)
+        await executeExport(doInBetween: doInBetween, exportable: exportable)
+    }
+    
+}
+
+private extension SyncManager {
+    
+    func executeExport(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), exportable: [Exportable.Type]) async {
+        guard exportable.count > 0 else {
+            tracker.updateStatus(.exportDone)
+            return
+        }
+
+        await doExport(in: context, objects: exportable, helpers: container.exportHelperObjects)
+
+        guard tracker.status == .exportDone else {
+            return
+        }
+                
+        do {
+            tracker.statusMessage("Saving Export Data")
+            try context.performAndWait {
+                try doInBetween(context)
+                try context.persistentSave()
+                context.refreshAllObjects()
+            }
+        }
+        catch {
+            self.tracker.updateStatus(.error)
+            AppControl.makeError(onAction: "Saving Export Data", error: error)
+        }
+        
+        try? await Task.sleep(nanoseconds: UInt64(3 * 1_000_000_000))
+
+    }
+    
+    func exectuteImport(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type]) async {
+        guard importable.count > 0 else {
+            tracker.updateStatus(.importDone)
+            return
+        }
+        
+        await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
+        
+        guard tracker.status == .importDone else {
+            return
+        }
+                
+        do {
+            tracker.statusMessage("Saving Import Data")
+            try context.performAndWait {
+                try doInBetween(context)
+                try context.persistentSave()
+                context.refreshAllObjects()
+            }
+        }
+        catch {
+            self.tracker.updateStatus(.error)
+            AppControl.makeError(onAction: "Saving Import Data", error: error)
+        }
+        
+        try? await Task.sleep(nanoseconds: UInt64(3 * 1_000_000_000))
+    }
+}
+
+private extension SyncManager {
+    
     func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
-        guard tracker.status == .importPreparing, objects.count > 0 else { return }
         tracker.statusMessage("Importing")
         tracker.updateStatus(.importing)
         
@@ -135,7 +231,6 @@ private extension SyncManager {
     }
 
     func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
-        guard tracker.status == .exportReady, objects.count > 0 else { return }
         tracker.updateStatus(.exporting)
         tracker.statusMessage("Exporting")
         

@@ -57,9 +57,7 @@ public extension Importable {
             else {
                 print("---------------->>> \(Self.entityName)")
             }
-            
-            print(text)
-            
+                        
             let statement = try connection.prepareStatement(text: text)
             defer { statement.close() }
             let cursor = try statement.execute()
