@@ -47,6 +47,10 @@ public extension CurrentUser {
         UUID(uuidString: data["guid"] as! String)!
     }
     
+    static var applicationUserGuid: UUID {
+        UUID(uuidString: data["applicationUserGuid"] as! String)!
+    }
+    
     static var isAdmin: Bool {
         data["isAdmin"] as? Bool ?? false
     }
@@ -107,11 +111,17 @@ public extension CurrentUser {
     
     static func setAdmin(to value: Bool) {
         data["isAdmin"] = value
-        data.saveToDefaults(key: userKey)
     }
     
     static func setDefaultsGroup(to value: Int) {
         data["defaultsGroup"] = value
+    }
+    
+    static func setApplicationUserGuid(to value: UUID) {
+        data["applicationUserGuid"] = value.uuidString
+    }
+    
+    static func saveDefaults() {
         data.saveToDefaults(key: userKey)
     }
 }

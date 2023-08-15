@@ -12,26 +12,32 @@ public class SyncManager {
     
     public enum SyncType {
         case importOnly
+        case importOnlyNoUI
+        
         case exportOnly
+        case exportOnlyNoUI
         
         case importFirst
+        case importFirstNoUI
+        
         case exportFirst
+        case exportFirstNoUI
     }
     
     public var tracker: SyncTracker
     public var container: ObjectContainer
-    
+    private var context: NSManagedObjectContext
+
     public var currentQuery: String?
     
     weak public var database: (any Database)!
     
-    var context: NSManagedObjectContext {
-        database.type.syncBackground
-    }
     
-    public init(for container: ObjectContainer, database: any Database) {
+    public init(for container: ObjectContainer, database: any Database, context: NSManagedObjectContext) {
         self.container = container
         tracker = SyncTracker()
+        self.context = context
+        context.mergePolicy = SelectiveMergePolicy()
         tracker.manager = self
         self.database = database
         database.getNotExported()
@@ -43,7 +49,10 @@ public class SyncManager {
         
         tracker.currentSyncStartDate = Date()
         tracker.totalRecordsToSync = getRecordCount(for: type, importable: importable, exportable: exportable)
-        await AppControl.showSheet(view: SyncView(for: self))
+        
+        if showUI(for: type) {
+            await AppControl.showSheet(view: SyncView(for: self))
+        }
         
         defer {
             currentQuery = ""
@@ -64,13 +73,13 @@ public class SyncManager {
         }
         
         switch type {
-        case .exportFirst:
+        case .exportFirst, .exportFirstNoUI:
             await exportFirst(doInBetween: doInBetween, importable: importable, exportable: exportable)
-        case .importFirst:
+        case .importFirst, .importFirstNoUI:
             await importFirst(doInBetween: doInBetween, importable: importable, exportable: exportable)
-        case .importOnly:
+        case .importOnly, .importOnlyNoUI:
             await importOnly(doInBetween: doInBetween, importable: importable)
-        case .exportOnly:
+        case .exportOnly, .exportOnlyNoUI:
             await exportOnly(doInBetween: doInBetween, exportable: exportable)
         }
         
@@ -88,54 +97,69 @@ private extension SyncManager {
     
     func getRecordCount(for type: SyncType, importable: [Importable.Type], exportable: [Exportable.Type]) -> Int {
         switch type {
-        case .exportFirst, .importFirst:
+        case .exportFirst, .importFirst, .exportFirstNoUI, .importFirstNoUI:
             return exportable.count + importable.count
-        case .exportOnly:
+        case .exportOnly, .exportOnlyNoUI:
             return exportable.count
-        case .importOnly:
+        case .importOnly, .importOnlyNoUI:
             return importable.count
         }
     }
     
     func exportOnly(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), exportable: [Exportable.Type]) async {
         tracker.updateStatus(.exportReady)
-        await executeExport(doInBetween: doInBetween, exportable: exportable)
+        await executeExport(exportable: exportable)
     }
     
     func importOnly(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type]) async {
         tracker.updateStatus(.importReady)
-        await exectuteImport(doInBetween: doInBetween, importable: importable)
+        await exectuteImport(importable: importable)
     }
     
     func exportFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
         tracker.updateStatus(.exportReady)
-        await executeExport(doInBetween: doInBetween, exportable: exportable)
+        await executeExport(exportable: exportable)
         
         guard tracker.status == .exportDone else {
             return
         }
         
+        inBetweenActions(for: doInBetween)
+        
         tracker.updateStatus(.importReady)
-        await exectuteImport(doInBetween: doInBetween, importable: importable)
+        await exectuteImport(importable: importable)
     }
     
     func importFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
         tracker.updateStatus(.importReady)
-        await exectuteImport(doInBetween: doInBetween, importable: importable)
+        await exectuteImport(importable: importable)
 
         guard tracker.status == .importDone else {
             return
         }
         
+        inBetweenActions(for: doInBetween)
+        
         tracker.updateStatus(.exportReady)
-        await executeExport(doInBetween: doInBetween, exportable: exportable)
+        await executeExport(exportable: exportable)
     }
-    
 }
 
 private extension SyncManager {
     
-    func executeExport(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), exportable: [Exportable.Type]) async {
+    func inBetweenActions(for function: ((_ context: NSManagedObjectContext) throws -> ())) {
+        do {
+            try context.performAndWait {
+                try function(context)
+                try context.persistentSave()
+            }
+        }
+        catch {
+            AppControl.makeError(onAction: "Sync Actions Save", error: error)
+        }
+    }
+    
+    func executeExport(exportable: [Exportable.Type]) async {
         guard exportable.count > 0 else {
             tracker.updateStatus(.exportDone)
             return
@@ -150,7 +174,6 @@ private extension SyncManager {
         do {
             tracker.statusMessage("Saving Export Data")
             try context.performAndWait {
-                try doInBetween(context)
                 try context.persistentSave()
                 context.refreshAllObjects()
             }
@@ -164,7 +187,7 @@ private extension SyncManager {
 
     }
     
-    func exectuteImport(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type]) async {
+    func exectuteImport(importable: [Importable.Type]) async {
         guard importable.count > 0 else {
             tracker.updateStatus(.importDone)
             return
@@ -179,7 +202,6 @@ private extension SyncManager {
         do {
             tracker.statusMessage("Saving Import Data")
             try context.performAndWait {
-                try doInBetween(context)
                 try context.persistentSave()
                 context.refreshAllObjects()
             }
@@ -273,6 +295,18 @@ private extension SyncManager {
     }
 }
 
+private extension SyncManager {
+    
+    func showUI(for type: SyncType) -> Bool {
+        switch type {
+        case .importOnlyNoUI, .exportOnlyNoUI, .importFirstNoUI, .exportFirstNoUI:
+            return false
+        default:
+            return true
+        }
+    }
+}
+
 public extension SyncManager {
     
     func clear() {
@@ -280,26 +314,5 @@ public extension SyncManager {
         tracker.manager = self
         database.getNotExported()
     }
-    
-//    func testExport(in context: NSManagedObjectContext, objects: [NSManagedObject.Type]) {
-//        NetworkManager.shared.pool?.withConnection { result in
-//            do {
-//                let connection = try result.get()
-//                defer { connection.close() }
-//
-//                for object in objects {
-//                    try ExporterTest(for: object).export(with: connection, in: context)
-//                    print("finished export for \(object.entityName)")
-//                    sleep(3)
-//                }
-//            }
-//            catch {
-//                print(error.localizedDescription)
-//            }
-//            
-//            print("FINISHED ALL READY FOR SLEEP")
-//            sleep(4)
-//        }
-//    }
 }
 
