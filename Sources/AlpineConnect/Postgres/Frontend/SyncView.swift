@@ -42,9 +42,6 @@ public struct SyncView: View {
                 }
             }
         }
-        .onDisappear {
-            viewModel.sync.clear()
-        }
     }
     
     var hello: some View {

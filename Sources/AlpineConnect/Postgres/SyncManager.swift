@@ -22,6 +22,8 @@ public class SyncManager {
         
         case exportFirst
         case exportFirstNoUI
+        
+        case none
     }
     
     public var tracker: SyncTracker
@@ -31,7 +33,7 @@ public class SyncManager {
     public var currentQuery: String?
     
     weak public var database: (any Database)!
-    
+    var isForeground = true
     
     public init(for container: ObjectContainer, database: any Database, context: NSManagedObjectContext) {
         self.container = container
@@ -41,9 +43,25 @@ public class SyncManager {
         tracker.manager = self
         self.database = database
         database.getNotExported()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(contextDidSave(notification:)), name: NSNotification.Name.NSManagedObjectContextDidSave, object: context)
     }
     
-    public func sync(type: SyncType, doBefore: (() -> ())?, doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), doAfter: (() -> ())?) async {
+    @objc
+    func contextDidSave(notification: Notification) {
+        DispatchQueue.main.async {
+            self.database.type.main.mergeChanges(fromContextDidSave: notification)
+        }
+    }
+    
+    public func sync(type: SyncType, isBackground: Bool = false, doBefore: (() -> ())?, doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), doAfter: (() -> ())?) async {
+        guard tracker.internalStatus == .none else {
+            AppControl.makeSimpleAlert(title: "Already Syncing", message: "Please wait for the current sync to complete.")
+            return
+        }
+        
+        isForeground = !isBackground
+        tracker.updateType(type)
         currentQuery = ""
         let (importable, exportable) = sortTypes(container.objects)
         
@@ -51,7 +69,7 @@ public class SyncManager {
         tracker.totalRecordsToSync = getRecordCount(for: type, importable: importable, exportable: exportable)
         
         if showUI(for: type) {
-            await AppControl.showSheet(view: SyncView(for: self))
+            showUI()
         }
         
         defer {
@@ -59,11 +77,17 @@ public class SyncManager {
             if tracker.status != .error {
                 CurrentUser.updateSyncDate(tracker.currentSyncStartDate)
                 tracker.updateStatus(.none)
+                tracker.updateType(.none)
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                self.clear()
             }
         }
         
         guard await NetworkMonitor.shared.canConnectToServer() else {
-            AppControl.makeSimpleAlert(title: "Connection Timeout", message: "Cannot connect to server in reasonable time, please try again later.")
+            if isForeground {
+                AppControl.makeSimpleAlert(title: "Connection Timeout", message: "Cannot connect to server in reasonable time, please try again later.")
+            }
             tracker.updateStatus(.error)
             return
         }
@@ -81,6 +105,8 @@ public class SyncManager {
             await importOnly(doInBetween: doInBetween, importable: importable)
         case .exportOnly, .exportOnlyNoUI:
             await exportOnly(doInBetween: doInBetween, exportable: exportable)
+        case .none:
+            AppControl.makeSimpleAlert(title: "Invalid Status", message: "Sync status cannot be 'none'.")
         }
         
         guard tracker.status != .error else {
@@ -95,6 +121,17 @@ public class SyncManager {
 
 private extension SyncManager {
     
+    func mergeBackgroundChangesToMainContext() {
+        DispatchQueue.main.async { [self] in
+            let changes = context.insertedObjects.union(context.updatedObjects).union(context.deletedObjects)
+            
+            for obj in changes {
+                let mainContextObject = database.container.viewContext.object(with: obj.objectID)
+                database.container.viewContext.refresh(mainContextObject, mergeChanges: true)
+            }
+        }
+    }
+    
     func getRecordCount(for type: SyncType, importable: [Importable.Type], exportable: [Exportable.Type]) -> Int {
         switch type {
         case .exportFirst, .importFirst, .exportFirstNoUI, .importFirstNoUI:
@@ -103,6 +140,8 @@ private extension SyncManager {
             return exportable.count
         case .importOnly, .importOnlyNoUI:
             return importable.count
+        case .none:
+            return 0
         }
     }
     
@@ -128,6 +167,10 @@ private extension SyncManager {
         
         tracker.updateStatus(.importReady)
         await exectuteImport(importable: importable)
+        
+        if tracker.status == .importDone {
+            CurrentUser.requiresSync = false
+        }
     }
     
     func importFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
@@ -142,6 +185,10 @@ private extension SyncManager {
         
         tracker.updateStatus(.exportReady)
         await executeExport(exportable: exportable)
+        
+        if tracker.status == .exportDone {
+            CurrentUser.requiresSync = false
+        }
     }
 }
 
@@ -155,7 +202,7 @@ private extension SyncManager {
             }
         }
         catch {
-            AppControl.makeError(onAction: "Sync Actions Save", error: error)
+            AppControl.makeError(onAction: "Sync Actions Save", error: error, showToUser: isForeground)
         }
     }
     
@@ -180,10 +227,10 @@ private extension SyncManager {
         }
         catch {
             self.tracker.updateStatus(.error)
-            AppControl.makeError(onAction: "Saving Export Data", error: error)
+            AppControl.makeError(onAction: "Saving Export Data", error: error, showToUser: isForeground)
         }
         
-        try? await Task.sleep(nanoseconds: UInt64(3 * 1_000_000_000))
+        try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
 
     }
     
@@ -208,10 +255,10 @@ private extension SyncManager {
         }
         catch {
             self.tracker.updateStatus(.error)
-            AppControl.makeError(onAction: "Saving Import Data", error: error)
+            AppControl.makeError(onAction: "Saving Import Data", error: error, showToUser: isForeground)
         }
         
-        try? await Task.sleep(nanoseconds: UInt64(3 * 1_000_000_000))
+        try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
     }
 }
 
@@ -245,7 +292,7 @@ private extension SyncManager {
                 }
                 catch {
                     self.tracker.updateStatus(.error)
-                    AppControl.makeError(onAction: "Data Import", error: error, customDescription: self.currentQuery)
+                    AppControl.makeError(onAction: "Data Import", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
                     continuation.resume()
                 }
             }
@@ -277,7 +324,7 @@ private extension SyncManager {
                 }
                 catch {
                     self.tracker.updateStatus(.error)
-                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery)
+                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
                     context.performAndWait {
                         context.rollback()
                     }
@@ -308,6 +355,10 @@ private extension SyncManager {
 }
 
 public extension SyncManager {
+    
+    func showUI() {
+        AppControl.showSheet(view: SyncView(for: self))
+    }
     
     func clear() {
         tracker = SyncTracker()

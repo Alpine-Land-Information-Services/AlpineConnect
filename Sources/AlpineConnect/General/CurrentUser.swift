@@ -64,6 +64,26 @@ public extension CurrentUser {
         }
     }
     
+    static var requiresSync: Bool {
+        get {
+            data["requiresSync"] as? Bool ?? false
+        }
+        set {
+            data["requiresSync"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
+    static var didBackgroundSync: Bool {
+        get {
+            data["didBackgroundSync"] as? Bool ?? false
+        }
+        set {
+            data["didBackgroundSync"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
     static var email: String {
         data["email"] as! String
     }
@@ -100,6 +120,9 @@ public extension CurrentUser {
             data["lastSync"] = date
         case .sandbox:
             data["lastSyncSandbox"] = date
+        }
+        if date == nil {
+            data["requiresSync"] = false
         }
         data.saveToDefaults(key: userKey)
     }

@@ -29,6 +29,7 @@ public class SyncTracker: ObservableObject {
         case none
     }
     
+    
     struct SyncableRecord: Identifiable {
         
         enum RecordType: String {
@@ -45,7 +46,19 @@ public class SyncTracker: ObservableObject {
     public var currentSyncStartDate = Date()
     
     @Published public var showSync = false
-    
+    @Published public var syncType = SyncManager.SyncType.none {
+        didSet {
+            withAnimation {
+                isSyncing = checkIfSyncing(type: syncType)
+            }
+        }
+    }
+    @Published public var isSyncing = false {
+        didSet {
+            NotificationCenter.default.post(Notification(name: Notification.Name("AC_SyncChange"), object: isSyncing))
+        }
+    }
+        
     @Published public var slowStatus = SyncStatus.none
     var internalStatus = SyncStatus.none
     
@@ -94,6 +107,15 @@ extension SyncTracker {
 
 extension SyncTracker {
     
+    func checkIfSyncing(type: SyncManager.SyncType) -> Bool {
+        switch type {
+        case .exportFirst, .importFirst, .exportFirstNoUI, .importFirstNoUI:
+            return true
+        default:
+            return false
+        }
+    }
+    
     func toggleSyncWindow(to value: Bool) {
         DispatchQueue.main.async {
             withAnimation {
@@ -116,7 +138,18 @@ public extension SyncTracker {
     func updateStatus(_ status: SyncStatus) {
         internalStatus = status
         DispatchQueue.main.async {
-            self.slowStatus = status
+            withAnimation {
+                self.slowStatus = status
+            }
+        }
+    }
+    
+    func updateType(_ type: SyncManager.SyncType) {
+        DispatchQueue.main.async {
+            withAnimation {
+                print("updated type to\(type)")
+                self.syncType = type
+            }
         }
     }
     
