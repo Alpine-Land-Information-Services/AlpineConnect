@@ -53,13 +53,23 @@ public class SyncTracker: ObservableObject {
             }
         }
     }
+    
+    @Published public var isDoingSomeSync = false
+    @Published var showingUI = false
+    
     @Published public var isSyncing = false {
         didSet {
             NotificationCenter.default.post(Notification(name: Notification.Name("AC_SyncChange"), object: isSyncing))
         }
     }
         
-    @Published public var slowStatus = SyncStatus.none
+    @Published public var slowStatus = SyncStatus.none {
+        didSet {
+            if internalStatus == .error {
+                NotificationCenter.default.post(Notification(name: Notification.Name("AC_SyncChange"), object: false))
+            }
+        }
+    }
     var internalStatus = SyncStatus.none
     
     @Published public var statusMessage = ""

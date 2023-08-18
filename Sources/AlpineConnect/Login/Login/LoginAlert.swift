@@ -174,7 +174,7 @@ class LoginAlert: ObservableObject {
                 self.continueWithLogin()}),
                          secondaryButton: .cancel(Text("Not Now"), action: self.continueWithLogin))
         default:
-            return Alert(title: Text("Something Went Wrong"), message: Text("Please try again. \n\n Error: \n \(Login.loginResponse)"))
+            return Alert(title: Text("Something Went Wrong"), message: Text("Please try again. \n\n Error: \n\(Login.responseBody ?? "") \n \(Login.loginResponse)"))
 
         }
     }

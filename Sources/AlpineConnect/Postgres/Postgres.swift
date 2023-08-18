@@ -37,7 +37,7 @@ public extension Optional where Wrapped == String {
     }
     
     func toPostgres() -> String {
-        self != nil && self != "" ? "'\(self!)'" : "NULL"
+        self != nil && self != "" ? "'\(self!.postgresEscaped)'" : "NULL"
     }
 }
 

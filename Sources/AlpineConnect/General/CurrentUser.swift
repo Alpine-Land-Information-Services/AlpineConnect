@@ -64,6 +64,26 @@ public extension CurrentUser {
         }
     }
     
+    static var syncOnStart: Bool {
+        get {
+            data["syncOnStart"] as? Bool ?? true
+        }
+        set {
+            data["syncOnStart"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
+    static var syncWithCellular: Bool {
+        get {
+            data["syncWithCellular"] as? Bool ?? true
+        }
+        set {
+            data["syncWithCellular"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
     static var requiresSync: Bool {
         get {
             data["requiresSync"] as? Bool ?? false

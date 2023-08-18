@@ -11,6 +11,7 @@ import PostgresClientKit
 public class Login {
     
     public static var loginResponse = ""
+    public static var responseBody: String?
     
     static private let serverMode = "default" // "default" - use regular url, "test" - use testing url
     
@@ -170,7 +171,7 @@ public class Login {
                 loginResponse = "Cannot get HHTP response."
                 return .unknownError
             }
-            
+            responseBody = String(data: body, encoding: .utf8)
             TokenManager.saveLoginToken(try JSONDecoder().decode(String.self, from: body))
             
             switch httpResponse.statusCode {

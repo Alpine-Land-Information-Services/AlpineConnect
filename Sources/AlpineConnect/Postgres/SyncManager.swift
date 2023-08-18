@@ -60,6 +60,7 @@ public class SyncManager {
             return
         }
         
+        tracker.isDoingSomeSync = true
         isForeground = !isBackground
         tracker.updateType(type)
         currentQuery = ""
@@ -74,12 +75,17 @@ public class SyncManager {
         
         defer {
             currentQuery = ""
+            DispatchQueue.main.async {
+                self.tracker.isDoingSomeSync = false
+            }
             if tracker.status != .error {
                 CurrentUser.updateSyncDate(tracker.currentSyncStartDate)
-                tracker.updateStatus(.none)
-                tracker.updateType(.none)
+                self.tracker.updateStatus(.none)
+                self.tracker.updateType(.none)
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            if !tracker.showingUI {
+                self.tracker.updateStatus(.none)
+                self.tracker.updateType(.none)
                 self.clear()
             }
         }
@@ -187,7 +193,9 @@ private extension SyncManager {
         await executeExport(exportable: exportable)
         
         if tracker.status == .exportDone {
-            CurrentUser.requiresSync = false
+            DispatchQueue.main.async {
+                CurrentUser.requiresSync = false
+            }
         }
     }
 }
@@ -352,6 +360,14 @@ private extension SyncManager {
             return true
         }
     }
+    
+    func allowSync() -> Bool {
+        guard !tracker.isDoingSomeSync else {
+            AppControl.makeSimpleAlert(title: "Syncing", message: "Please wait for the sync process to complete before proceeding.")
+            return false
+        }
+        return true
+    }
 }
 
 public extension SyncManager {
@@ -364,6 +380,20 @@ public extension SyncManager {
         tracker = SyncTracker()
         tracker.manager = self
         database.getNotExported()
+    }
+    
+    func nonSyncAction(_ action: () -> Void) {
+        guard allowSync() else {
+            return
+        }
+        action()
+    }
+    
+    func nonSyncAction(_ action: () async -> Void) async {
+        guard allowSync() else {
+            return
+        }
+        await action()
     }
 }
 

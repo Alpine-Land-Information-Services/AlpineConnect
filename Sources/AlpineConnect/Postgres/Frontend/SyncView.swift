@@ -42,6 +42,12 @@ public struct SyncView: View {
                 }
             }
         }
+        .onAppear {
+            tracker.showingUI = true
+        }
+        .onDisappear {
+            tracker.manager.clear()
+        }
     }
     
     var hello: some View {

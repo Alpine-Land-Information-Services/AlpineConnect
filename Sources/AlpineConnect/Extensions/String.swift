@@ -9,6 +9,12 @@ import Foundation
 
 public func escapeForSql(_ string: String) -> String {
     let str = string.replacingOccurrences(of: "'", with: "''")
-//    str = str.replacingOccurrences(of: "\"", with: "\\\"")
     return str
+}
+
+public extension String {
+    
+    var postgresEscaped: String {
+        return replacingOccurrences(of: "'", with: "''")
+    }
 }
