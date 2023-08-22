@@ -52,8 +52,6 @@ public struct AppView<App: View>: View {
                 control.currentCover
                     .popup(isPresented: $control.showSecondaryPopup, alignment: .bottom, direction: .bottomTrailing) {
                         control.currentSecondaryPopup.content
-//                            .padding(.trailing, 40)
-//                            .offset(x: hSizeClass == .compact ? -18 : 0)
                     }
             })
             .ignoresSafeArea()

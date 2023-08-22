@@ -64,15 +64,16 @@ public extension CurrentUser {
         }
     }
     
-    static var syncOnStart: Bool {
+    static var autoSync: Bool {
         get {
-            data["syncOnStart"] as? Bool ?? true
+            data["autoSync"] as? Bool ?? true
         }
         set {
-            data["syncOnStart"] = newValue
+            data["autoSync"] = newValue
             data.saveToDefaults(key: userKey)
         }
     }
+    
     
     static var syncWithCellular: Bool {
         get {
@@ -80,6 +81,16 @@ public extension CurrentUser {
         }
         set {
             data["syncWithCellular"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
+    static var syncPauseEndDate: Date? {
+        get {
+            data["syncPauseEndDate"] as? Date
+        }
+        set {
+            data["syncPauseEndDate"] = newValue
             data.saveToDefaults(key: userKey)
         }
     }

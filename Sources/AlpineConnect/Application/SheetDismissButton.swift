@@ -9,11 +9,31 @@ import SwiftUI
 
 public struct SheetDismissButton: View {
     
-    public init() {}
+    var type: DismissType
+    var additionalAction: (() -> Void)?
+    
+    public enum DismissType {
+        case sheet
+        case fullscreen
+    }
+    
+    public init(_ type: DismissType = .sheet, addtionalAction: (() -> Void)? = nil) {
+        self.type = type
+        self.additionalAction = addtionalAction
+    }
     
     public var body: some View {
         Button {
-            AppControl.shared.showSheet = false
+            switch type {
+            case .fullscreen:
+                AppControl.shared.showCover = false
+            case.sheet:
+                AppControl.shared.showSheet = false
+            }
+            
+            if let additionalAction {
+                additionalAction()
+            }
         } label: {
             Label("Dismiss", systemImage: "xmark")
                 .foregroundColor(.red)
