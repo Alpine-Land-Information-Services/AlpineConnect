@@ -7,10 +7,10 @@
 
 import Foundation
 
-public func escapeForSql(_ string: String) -> String {
-    let str = string.replacingOccurrences(of: "'", with: "''")
-    return str
-}
+//public func escapeForSql(_ string: String) -> String {
+//    let str = string.replacingOccurrences(of: "'", with: "''")
+//    return str
+//}
 
 public extension String {
     
