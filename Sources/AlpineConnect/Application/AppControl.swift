@@ -51,7 +51,7 @@ open class AppControl: ObservableObject {
     
     public var showAlert: Bool {
         get {
-            if showSheet {
+            if showSheet || showCover {
                 return showSheetAlert
             }
             else {
@@ -59,7 +59,7 @@ open class AppControl: ObservableObject {
             }
         }
         set {
-            if showSheet {
+            if showSheet || showCover {
                 showSheetAlert = newValue
             }
             else {

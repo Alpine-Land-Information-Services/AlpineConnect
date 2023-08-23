@@ -50,9 +50,17 @@ public struct AppView<App: View>: View {
             }
             .fullScreenCover(isPresented: $control.showCover, content: {
                 control.currentCover
+                    .overlay {
+                        if control.sheetDimView {
+                            Color(uiColor: .black)
+                                .opacity(0.4)
+                                .ignoresSafeArea()
+                        }
+                    }
                     .popup(isPresented: $control.showSecondaryPopup, alignment: .bottom, direction: .bottomTrailing) {
                         control.currentSecondaryPopup.content
                     }
+                    .appAlert(isPresented: $control.showSheetAlert, alert: control.currentAlert)
             })
             .ignoresSafeArea()
     }
