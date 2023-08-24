@@ -15,10 +15,12 @@ public struct ReportIssueView: View {
     
     public init(userName: String = "", email: String = "", title: String = "", text: String = "") {
         viewModel = ReportIssueViewModel.shared
-        viewModel.name = userName
-        viewModel.email = email
-        viewModel.title = title
-        viewModel.message = text
+        DispatchQueue.main.async { [self] in
+            viewModel.name = userName
+            viewModel.email = email
+            viewModel.title = title
+            viewModel.message = text
+        }
     }
     
     public var body: some View {

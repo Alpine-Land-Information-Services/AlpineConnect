@@ -33,6 +33,13 @@ public struct SyncView: View {
                 syncedRecords
             }
             .background(Color(uiColor: .systemGray6))
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarTrailing) {
+//                    Button("Close") {
+//                        tracker.manager.activeConnection?.closeAbruptly()
+//                    }
+//                }
+//            }
         }
         .interactiveDismissDisabled(tracker.status != .none)
         .onChange(of: tracker.status) { newValue in

@@ -7,6 +7,7 @@
 
 import CoreData
 import AlpineCore
+import PostgresClientKit
 
 public class SyncManager {
     
@@ -29,6 +30,8 @@ public class SyncManager {
     public var tracker: SyncTracker
     public var container: ObjectContainer
     private var context: NSManagedObjectContext
+    
+    var activeConnection: Connection?
 
     public var currentQuery: String?
     
@@ -60,10 +63,11 @@ public class SyncManager {
             return
         }
         
-        tracker.isDoingSomeSync = true
+        DispatchQueue.main.async {
+            self.tracker.isDoingSomeSync = true
+        }
         isForeground = !isBackground
         tracker.updateType(type)
-        currentQuery = ""
         let (importable, exportable) = sortTypes(container.objects)
         
         tracker.currentSyncStartDate = Date()
@@ -112,7 +116,7 @@ public class SyncManager {
         case .exportOnly, .exportOnlyNoUI:
             await exportOnly(doInBetween: doInBetween, exportable: exportable)
         case .none:
-            AppControl.makeSimpleAlert(title: "Invalid Status", message: "Sync status cannot be 'none'.")
+            AppControl.makeSimpleAlert(title: "Invalid Status", message: "Sync type cannot be 'none'.")
         }
         
         guard tracker.status != .error else {
@@ -151,52 +155,11 @@ private extension SyncManager {
         }
     }
     
-    func exportOnly(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), exportable: [Exportable.Type]) async {
-        tracker.updateStatus(.exportReady)
-        await executeExport(exportable: exportable)
-    }
-    
-    func importOnly(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type]) async {
-        tracker.updateStatus(.importReady)
-        await exectuteImport(importable: importable)
-    }
-    
-    func exportFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
-        tracker.updateStatus(.exportReady)
-        await executeExport(exportable: exportable)
+    func sortTypes(_ objects: [CDObject.Type]) -> ([Importable.Type], [any Exportable.Type]) {
+        let importable = objects.filter({$0 is Importable.Type})
+        let exportable =  objects.filter({$0 is any Exportable.Type})
         
-        guard tracker.status == .exportDone else {
-            return
-        }
-        
-        inBetweenActions(for: doInBetween)
-        
-        tracker.updateStatus(.importReady)
-        await exectuteImport(importable: importable)
-        
-        if tracker.status == .importDone {
-            CurrentUser.requiresSync = false
-        }
-    }
-    
-    func importFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
-        tracker.updateStatus(.importReady)
-        await exectuteImport(importable: importable)
-
-        guard tracker.status == .importDone else {
-            return
-        }
-        
-        inBetweenActions(for: doInBetween)
-        
-        tracker.updateStatus(.exportReady)
-        await executeExport(exportable: exportable)
-        
-        if tracker.status == .exportDone {
-            DispatchQueue.main.async {
-                CurrentUser.requiresSync = false
-            }
-        }
+        return (importable as! [Importable.Type], exportable as! [any Exportable.Type])
     }
 }
 
@@ -213,144 +176,6 @@ private extension SyncManager {
             AppControl.makeError(onAction: "Sync Actions Save", error: error, showToUser: isForeground)
         }
     }
-    
-    func executeExport(exportable: [Exportable.Type]) async {
-        guard exportable.count > 0 else {
-            tracker.updateStatus(.exportDone)
-            return
-        }
-
-        await doExport(in: context, objects: exportable, helpers: container.exportHelperObjects)
-
-        guard tracker.status == .exportDone else {
-            return
-        }
-                
-        do {
-            tracker.statusMessage("Saving Export Data")
-            try context.performAndWait {
-                try context.persistentSave()
-                context.refreshAllObjects()
-            }
-        }
-        catch {
-            self.tracker.updateStatus(.error)
-            AppControl.makeError(onAction: "Saving Export Data", error: error, showToUser: isForeground)
-        }
-        
-        try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
-
-    }
-    
-    func exectuteImport(importable: [Importable.Type]) async {
-        guard importable.count > 0 else {
-            tracker.updateStatus(.importDone)
-            return
-        }
-        
-        await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
-        
-        guard tracker.status == .importDone else {
-            return
-        }
-                
-        do {
-            tracker.statusMessage("Saving Import Data")
-            try context.performAndWait {
-                try context.persistentSave()
-                context.refreshAllObjects()
-            }
-        }
-        catch {
-            self.tracker.updateStatus(.error)
-            AppControl.makeError(onAction: "Saving Import Data", error: error, showToUser: isForeground)
-        }
-        
-        try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
-    }
-}
-
-private extension SyncManager {
-    
-    func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
-        tracker.statusMessage("Importing")
-        tracker.updateStatus(.importing)
-        
-        await withCheckedContinuation({ continuation in
-            NetworkManager.shared.pool?.withConnection { con_from_pool in
-                do {
-                    try context.performAndWait {
-                        let connection = try con_from_pool.get()
-                        defer { connection.close() }
-                        
-                        for helper in helpers {
-                            try helper.performWork(with: connection, in: context)
-                        }
-                        
-                        for object in objects {
-                            guard object.sync(with: connection, in: context) else {
-                                self.tracker.updateStatus(.error)
-                                continuation.resume()
-                                return
-                            }
-                        }
-                        self.tracker.updateStatus(.importDone)
-                        continuation.resume()
-                    }
-                }
-                catch {
-                    self.tracker.updateStatus(.error)
-                    AppControl.makeError(onAction: "Data Import", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
-                    continuation.resume()
-                }
-            }
-        })
-    }
-
-    func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
-        tracker.updateStatus(.exporting)
-        tracker.statusMessage("Exporting")
-        
-        await withCheckedContinuation { continuation in
-            NetworkManager.shared.pool?.withConnection { result in
-                do {
-                    let connection = try result.get()
-                    defer { connection.close() }
-                    
-                    try context.performAndWait {
-                        for helper in helpers {
-                            try helper.performWork(with: connection, in: context)
-                        }
-                    }
-                    
-                    for object in objects {
-                        try Exporter(for: object, using: self).export(with: connection, in: context)
-                    }
-                    
-                    self.tracker.updateStatus(.exportDone)
-                    continuation.resume()
-                }
-                catch {
-                    self.tracker.updateStatus(.error)
-                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
-                    context.performAndWait {
-                        context.rollback()
-                    }
-                    continuation.resume()
-                }
-            }
-        }
-    }
-    
-    func sortTypes(_ objects: [CDObject.Type]) -> ([Importable.Type], [any Exportable.Type]) {
-        let importable = objects.filter({$0 is Importable.Type})
-        let exportable =  objects.filter({$0 is any Exportable.Type})
-        
-        return (importable as! [Importable.Type], exportable as! [any Exportable.Type])
-    }
-}
-
-private extension SyncManager {
     
     func showUI(for type: SyncType) -> Bool {
         switch type {
@@ -394,6 +219,194 @@ public extension SyncManager {
             return
         }
         await action()
+    }
+    
+    func cancelSync() {
+        guard let activeConnection else {
+            return
+        }
+        
+    }
+}
+
+private extension SyncManager { //MARK: Import
+    
+    func importOnly(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type]) async {
+        tracker.updateStatus(.importReady)
+        await exectuteImport(importable: importable)
+    }
+    
+    func importFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
+        tracker.updateStatus(.importReady)
+        await exectuteImport(importable: importable)
+
+        guard tracker.status == .importDone else {
+            return
+        }
+        
+        inBetweenActions(for: doInBetween)
+        
+        tracker.updateStatus(.exportReady)
+        await executeExport(exportable: exportable)
+        
+        if tracker.status == .exportDone {
+            DispatchQueue.main.async {
+                CurrentUser.requiresSync = false
+            }
+        }
+    }
+    
+    func exectuteImport(importable: [Importable.Type]) async {
+        guard importable.count > 0 else {
+            tracker.updateStatus(.importDone)
+            return
+        }
+        
+        await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
+        
+        guard tracker.status == .importDone else {
+            return
+        }
+                
+        do {
+            tracker.statusMessage("Saving Import Data")
+            try context.performAndWait {
+                try context.persistentSave()
+                context.refreshAllObjects()
+            }
+        }
+        catch {
+            self.tracker.updateStatus(.error)
+            AppControl.makeError(onAction: "Saving Import Data", error: error, showToUser: isForeground)
+        }
+        
+        try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+    }
+    
+    func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
+        tracker.statusMessage("Importing")
+        tracker.updateStatus(.importing)
+        
+        await withCheckedContinuation({ continuation in
+            NetworkManager.shared.pool?.withConnection { con_from_pool in
+                do {
+                    try context.performAndWait {
+                        let connection = try con_from_pool.get()
+                        self.activeConnection = connection
+                        defer { connection.close() }
+                        
+                        for helper in helpers {
+                            try helper.performWork(with: connection, in: context)
+                        }
+                        
+                        for object in objects {
+                            guard object.sync(with: connection, in: context) else {
+                                self.tracker.updateStatus(.error)
+                                continuation.resume()
+                                return
+                            }
+                        }
+                        self.tracker.updateStatus(.importDone)
+                        continuation.resume()
+                    }
+                }
+                catch {
+                    self.tracker.updateStatus(.error)
+                    AppControl.makeError(onAction: "Data Import", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
+                    continuation.resume()
+                }
+            }
+        })
+    }
+}
+
+private extension SyncManager { //MARK: Export
+    
+    func exportOnly(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), exportable: [Exportable.Type]) async {
+        tracker.updateStatus(.exportReady)
+        await executeExport(exportable: exportable)
+    }
+    
+    func exportFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
+        tracker.updateStatus(.exportReady)
+        await executeExport(exportable: exportable)
+        
+        guard tracker.status == .exportDone else {
+            return
+        }
+        
+        inBetweenActions(for: doInBetween)
+        
+        tracker.updateStatus(.importReady)
+        await exectuteImport(importable: importable)
+        
+        if tracker.status == .importDone {
+            CurrentUser.requiresSync = false
+        }
+    }
+    
+    func executeExport(exportable: [Exportable.Type]) async {
+        guard exportable.count > 0 else {
+            tracker.updateStatus(.exportDone)
+            return
+        }
+
+        await doExport(in: context, objects: exportable, helpers: container.exportHelperObjects)
+
+        guard tracker.status == .exportDone else {
+            return
+        }
+                
+        do {
+            tracker.statusMessage("Saving Export Data")
+            try context.performAndWait {
+                try context.persistentSave()
+                context.refreshAllObjects()
+            }
+        }
+        catch {
+            self.tracker.updateStatus(.error)
+            AppControl.makeError(onAction: "Saving Export Data", error: error, showToUser: isForeground)
+        }
+        
+        try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
+
+    }
+    
+    func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
+        tracker.updateStatus(.exporting)
+        tracker.statusMessage("Exporting")
+        
+        await withCheckedContinuation { continuation in
+            NetworkManager.shared.pool?.withConnection { result in
+                do {
+                    let connection = try result.get()
+                    self.activeConnection = connection
+                    defer { connection.close() }
+                    
+                    try context.performAndWait {
+                        for helper in helpers {
+                            try helper.performWork(with: connection, in: context)
+                        }
+                    }
+                    
+                    for object in objects {
+                        try Exporter(for: object, using: self).export(with: connection, in: context)
+                    }
+                    
+                    self.tracker.updateStatus(.exportDone)
+                    continuation.resume()
+                }
+                catch {
+                    self.tracker.updateStatus(.error)
+                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
+                    context.performAndWait {
+                        context.rollback()
+                    }
+                    continuation.resume()
+                }
+            }
+        }
     }
 }
 
