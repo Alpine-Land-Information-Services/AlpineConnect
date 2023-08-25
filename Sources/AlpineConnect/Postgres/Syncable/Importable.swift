@@ -70,7 +70,9 @@ public extension Importable {
             result = true
             
         } catch {
-            AppControl.makeError(onAction: "\(Self.entityName) Import", error: error, customDescription: syncManager.currentQuery)
+            syncManager.nonCancelAction {
+                AppControl.makeError(onAction: "\(Self.entityName) Import", error: error, customDescription: syncManager.currentQuery)
+            }
         }
         
         return result

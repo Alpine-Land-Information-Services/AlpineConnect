@@ -38,6 +38,8 @@ public class SyncManager {
     weak public var database: (any Database)!
     var isForeground = true
     
+    var timer: Timer?
+    
     public init(for container: ObjectContainer, database: any Database, context: NSManagedObjectContext) {
         self.container = container
         tracker = SyncTracker()
@@ -72,17 +74,23 @@ public class SyncManager {
         
         tracker.currentSyncStartDate = Date()
         tracker.totalRecordsToSync = getRecordCount(for: type, importable: importable, exportable: exportable)
-        
+
+        scheduleTimer()
         if showUI(for: type) {
             showUI()
         }
         
         defer {
             currentQuery = ""
+            timer?.invalidate()
+            activeConnection = nil
             DispatchQueue.main.async {
                 self.tracker.isDoingSomeSync = false
             }
-            if tracker.status != .error {
+            if tracker.status == .canceled {
+                self.tracker.updateType(.none)
+            }
+            else if tracker.status != .error {
                 CurrentUser.updateSyncDate(tracker.currentSyncStartDate)
                 self.tracker.updateStatus(.none)
                 self.tracker.updateType(.none)
@@ -119,13 +127,22 @@ public class SyncManager {
             AppControl.makeSimpleAlert(title: "Invalid Status", message: "Sync type cannot be 'none'.")
         }
         
-        guard tracker.status != .error else {
+        guard tracker.status != .error && !isSyncCanceled else {
             return
         }
         
         if let doAfter {
             doAfter()
         }
+    }
+    
+    @objc
+    func timerFired() {
+        guard activeConnection != nil else {
+            timer?.invalidate()
+            return
+        }
+        promptForCancel()
     }
 }
 
@@ -167,6 +184,7 @@ private extension SyncManager {
     
     func inBetweenActions(for function: ((_ context: NSManagedObjectContext) throws -> ())) {
         do {
+            guard !isSyncCanceled else { return }
             try context.performAndWait {
                 try function(context)
                 try context.persistentSave()
@@ -220,12 +238,57 @@ public extension SyncManager {
         }
         await action()
     }
+}
+
+extension SyncManager { //MARK: Cancel
+    
+    var isSyncCanceled: Bool {
+        tracker.status == .canceled
+    }
+    
+    func scheduleTimer() {
+        if CurrentUser.syncTimeout != 0 {
+            DispatchQueue.main.async { [self] in
+                timer = Timer.scheduledTimer(timeInterval: TimeInterval(CurrentUser.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+            }
+        }
+    }
     
     func cancelSync() {
         guard let activeConnection else {
             return
         }
         
+        timer?.invalidate()
+        tracker.updateStatus(.canceled)
+        activeConnection.closeAbruptly()
+        self.activeConnection = nil
+    }
+    
+    func nonCancelAction(_ action: @escaping () -> Void) {
+        if tracker.status != .canceled {
+            action()
+        }
+    }
+    
+    func userSyncCancelAlert() {
+        guard activeConnection != nil else {
+            AppControl.makeSimpleAlert(title: "Not Syncing", message: "Cannot cancel as there is no sync in progress.")
+            return
+        }
+        
+        let alert = AppAlert(title: "Cancel Sync?", message: "Current sync process will be canceled.", dismiss: AlertAction(text: "No", role: .dismiss, action: {}), actions: [AlertAction(text: "Proceed", role: .alert, action: {
+            self.cancelSync()
+        })])
+        
+        AppControl.makeAlert(alert: alert)
+    }
+    
+    func promptForCancel() {
+        let alert = AppAlert(title: "Sync Timeout", message: "Current sync process is taking longer than the timeout threshold. \n\n Would you like to cancel or continue the process?", dismiss: AlertAction(text: "Continue", role: .dismiss, action: {}), actions: [AlertAction(text: "Cancel It", role: .alert, action: {
+            self.cancelSync()
+        })])
+        AppControl.makeAlert(alert: alert)
     }
 }
 
@@ -245,7 +308,8 @@ private extension SyncManager { //MARK: Import
         }
         
         inBetweenActions(for: doInBetween)
-        
+        guard !isSyncCanceled else { return }
+
         tracker.updateStatus(.exportReady)
         await executeExport(exportable: exportable)
         
@@ -296,12 +360,22 @@ private extension SyncManager { //MARK: Import
                         defer { connection.close() }
                         
                         for helper in helpers {
+                            guard !self.isSyncCanceled else {
+                                continuation.resume()
+                                return
+                            }
                             try helper.performWork(with: connection, in: context)
                         }
                         
                         for object in objects {
+                            guard !self.isSyncCanceled else {
+                                continuation.resume()
+                                return
+                            }
                             guard object.sync(with: connection, in: context) else {
-                                self.tracker.updateStatus(.error)
+                                self.nonCancelAction {
+                                    self.tracker.updateStatus(.error)
+                                }
                                 continuation.resume()
                                 return
                             }
@@ -311,8 +385,10 @@ private extension SyncManager { //MARK: Import
                     }
                 }
                 catch {
-                    self.tracker.updateStatus(.error)
-                    AppControl.makeError(onAction: "Data Import", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
+                    self.nonCancelAction {
+                        self.tracker.updateStatus(.error)
+                        AppControl.makeError(onAction: "Data Import", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
+                    }
                     continuation.resume()
                 }
             }
@@ -336,7 +412,8 @@ private extension SyncManager { //MARK: Export
         }
         
         inBetweenActions(for: doInBetween)
-        
+        guard !isSyncCanceled else { return }
+
         tracker.updateStatus(.importReady)
         await exectuteImport(importable: importable)
         
@@ -365,8 +442,10 @@ private extension SyncManager { //MARK: Export
             }
         }
         catch {
-            self.tracker.updateStatus(.error)
-            AppControl.makeError(onAction: "Saving Export Data", error: error, showToUser: isForeground)
+            nonCancelAction {
+                self.tracker.updateStatus(.error)
+                AppControl.makeError(onAction: "Saving Export Data", error: error, showToUser: self.isForeground)
+            }
         }
         
         try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
@@ -386,11 +465,19 @@ private extension SyncManager { //MARK: Export
                     
                     try context.performAndWait {
                         for helper in helpers {
+                            guard !self.isSyncCanceled else {
+                                continuation.resume()
+                                return
+                            }
                             try helper.performWork(with: connection, in: context)
                         }
                     }
                     
                     for object in objects {
+                        guard !self.isSyncCanceled else {
+                            continuation.resume()
+                            return
+                        }
                         try Exporter(for: object, using: self).export(with: connection, in: context)
                     }
                     
@@ -398,8 +485,10 @@ private extension SyncManager { //MARK: Export
                     continuation.resume()
                 }
                 catch {
-                    self.tracker.updateStatus(.error)
-                    AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
+                    self.nonCancelAction {
+                        self.tracker.updateStatus(.error)
+                        AppControl.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
+                    }
                     context.performAndWait {
                         context.rollback()
                     }

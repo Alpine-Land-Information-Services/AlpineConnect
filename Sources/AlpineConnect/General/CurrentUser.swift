@@ -75,6 +75,16 @@ public extension CurrentUser {
     }
     
     
+    static var syncTimeout: Int {
+        get {
+            data["syncTimeout"] as? Int ?? 60
+        }
+        set {
+            data["syncTimeout"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
     static var syncWithCellular: Bool {
         get {
             data["syncWithCellular"] as? Bool ?? true

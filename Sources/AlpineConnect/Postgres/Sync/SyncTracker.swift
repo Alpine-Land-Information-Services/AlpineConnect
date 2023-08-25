@@ -26,6 +26,7 @@ public class SyncTracker: ObservableObject {
         case saving
         
         case error
+        case canceled
         case none
     }
     
@@ -65,7 +66,7 @@ public class SyncTracker: ObservableObject {
         
     @Published public var slowStatus = SyncStatus.none {
         didSet {
-            if internalStatus == .error {
+            if internalStatus == .error || internalStatus == .canceled {
                 NotificationCenter.default.post(Notification(name: Notification.Name("AC_SyncChange"), object: false))
             }
         }
