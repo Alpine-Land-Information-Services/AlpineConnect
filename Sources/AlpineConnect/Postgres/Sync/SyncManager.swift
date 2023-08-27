@@ -47,7 +47,9 @@ public class SyncManager {
         context.mergePolicy = SelectiveMergePolicy()
         tracker.manager = self
         self.database = database
-        database.getNotExported()
+        DispatchQueue.global(qos: .background).async {
+            database.getNotExported()
+        }
         
         NotificationCenter.default.addObserver(self, selector: #selector(contextDidSave(notification:)), name: NSNotification.Name.NSManagedObjectContextDidSave, object: context)
     }
