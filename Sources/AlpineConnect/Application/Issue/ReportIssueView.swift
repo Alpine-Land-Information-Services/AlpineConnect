@@ -45,7 +45,7 @@ public struct ReportIssueView: View {
                 ProgressView("Sending...").foregroundColor(Color.white).progressViewStyle(CircularProgressViewStyle(tint: .white))
             }
         }
-        .navigationTitle("Report Issue")
+        .navigationTitle("Contact Support")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
