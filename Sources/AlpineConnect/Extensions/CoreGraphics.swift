@@ -55,3 +55,25 @@ public extension CGPoint {
         return sqrt(pow((to.x - self.x), 2) + pow((to.y - self.y), 2))
     }
 }
+
+public extension CGImage {
+    
+    func resize(to size: CGSize) -> CGImage? {
+        let destWidth = Int(size.width)
+        let destHeight = Int(size.height)
+        let bitsPerComponent = 8
+        let bytesPerPixel = self.bitsPerPixel / bitsPerComponent
+        let destBytesPerRow = destWidth * bytesPerPixel
+        
+        let context = CGContext(data: nil,
+                                width: destWidth,
+                                height: destHeight,
+                                bitsPerComponent: bitsPerComponent,
+                                bytesPerRow: destBytesPerRow,
+                                space: self.colorSpace!,
+                                bitmapInfo: self.bitmapInfo.rawValue)!
+        context.interpolationQuality = .low
+        context.draw(self, in: CGRect(origin: CGPoint.zero, size: size))
+        return context.makeImage()
+    }
+}
