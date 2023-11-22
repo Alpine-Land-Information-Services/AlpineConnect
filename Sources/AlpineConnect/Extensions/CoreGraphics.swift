@@ -30,6 +30,10 @@ public extension CGSize {
     static func /(lhs: Self, div: CGFloat) -> CGSize {
         CGSize(width: lhs.width / div, height: lhs.height / div)
     }
+    
+    func center() -> CGPoint {
+        CGPoint(x: self.width / 2, y: self.height / 2)
+    }
 }
 
 
