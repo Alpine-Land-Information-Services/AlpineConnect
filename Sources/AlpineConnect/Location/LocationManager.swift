@@ -68,6 +68,14 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
         manager.stopUpdatingHeading()
         isActive = false
     }
+    
+    public func addLocationUser(id: UUID, description: String) {
+        locationUsers[id] = description
+    }
+    
+    public func removeLocationUser(with id: UUID) {
+        locationUsers.removeValue(forKey: id)
+    }
 
     public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
