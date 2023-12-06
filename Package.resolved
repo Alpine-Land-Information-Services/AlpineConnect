@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "AlpineCore",
+        "repositoryURL": "https://github.com/jenyalebid/AlpineCore.git",
+        "state": {
+          "branch": "main",
+          "revision": "1001e68384e295abcf57dcd6f83dea24544ca529",
+          "version": null
+        }
+      },
+      {
         "package": "AlpineUI",
         "repositoryURL": "https://github.com/jenyalebid/AlpineUI.git",
         "state": {
