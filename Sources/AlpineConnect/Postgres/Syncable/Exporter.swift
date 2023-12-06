@@ -36,7 +36,7 @@ class Exporter {
             return
         }
 
-        let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.exportPredicate, with: 10, isModifying: true)
+        let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.exportPredicate, sortDescriptors: nil, with: 10, isModifying: true)
         var objects: [any Exportable]? = []
 
         repeat {
