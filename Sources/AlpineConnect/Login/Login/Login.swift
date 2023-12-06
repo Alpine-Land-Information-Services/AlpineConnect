@@ -77,11 +77,38 @@ public class Login {
         let user: User
     }
     
+    public struct ProblemDetails : Decodable {
+        /// <summary>
+        /// Gets or sets the unique identifier for the request.
+        /// </summary>
+        let requestId: String?
+        /// <summary>
+        /// Gets or sets the type of the problem.
+        /// </summary>
+        let type: String?
+        /// <summary>
+        /// Gets or sets the title of the problem.
+        /// </summary>
+        let title: String?
+        /// <summary>
+        /// Gets or sets the HTTP status code associated with the problem.
+        /// </summary>
+        let status: Int?
+        /// <summary>
+        /// Gets or sets a detailed description of the problem.
+        /// </summary>
+        let detail: String?
+        /// <summary>
+        /// Gets or sets the URI of the specific instance of the problem.
+        /// </summary>
+        let instance: String?
+    }
+    
     public struct User: Decodable {
         public let email: String
         public let firstName: String
         public let lastName: String
-        let phoneNumber: String
+        let phoneNumber: String?
         let created: Date
         let passwordChangeRequired: Bool
         let timeZoneId: String
@@ -112,6 +139,8 @@ public class Login {
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
                     decoder.dateDecodingStrategy = .formatted(dateFormatter)
+                    let jsonString = String(data: data, encoding: .utf8)
+                    print(jsonString ?? "")
                     let userResponce = try decoder.decode(UserResponse.self, from: data)
                     print(userResponce)
                     TokenManager.saveLoginToken(userResponce.sessionToken)
@@ -123,6 +152,14 @@ public class Login {
                 }
             }
             else if httpResponse.statusCode == 401 {
+                let decoder = JSONDecoder()
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                decoder.dateDecodingStrategy = .formatted(dateFormatter)
+                let jsonString = String(data: data, encoding: .utf8)
+                print(jsonString ?? "")
+                let userResponce = try decoder.decode(ProblemDetails.self, from: data)
+                print(userResponce)
                 completionHandler(.wrongPassword)
             }
             else {
