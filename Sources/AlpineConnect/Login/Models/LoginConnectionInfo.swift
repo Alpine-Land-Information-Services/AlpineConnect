@@ -9,22 +9,63 @@ import Foundation
 
 public struct LoginConnectionInfo {
     
-    static var shared = LoginConnectionInfo(host: "", database: "", appFullName: "", appDBName: "", connectDBPassword: "", appUserFunction: {_ in })
+    public init(appInfo: AppInfo, loginPageInfo: LoginPageInfo, postgresInfo: PostgresInfo?, trackingInfo: TrackingInfo?) {
+        self.appInfo = appInfo
+        self.loginPageInfo = loginPageInfo
+        self.postgresInfo = postgresInfo
+        self.trackingInfo = trackingInfo
+    }
     
-    public init(host: String, database: String, appFullName: String, appDBName: String, connectDBPassword: String,
-                appUserFunction: @escaping (@escaping (LoginResponse) -> ()) -> ()) {
+    public var appInfo: AppInfo
+    public var loginPageInfo: LoginPageInfo
+    public var postgresInfo: PostgresInfo?
+    public var trackingInfo: TrackingInfo?
+}
+
+public struct PostgresInfo {
+    
+    public init(host: String, databaseType: String, databaseName: String) {
         self.host = host
-        self.database = database
-        self.appFullName = appFullName
-        self.appDBName = appDBName
-        self.connectDBPassword = connectDBPassword
-        self.appUserFunction = appUserFunction
+        self.databaseType = databaseType
+        self.databaseName = databaseName
     }
     
     var host: String
-    var database: String
-    var appFullName: String
-    var appDBName: String
-    var connectDBPassword: String
-    var appUserFunction: (@escaping (LoginResponse) -> ()) -> ()
+    var databaseType: String
+    var databaseName: String
+}
+
+public struct LoginPageInfo {
+    
+    public init(appName: String, companyName: String, logoImageName: String) {
+        self.appName = appName
+        self.companyName = companyName
+        self.logoImageName = logoImageName
+    }
+    
+    var appName: String
+    var companyName: String
+    var logoImageName: String
+}
+
+public struct TrackingInfo {
+    
+    public init(password: String) {
+        self.password = password
+    }
+    
+    var password: String
+}
+
+public struct AppInfo {
+    
+    public init(url: String, token: String, userTableConnect: @escaping () -> ConnectionResponse) {
+        self.url = url
+        self.token = token
+        self.userTableConnect = userTableConnect
+    }
+    
+    var url: String
+    var token: String
+    var userTableConnect: () async -> ConnectionResponse
 }

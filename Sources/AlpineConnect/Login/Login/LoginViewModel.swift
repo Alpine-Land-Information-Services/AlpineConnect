@@ -57,13 +57,13 @@ class LoginViewModel: ObservableObject {
     func setLoginConnectionInfo() {
         NetworkMonitor.shared.start()
         Location.shared.start()
-        LoginConnectionInfo.shared = info
+//        LoginConnectionInfo.shared = info
         authenthication.fetchCredentialsFromKeyChain()
     }
 
     func loginButtonPressed() {
         guard !userManager.inputPassword.isEmpty && !userManager.userName.isEmpty else {
-            loginAlert.updateAlertType(_: .emptyFields)
+            loginAlert.updateAlertType(.emptyFields)
             return
         }
         doLogin(manual: true)
@@ -102,9 +102,11 @@ class LoginViewModel: ObservableObject {
     }
     
     func makeLoginUpdateInfo() -> Login.UserLoginUpdate {
-        let login = Login.UserLoginUpdate(email: userManager.userName, password: userManager.password, appName: info.appDBName, appVersion: Tracker.appVersion(), machineName: Tracker.deviceName(), info: userManager.userName)
-        userManager.loginUpdate = login
-        return login
+//        let login = Login.UserLoginUpdate(email: userManager.userName, password: userManager.password, appName: info.appDBName, appVersion: Tracker.appVersion(), machineName: Tracker.deviceName(), info: userManager.userName)
+//        userManager.loginUpdate = login
+//        return login
+        
+        fatalError()
     }
     
     func handleOfflineAuthenticationResponse() {
@@ -120,14 +122,15 @@ class LoginViewModel: ObservableObject {
     func handleOnlineAuthenticationResponse(_ response: LoginResponse) {
         switch response {
         case .successfulLogin:
-            info.appUserFunction { userFunctionResponse in
-                switch userFunctionResponse {
-                case .successfulLogin:
-                    self.performLogin()
-                default:
-                    self.loginAlert.updateAlertType(userFunctionResponse)
-                }
-            }
+            return
+//            info.appUserFunction { userFunctionResponse in
+//                switch userFunctionResponse {
+//                case .successfulLogin:
+//                    self.performLogin()
+//                default:
+//                    self.loginAlert.updateAlertType(userFunctionResponse)
+//                }
+//            }
         default:
             loginAlert.updateAlertType(response)
         }

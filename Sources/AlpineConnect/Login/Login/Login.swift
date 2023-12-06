@@ -95,7 +95,7 @@ public class Login {
     
     static func getBackendUser(email: String) async throws -> (BackendUser, HTTPURLResponse)? {
         guard let url = URL(string: "\(serverURL)user?email=\(email)") else {
-            AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot make URL")
+//            AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot make URL")
             loginResponse = "Cannot make backend URL"
             return nil
         }
@@ -108,7 +108,7 @@ public class Login {
         let user = try JSONDecoder().decode(BackendUser.self, from: body)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot get HTTP URL response")
+//            AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot get HTTP URL response")
             loginResponse = "Cannot get HTTP URL response"
             return nil
         }
@@ -154,7 +154,7 @@ public class Login {
     
     static func updateUserLogin(info: UserLoginUpdate) async -> LoginResponse {
         guard let url = URL(string: "\(serverURL)user/credentials") else {
-            AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot make URL to get user info.")
+//            AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot make URL to get user info.")
             return .unknownError
         }
         
@@ -167,7 +167,7 @@ public class Login {
             let (body, response) = try await URLSession.shared.upload(for: request, from: data)
                         
             guard let httpResponse = response as? HTTPURLResponse else {
-                AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot get HHTP response.")
+//                AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot get HHTP response.")
                 loginResponse = "Cannot get HHTP response."
                 return .unknownError
             }
