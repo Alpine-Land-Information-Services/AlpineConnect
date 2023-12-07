@@ -24,15 +24,17 @@ public struct LoginConnectionInfo {
 
 public struct PostgresInfo {
     
-    public init(host: String, databaseType: String, databaseName: String) {
+    public init(host: String, databaseType: String, databaseName: String, timeout: Int?) {
         self.host = host
         self.databaseType = databaseType
         self.databaseName = databaseName
+        self.timeout = timeout
     }
     
     var host: String
     var databaseType: String
     var databaseName: String
+    var timeout: Int?
 }
 
 public struct LoginPageInfo {

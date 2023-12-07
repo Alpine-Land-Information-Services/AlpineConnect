@@ -11,7 +11,7 @@ public class BackyardLogin {
     
     public struct Response: Decodable {
         let sessionToken: String
-        let user: User
+        let user: ConnectUser
     }
 
     var info: LoginConnectionInfo
@@ -56,22 +56,12 @@ public class BackyardLogin {
     }
     
     func decodeSuccessfulResponse(from data: Data) async throws -> ConnectionResponse {
-        let decoder = JSONDecoder()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        decoder.dateDecodingStrategy = .formatted(dateFormatter)
-        
-        let response = try decoder.decode(Response.self, from: data)
+        let response = try ConnectManager.decoder.decode(Response.self, from: data)
         return ConnectionResponse(result: .success, data: response, problem: nil)
     }
     
     func decodeErrorResponse(from data: Data) async throws -> ConnectionResponse {
-        let decoder = JSONDecoder()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        decoder.dateDecodingStrategy = .formatted(dateFormatter)
-
-        let problem = try decoder.decode(ConnectionProblem.self, from: data)
+        let problem = try ConnectManager.decoder.decode(ConnectionProblem.self, from: data)
         return ConnectionResponse(result: .fail, problem: problem)
     }
 }

@@ -29,7 +29,7 @@ public struct ConnectionProblem: Decodable {
     
     var alert: ConnectAlert {
         customAlert ??
-        ConnectAlert(title: title ?? "Could not Connect", message: alertDetail)
+        ConnectAlert(title: title ?? "Unable to Sign In", message: alertDetail)
     }
     
     public init(type: String? = nil, title: String? = nil, status: Int? = nil, detail: String? = nil, customAlert: ConnectAlert?) {
@@ -50,7 +50,7 @@ extension ConnectionProblem {
     }
     
     static func missingInfo() -> ConnectionProblem {
-        let alert = ConnectAlert(title: "Credentials Error", message: "Could not retrieve login credentials. \n\nTry again by relaunching application. If the issue persists, contact support.", buttons: nil, dismissButton: nil)
+        let alert = ConnectAlert(title: "Internal Error", message: "Could not retrieve information required for login. \n\nTry again by relaunching application. If the issue persists, contact support.", buttons: nil, dismissButton: nil)
         
         return ConnectionProblem(customAlert: alert)
     }

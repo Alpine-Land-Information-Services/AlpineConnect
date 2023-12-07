@@ -10,10 +10,10 @@ import AlpineUI
 
 struct AlpineLoginView_V2: View {
     
-    @EnvironmentObject var manager: AppManager
+    @EnvironmentObject var manager: ConnectManager
     @ObservedObject var networkMonitor = NetworkMonitor.shared
     
-    @State private var userName = ""
+    @State private var email = ""
     @State private var password = ""
     
     @State private var isAlertPresented = false
@@ -100,8 +100,8 @@ struct AlpineLoginView_V2: View {
     
     var login: some View {
         VStack {
-            TextField("", text: $userName)
-                .loginField(placeholder: "Email", value: $userName)
+            TextField("", text: $email)
+                .loginField(placeholder: "Email", value: $email)
                 .disableAutocorrection(true)
                 .autocapitalization(.none)
                 .keyboardType(.emailAddress)
@@ -153,22 +153,46 @@ struct AlpineLoginView_V2: View {
 extension AlpineLoginView_V2 {
     
     var fieldsEmpty: Bool {
-        userName.isEmpty || password.isEmpty
+        email.isEmpty || password.isEmpty
     }
     
     func clear() {
-        userName = ""
+        email = ""
         password = ""
     }
     
-    func loginPress() {
+    func loginPress(offline: Bool = false) {
         attemptingLogin = true
         
         guard !fieldsEmpty else {
             triggerAlert(with: .empty)
             return
         }
+        manager.fillData(email: email, password: password, and: info)
         
+        Task {
+            do {
+                let response = try await manager.attemptLogin(offline: offline)
+                DispatchQueue.main.async {
+                    self.processLoginResponse(response)
+                    attemptingLogin = false
+                }
+            }
+            catch {
+                responseFailAlert(for: error)
+            }
+        }
+    }
+    
+    func responseFailAlert(for error: Error) {
+        var errorDescription = "\(error)"
+        if let connectError = error as? ConnectError {
+            errorDescription = connectError.message
+        }
+        currentAlert = ConnectAlert(title: "Something Went Wrong", message: errorDescription)
+        
+        attemptingLogin = false
+        isAlertPresented.toggle()
     }
     
     fileprivate func triggerAlert(with type: LoginAlertType) {
@@ -180,6 +204,83 @@ extension AlpineLoginView_V2 {
         }
         
         isAlertPresented.toggle()
+    }
+    
+    private func doSignIn() {
+        withAnimation {
+            manager.isSignedIn = true
+        }
+    }
+
+}
+
+private extension AlpineLoginView_V2 {
+    
+    func processLoginResponse(_ response: ConnectionResponse) {
+        switch response.result {
+        case .success:
+            doSignIn()
+        case .fail:
+            makeFailAlert(from: response)
+        case .moreDetail:
+            processDetailResponse(response.detail)
+        }
+    }
+    
+    func makeFailAlert(from response: ConnectionResponse) {
+        if let problem = response.problem {
+            currentAlert = problem.alert
+        }
+        else {
+            currentAlert = ConnectAlert(title: "Sign In Error", message: "No details were provided. \n\nContact support if the issue persists.")
+        }
+        
+        isAlertPresented.toggle()
+    }
+    
+    
+    func processDetailResponse(_ detail: ConnectionDetail?) {
+        guard let detail else {
+            currentAlert = ConnectAlert(title: "Sign In Error", message: "Detail response returned no detail. \n\nContact support if the issue persists.")
+            isAlertPresented.toggle()
+            return
+        }
+        
+        switch detail {
+        case .timeout:
+            timeoutAlert()
+        case .enableKeychain:
+            return
+        case .overrideKeychain:
+            overrideKeychainAlert()
+        case .keychainSaveFail:
+            keychainSaveFailAlert()
+        }
+        
+        isAlertPresented.toggle()
+    }
+    
+    func timeoutAlert() {
+        let offlineButton = AlertButton(label: "Sign In Offline") {
+            loginPress(offline: true)
+        }
+        let dismissButton = AlertButton(label: "Cancel", role: .cancel, action: {})
+        currentAlert = ConnectAlert(title: "Sign In Timeout", message: "Could not reach network in reasonable time.", buttons: [offlineButton], dismissButton: dismissButton)
+    }
+    
+    func overrideKeychainAlert() {
+        let proceedButton = AlertButton(label: "Proceed") {
+            processLoginResponse(manager.overrideCredentials())
+        }
+        let proceedNoOverride = AlertButton(label: "Proceed Without Override", role: .cancel, action: doSignIn)
+        
+        currentAlert = ConnectAlert(title: "New Sign In", message: "Your sign in will override previous stored credentials. \n\nGoing forward, any future attempts to sign in while offline will only work this account unless a new sign in is performed while online.", buttons: [proceedButton, proceedNoOverride])
+    }
+    
+    func keychainSaveFailAlert() {
+        let continueButton = AlertButton(label: "Proceed Anyway", role: .destructive, action: doSignIn)
+        let cancel = AlertButton(label: "Cancel", role: .cancel, action: {})
+        currentAlert = ConnectAlert(title: "Could Not Save Credentials", message: "There was an issue attempting to save sign in information. \n\nOffline Sign In will be availible until saved. \n\nIf the Issue persists, contact support.", buttons: [continueButton], dismissButton: cancel)
     }
 }
 

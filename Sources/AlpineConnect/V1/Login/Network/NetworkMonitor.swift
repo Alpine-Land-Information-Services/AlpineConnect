@@ -23,6 +23,8 @@ public class NetworkMonitor: ObservableObject {
     @Published public var connectionType = ConnectionType.offline
     @Published public var connected = false
     
+    static var serverURL = "https://alpinebackyard20220722084741.azurewebsites.net/"
+    
     public func start() {
         let monitor = NWPathMonitor()
         monitor.start(queue: DispatchQueue(label: "NetworkMonitor"))
@@ -108,7 +110,7 @@ public class NetworkMonitor: ObservableObject {
         task.resume()
     }
     
-    func canConnectToServer(_ server: String = Login.serverURL) async -> Bool {
+    func canConnectToServer(_ server: String = serverURL) async -> Bool {
         await withCheckedContinuation { continuation in
             canConnectToServer { connection in
                 continuation.resume(returning: connection)

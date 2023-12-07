@@ -1,6 +1,6 @@
 //
 //  AppView_V2.swift
-//  
+//  AlpineConnect
 //
 //  Created by Jenya Lebid on 12/6/23.
 //
@@ -10,7 +10,7 @@ import SwiftUI
 public struct AppView_V2<App: View>: View {
     
     @ViewBuilder var app: App
-    @ObservedObject var manager = AppManager.shared
+    @ObservedObject var manager = ConnectManager.shared
     
     var info: LoginConnectionInfo
     
@@ -20,15 +20,16 @@ public struct AppView_V2<App: View>: View {
     }
     
     public var body: some View {
-        Group {
-            if manager.user != nil {
-                
-            }
-            else {
-                AlpineLoginView_V2(info: info)
-            }
+        if manager.isSignedIn {
+            app
+                .transition(.opacity)
         }
-        .environmentObject(manager)
+        else {
+            AlpineLoginView_V2(info: info)
+                .transition(.move(edge: .bottom))
+                .environmentObject(manager)
+//                    .transition(.asymmetric(insertion: .slide, removal: .move(edge: .bottom)))
+        }
     }
 }
 

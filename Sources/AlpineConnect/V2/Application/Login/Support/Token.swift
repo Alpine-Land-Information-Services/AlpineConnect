@@ -10,4 +10,8 @@ import Foundation
 public struct Token: Codable {
     var rawValue: String
     var expirationDate: Date
+    
+    var encoded: Data? {
+        try? JSONEncoder().encode(self)
+    }
 }
