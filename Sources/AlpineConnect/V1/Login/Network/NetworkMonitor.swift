@@ -10,7 +10,8 @@ import Network
 import SwiftUI
 import AlpineUI
 
-public class NetworkMonitor: ObservableObject {
+@Observable
+public class NetworkMonitor {
     
     static public let shared = NetworkMonitor()
     
@@ -20,8 +21,8 @@ public class NetworkMonitor: ObservableObject {
         case cellular
     }
     
-    @Published public var connectionType = ConnectionType.offline
-    @Published public var connected = false
+    public var connectionType = ConnectionType.offline
+    public var connected = false
     
     static var serverURL = "https://alpinebackyard20220722084741.azurewebsites.net/"
     

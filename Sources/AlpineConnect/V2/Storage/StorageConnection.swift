@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 @Observable
 public class StorageConnection {
@@ -14,18 +15,28 @@ public class StorageConnection {
         StorageManager.shared
     }
     
-    var sessionToken: Token
+    var sessionToken: Token?
     public var items = [StorageItem]()
     
-    var alert: ConnectAlert = .empty
-    var isAlertPresented = false
+    public var alert: ConnectAlert = .empty
+    public var isAlertPresented = false
     
     var isFetching = false
     
-    public init(sessionToken: Token) {
-        self.sessionToken = sessionToken
+    public var status: StorageConnectionStatus
+    
+    public var isConnected: Bool {
+        NetworkMonitor.shared.connected
     }
     
+    public var isAbleToFetch: Bool {
+        sessionToken != nil && isConnected
+    }
+    
+    public init(sessionToken: Token?, status: StorageConnectionStatus) {
+        self.sessionToken = sessionToken
+        self.status = status
+    }
     
     func presentAlert(from problem: ConnectionProblem) {
         DispatchQueue.main.async {

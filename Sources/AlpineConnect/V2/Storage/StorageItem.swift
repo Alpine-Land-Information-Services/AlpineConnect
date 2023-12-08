@@ -8,7 +8,7 @@
 import Foundation
 
 public struct StorageItem: Codable, Hashable, Equatable, Identifiable {
-    
+
     public var id: String {
         name
     }
@@ -21,6 +21,11 @@ public struct StorageItem: Codable, Hashable, Equatable, Identifiable {
     public var path: String
     public var contentType: String
 
-    public var created: String
-    public var lastModified: String
+    public var created: Date
+    public var lastModified: Date
+    
+ 
+    public static var demo: StorageItem {
+        StorageItem(name: "county.fgb", type: "File", size: 52087, hash: "23423424", path: "234", contentType: "", created: Date(), lastModified: Date())
+    }
 }

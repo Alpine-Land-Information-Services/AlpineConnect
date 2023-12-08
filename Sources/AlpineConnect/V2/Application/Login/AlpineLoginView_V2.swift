@@ -11,7 +11,7 @@ import AlpineUI
 struct AlpineLoginView_V2: View {
     
     @EnvironmentObject var manager: ConnectManager
-    @ObservedObject var networkMonitor = NetworkMonitor.shared
+    var networkMonitor = NetworkMonitor.shared
     
     @State private var email = ""
     @State private var password = ""
@@ -45,35 +45,7 @@ struct AlpineLoginView_V2: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             .ignoresSafeArea(.keyboard, edges: .all)
         }
-        .alert(currentAlert.title, isPresented: $isAlertPresented, actions: {
-            if let buttons = currentAlert.buttons {
-                ForEach(buttons, id: \.label) { button in
-                    Button(role: button.role) {
-                        button.action()
-                    } label: {
-                        Text(button.label)
-                    }
-                }
-            }
-            if let button = currentAlert.dismissButton {
-                Button(role: button.role) {
-                    button.action()
-                } label: {
-                    Text(button.label)
-                }
-            }
-            else {
-                Button(role: .cancel) {
-                    
-                } label: {
-                    Text("Okay")
-                }
-            }
-        }, message: {
-            if let message = currentAlert.message {
-                Text(message)
-            }
-        })
+        .connectAlert(currentAlert, isPresented: $isAlertPresented)
         .onAppear {
             
         }

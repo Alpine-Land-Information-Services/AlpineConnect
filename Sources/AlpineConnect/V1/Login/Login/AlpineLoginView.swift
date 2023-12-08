@@ -13,7 +13,7 @@ public struct AlpineLoginView: View {
     @StateObject var viewModel: LoginViewModel
     
     @ObservedObject var loginAlert = LoginAlert.shared
-    @ObservedObject var networkMonitor = NetworkMonitor.shared
+    var networkMonitor = NetworkMonitor.shared
     @ObservedObject var updater = SwiftUIUpdater()
     
     let updateStatus = NotificationCenter.default.publisher(for: NSNotification.Name("UpdateStatus"))

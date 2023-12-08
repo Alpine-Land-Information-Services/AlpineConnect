@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NetworkCheckModifier: ViewModifier {
     
-    @ObservedObject var network = NetworkMonitor.shared
+    var network = NetworkMonitor.shared
     
     func body(content: Content) -> some View {
         content

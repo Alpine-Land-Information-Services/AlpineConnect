@@ -8,14 +8,14 @@
 import SwiftUI
 
 public struct ConnectAlert {
-    var title: String
-    var message: String?
-    var buttons: [AlertButton]?
+    public var title: String
+    public var message: String?
+    public var buttons: [AlertButton]?
     
-    var dismissButton: AlertButton?
+    public var dismissButton: AlertButton?
     
-    static var empty: ConnectAlert {
-        ConnectAlert(title: "Empty Alert", message: "This should not be presented.")
+    public static var empty: ConnectAlert {
+        ConnectAlert(title: "Empty Alert", message: "This is an error if presented.")
     }
 }
 

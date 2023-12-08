@@ -11,7 +11,7 @@ import AlpineUI
 public struct ReportIssueView: View {
     
     @ObservedObject var viewModel: ReportIssueViewModel
-    @ObservedObject var network = NetworkMonitor.shared
+    var network = NetworkMonitor.shared
     
     public init(userName: String = "", email: String = "", title: String = "", text: String = "") {
         viewModel = ReportIssueViewModel.shared

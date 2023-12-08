@@ -9,14 +9,14 @@ import SwiftUI
 
 struct NetworkMonitorModifier: ViewModifier {
     
-    @ObservedObject var network = NetworkMonitor.shared
+    var network = NetworkMonitor.shared
     
     var connectAction: (() -> ())?
     var disconnectAction: (() -> ())?
     
     func body(content: Content) -> some View {
         content
-            .onChange(of: network.connected) { connected in
+            .onChange(of: network.connected) { _, connected in
                 switch connected {
                 case true:
                     TokenManager.checkToken()
