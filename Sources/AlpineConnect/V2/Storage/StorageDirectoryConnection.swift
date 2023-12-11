@@ -9,7 +9,7 @@ import Foundation
 
 @Observable
 public final class StorageDirectoryConnection: StorageConnection {
-    
+        
     public func open(_ directory: String) async -> [StorageItem]? {
         do {
             return try await fetchItems(in: directory)
@@ -62,7 +62,13 @@ public final class StorageDirectoryConnection: StorageConnection {
 private extension StorageDirectoryConnection {
     
     func decodeSuccessfulResponse(from data: Data) async throws -> [StorageItem] {
-        try ConnectManager.decoder.decode([StorageItem].self, from: data)
+        let items = try ConnectManager.decoder.decode([StorageItem].self, from: data)
+        DispatchQueue.main.async { [self] in
+            lastUpdate = Date()
+            status = .readyToFetch
+        }
+        
+        return items
     }
     
     func decodeErrorResponse(from data: Data) async throws {

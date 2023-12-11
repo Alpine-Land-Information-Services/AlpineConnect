@@ -157,7 +157,7 @@ public extension ConnectManager {
         }
         
         if let token = ConnectManager.shared.token ?? ConnectManager.shared.getStoredToken() {
-            if token.expirationDate.elapsed(.hour) < 8 {
+            if token.expirationDate.add(.hour, value: -1) > Date() {
                 return (TokenResponse.success, token)
             }
         }

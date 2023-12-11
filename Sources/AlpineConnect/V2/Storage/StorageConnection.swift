@@ -21,7 +21,7 @@ public class StorageConnection {
     public var alert: ConnectAlert = .empty
     public var isAlertPresented = false
     
-    var isFetching = false
+    public var lastUpdate: Date?
     
     public var status: StorageConnectionStatus
     
@@ -30,7 +30,7 @@ public class StorageConnection {
     }
     
     public var isAbleToFetch: Bool {
-        sessionToken != nil && isConnected
+        sessionToken != nil && isConnected && status == .readyToFetch
     }
     
     public init(sessionToken: Token?, status: StorageConnectionStatus) {
@@ -39,9 +39,11 @@ public class StorageConnection {
     }
     
     func presentAlert(from problem: ConnectionProblem) {
-        DispatchQueue.main.async {
-            self.alert = problem.alert
-            self.isAlertPresented.toggle()
+        DispatchQueue.main.async { [self] in
+            lastUpdate = Date()
+            status = .issue(problem.alertDetail)
+            alert = problem.alert
+            isAlertPresented.toggle()
         }
     }
 }
