@@ -15,7 +15,7 @@ public class StorageConnection {
         StorageManager.shared
     }
     
-    var sessionToken: Token?
+    public var sessionToken: Token?
     public var items = [StorageItem]()
     
     public var alert: ConnectAlert = .empty

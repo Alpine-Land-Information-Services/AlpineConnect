@@ -11,6 +11,7 @@ public enum StorageItemStatus: String {
     case cloud
     case downloading
     case paused
+    case pendingDownload
     case downloaded
     case issue
 }
