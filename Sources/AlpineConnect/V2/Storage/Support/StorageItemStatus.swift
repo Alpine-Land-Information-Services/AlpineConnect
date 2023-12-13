@@ -10,8 +10,16 @@ import Foundation
 public enum StorageItemStatus: String {
     case cloud
     case downloading
-    case paused
+    case uploading
+    case pendingUpload
     case pendingDownload
+    case uploadPaused
+    case downloadPaused
     case downloaded
     case issue
+}
+
+public enum StorageItemIssueAction: String {
+    case removeOrUpload
+    case chooseLocalOrCloud
 }

@@ -9,13 +9,13 @@ import Foundation
 
 public struct StorageDownloadRequestResponse {
     
-    public init(status: StorageItemStatus, savePath: String, remotePath: String) {
-        self.status = status
+    public init(queueOrder: Int, savePath: String, remotePath: String) {
+        self.queueOrder = queueOrder
         self.savePath = savePath
         self.remotePath = remotePath
     }
     
-    public var status: StorageItemStatus
+    public var queueOrder: Int
     public var savePath: String
     public var remotePath: String
 }

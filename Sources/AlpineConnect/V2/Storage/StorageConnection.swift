@@ -24,6 +24,10 @@ public class StorageConnection {
     public var lastUpdate: Date?
     
     public var status: StorageConnectionStatus
+    public var refreshID = UUID()
+        
+    public var localPath: String
+    public var serverPath: String?
     
     public var isConnected: Bool {
         NetworkMonitor.shared.connected
@@ -33,9 +37,15 @@ public class StorageConnection {
         sessionToken != nil && isConnected && status == .readyToFetch
     }
     
-    public init(sessionToken: Token?, status: StorageConnectionStatus) {
+    public init(sessionToken: Token?, status: StorageConnectionStatus, localPath: String, serverPath: String? = nil) {
         self.sessionToken = sessionToken
         self.status = status
+        self.localPath = localPath
+        self.serverPath = serverPath
+    }
+    
+    public func refresh() {
+        refreshID = UUID()
     }
     
     func presentAlert(from problem: ConnectionProblem) {
