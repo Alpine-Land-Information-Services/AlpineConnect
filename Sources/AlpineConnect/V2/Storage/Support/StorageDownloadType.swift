@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum StorageDownloadLocation {
+public enum StorageReferenceLocation: String {
     case myFolder
     case sharedLayers
 }

@@ -22,4 +22,6 @@ public enum StorageItemStatus: String {
 public enum StorageItemIssueAction: String {
     case removeOrUpload
     case chooseLocalOrCloud
+    case resetToCloud
+    case resetToDownloaded
 }

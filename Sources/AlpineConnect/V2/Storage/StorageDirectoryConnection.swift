@@ -36,7 +36,7 @@ public final class StorageDirectoryConnection: StorageConnection {
         guard let url = URL(string: "https://alpine-storage.azurewebsites.net/\(directory)") else {
             throw ConnectError("Could not create directory URL.", type: .storage)
         }
-        
+        print("https://alpine-storage.azurewebsites.net/\(directory)")
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.addValue(manager.token, forHTTPHeaderField: "ApiKey")
