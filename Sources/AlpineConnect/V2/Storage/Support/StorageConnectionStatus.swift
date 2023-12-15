@@ -14,11 +14,13 @@ public enum StorageConnectionStatus: Equatable {
     case offline
     case missingToken
     
+    case initial
+    
     case issue(_ description: String)
     
     public var summary: String {
         switch self {
-        case .readyToFetch:
+        case .readyToFetch, .initial:
             return "OK"
         case .fetching:
             return "Fetching"

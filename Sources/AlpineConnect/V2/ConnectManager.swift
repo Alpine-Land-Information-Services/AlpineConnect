@@ -157,8 +157,14 @@ public extension ConnectManager {
         }
         
         if let token = ConnectManager.shared.token ?? ConnectManager.shared.getStoredToken() {
-            if token.expirationDate.add(.hour, value: -1) > Date() {
-                return (TokenResponse.success, token)
+            print(NetworkMonitor.shared.connected)
+            if NetworkMonitor.shared.connected, await NetworkMonitor.shared.canConnectToServer() {
+                if token.expirationDate.add(.hour, value: -1) > Date() {
+                    return (TokenResponse.success, token)
+                }
+            }
+            else {
+                return (TokenResponse.notConnected, token)
             }
         }
 

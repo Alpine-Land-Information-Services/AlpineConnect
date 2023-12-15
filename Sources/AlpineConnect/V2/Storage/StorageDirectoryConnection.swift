@@ -10,7 +10,7 @@ import Foundation
 @Observable
 public final class StorageDirectoryConnection: StorageConnection {
         
-    public func open(_ directory: String) async -> [StorageItem]? {
+    public func open(_ directory: String) async -> StorageItemKind? {
         do {
             return try await fetchItems(in: directory)
         }
@@ -30,13 +30,12 @@ public final class StorageDirectoryConnection: StorageConnection {
         }
     }
     
-    private func fetchItems(in directory: String) async throws -> [StorageItem]? {
+    private func fetchItems(in directory: String) async throws -> StorageItemKind? {
         guard let sessionToken else { return nil }
         
-        guard let url = URL(string: "https://alpine-storage.azurewebsites.net/\(directory)") else {
+        guard let url = URL(string: "https://alpine-storage.azurewebsites.net/info/\(directory)") else {
             throw ConnectError("Could not create directory URL.", type: .storage)
         }
-        print("https://alpine-storage.azurewebsites.net/\(directory)")
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.addValue(manager.token, forHTTPHeaderField: "ApiKey")
@@ -61,14 +60,14 @@ public final class StorageDirectoryConnection: StorageConnection {
 
 private extension StorageDirectoryConnection {
     
-    func decodeSuccessfulResponse(from data: Data) async throws -> [StorageItem] {
-        let items = try ConnectManager.decoder.decode([StorageItem].self, from: data)
+    func decodeSuccessfulResponse(from data: Data) async throws -> StorageItemKind {
+        let item = try ConnectManager.decoder.decode(StorageItemKind.self, from: data)
         DispatchQueue.main.async { [self] in
             lastUpdate = Date()
             status = .readyToFetch
         }
         
-        return items
+        return item
     }
     
     func decodeErrorResponse(from data: Data) async throws {

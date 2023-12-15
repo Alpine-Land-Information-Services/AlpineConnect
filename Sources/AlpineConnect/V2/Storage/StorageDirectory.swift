@@ -9,7 +9,7 @@ import Foundation
 
 public struct StorageDirectory: Codable {
     
-    var type: String
-    var path: String
-    var contents: [StorageItemKind]
+    public var type: String
+    public var path: String
+    public var contents: [StorageItemKind]
 }

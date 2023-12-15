@@ -24,7 +24,8 @@ public class NetworkMonitor {
     public var connectionType = ConnectionType.offline
     public var connected = false
     
-    static var serverURL = "https://alpinebackyard20220722084741.azurewebsites.net/"
+    public static var serverURL = "https://alpinebackyard20220722084741.azurewebsites.net/"
+    public static var storageURL = "https://alpine-storage.azurewebsites.net"
     
     public func start() {
         let monitor = NWPathMonitor()
@@ -111,7 +112,7 @@ public class NetworkMonitor {
         task.resume()
     }
     
-    func canConnectToServer(_ server: String = serverURL) async -> Bool {
+    public func canConnectToServer(_ server: String = serverURL) async -> Bool {
         await withCheckedContinuation { continuation in
             canConnectToServer { connection in
                 continuation.resume(returning: connection)

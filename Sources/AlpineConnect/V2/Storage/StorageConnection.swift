@@ -23,27 +23,25 @@ public class StorageConnection {
     
     public var lastUpdate: Date?
     
-    public var status: StorageConnectionStatus
+    public var status: StorageConnectionStatus = .initial
     public var refreshID = UUID()
         
-    public var localPath: String
-    public var serverPath: String?
+    public var serverPath: String
+    public var localPath: String?
     
     public var reference: StorageReferenceLocation
     
     public var isConnected: Bool {
         NetworkMonitor.shared.connected
     }
-    
+
     public var isAbleToFetch: Bool {
         sessionToken != nil && isConnected && status == .readyToFetch
     }
     
-    public init(sessionToken: Token?, status: StorageConnectionStatus, reference: StorageReferenceLocation, localPath: String, serverPath: String? = nil) {
-        self.sessionToken = sessionToken
-        self.status = status
-        self.localPath = localPath
+    public init(reference: StorageReferenceLocation, serverPath: String, localPath: String? = nil) {
         self.serverPath = serverPath
+        self.localPath = localPath
         self.reference = reference
     }
     
@@ -59,4 +57,47 @@ public class StorageConnection {
             isAlertPresented.toggle()
         }
     }
+    
+   public func presentTimeoutAlert() {
+        DispatchQueue.main.async { [self] in
+            let issue = ConnectionProblem(title: "Connection Timeout", detail: "Could not establish connection with Cloud in reasonable time.", customAlert: nil)
+            status = .offline
+            alert = issue.alert
+            isAlertPresented.toggle()
+        }
+    }
+    
+    public func getToken(with info: LoginConnectionInfo) async {
+        do {
+            let response = try await ConnectManager.getValidToken(with: info)
+            var status = StorageConnectionStatus.initial
+            
+            switch response.0 {
+            case .success:
+                status = .initial
+            case .noStoredCredentials:
+                status = .issue("Missing Login Credentials")
+            case .notConnected:
+                status = .offline
+            case .serverIssue(let description):
+                status = .issue(description)
+            case .unknownIssue:
+                status = .issue("Unknown issue occurred while attempting to get token.")
+            }
+            
+            if let token = response.1 {
+                self.sessionToken = token
+            }
+            self.status = status
+        }
+        catch {
+            fatalError()
+        }
+    }
+
+    
+//    static func getStatus(token: Token?) -> StorageConnectionStatus {
+//        guard let token else { return .missingToken }
+//        if NetworkMonitor.shared.connected, NetworkMonitor.shared.ca
+//    }
 }
