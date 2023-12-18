@@ -12,4 +12,5 @@ public enum StorageItemType {
     case layerGroup
     case unknownFile
     case unknownGroup
+    case folder
 }

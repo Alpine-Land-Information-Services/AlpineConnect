@@ -9,6 +9,15 @@ import Foundation
 
 @Observable
 public final class StorageDirectoryConnection: StorageConnection {
+    
+    var baseURLString: String {
+        switch reference {
+        case .myFolder:
+            return "https://alpine-storage.azurewebsites.net/"
+        case .sharedLayers:
+            return "https://alpine-storage.azurewebsites.net/info/"
+        }
+    }
         
     public func open(_ directory: String) async -> StorageItemKind? {
         do {
@@ -33,7 +42,7 @@ public final class StorageDirectoryConnection: StorageConnection {
     private func fetchItems(in directory: String) async throws -> StorageItemKind? {
         guard let sessionToken else { return nil }
         
-        guard let url = URL(string: "https://alpine-storage.azurewebsites.net/info/\(directory)") else {
+        guard let url = URL(string: baseURLString + directory) else {
             throw ConnectError("Could not create directory URL.", type: .storage)
         }
         var request = URLRequest(url: url)
@@ -62,11 +71,8 @@ private extension StorageDirectoryConnection {
     
     func decodeSuccessfulResponse(from data: Data) async throws -> StorageItemKind {
         let item = try ConnectManager.decoder.decode(StorageItemKind.self, from: data)
-        DispatchQueue.main.async { [self] in
-            lastUpdate = Date()
-            status = .readyToFetch
-        }
-        
+        lastUpdate = Date()
+
         return item
     }
     
