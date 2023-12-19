@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum StorageItemStatus: String {
+public enum StorageItemStatus: String, Codable {
     case cloud
     case downloading
     case uploading
