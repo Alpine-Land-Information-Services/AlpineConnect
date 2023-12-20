@@ -9,5 +9,5 @@ import Foundation
 
 public enum StorageReferenceLocation: String {
     case myFolder
-    case sharedLayers
+    case cloudLayers
 }
