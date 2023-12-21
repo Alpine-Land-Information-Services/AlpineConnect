@@ -29,7 +29,7 @@ public class StorageConnection {
     public var serverPath: String
     public var localPath: String?
     
-    public var reference: StorageReferenceLocation
+    public var reference: ReferenceLocation
     
     public var isConnected: Bool {
         NetworkMonitor.shared.connected
@@ -39,14 +39,16 @@ public class StorageConnection {
         sessionToken != nil && isConnected && status == .readyToFetch
     }
     
-    public init(reference: StorageReferenceLocation, serverPath: String, localPath: String? = nil) {
+    public init(reference: ReferenceLocation, serverPath: String, localPath: String? = nil) {
         self.serverPath = serverPath
         self.localPath = localPath
         self.reference = reference
     }
     
     public func refresh() {
-        refreshID = UUID()
+        DispatchQueue.main.async {
+            self.refreshID = UUID()
+        }
     }
     
     func presentAlert(from problem: ConnectionProblem) {

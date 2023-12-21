@@ -14,8 +14,10 @@ public final class StorageDirectoryConnection: StorageConnection {
         switch reference {
         case .myFolder:
             return "https://alpine-storage.azurewebsites.net/"
-        case .cloudLayers:
+        case .cloud:
             return "https://alpine-storage.azurewebsites.net/info/"
+        default:
+            fatalError()
         }
     }
         

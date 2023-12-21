@@ -7,7 +7,9 @@
 
 import Foundation
 
-public enum StorageReferenceLocation: String {
+public enum ReferenceLocation: String {
     case myFolder
-    case cloudLayers
+    case cloud
+    case shared
+    case project
 }
