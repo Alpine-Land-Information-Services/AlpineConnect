@@ -69,9 +69,12 @@ public class StorageConnection {
         }
     }
     
-    public func getToken(with info: LoginConnectionInfo) async {
+    public func getToken(with info: LoginConnectionInfo, attemptFetchNew: Bool) async {
         do {
-            let response = try await ConnectManager.getValidToken(with: info)
+            let response = attemptFetchNew ?
+            try await ConnectManager.fetchNewToken(with: info) :
+            try await ConnectManager.getValidToken(with: info)
+            
             var status = StorageConnectionStatus.initial
             
             switch response.0 {
@@ -82,6 +85,9 @@ public class StorageConnection {
             case .notConnected:
                 status = .offline
             case .serverIssue(let description):
+                if description == "Session not authorized (Access token is disabled, a newer session exists)" {
+                    await getToken(with: info, attemptFetchNew: true)
+                }
                 status = .issue(description)
             case .unknownIssue:
                 status = .issue("Unknown issue occurred while attempting to get token.")

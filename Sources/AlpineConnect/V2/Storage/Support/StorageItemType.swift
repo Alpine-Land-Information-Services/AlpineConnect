@@ -13,4 +13,5 @@ public enum StorageItemType {
     case unknownFile
     case unknownGroup
     case folder
+    case json
 }

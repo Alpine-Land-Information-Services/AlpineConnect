@@ -150,14 +150,7 @@ public extension ConnectManager {
     }
     
     static func getValidToken(with info: LoginConnectionInfo) async throws -> (TokenResponse, Token?) {
-        guard let email = UserDefaults.standard.string(forKey: "AC_last_login"),
-              let password = AuthManager.retrieveFromKeychain(account: email)
-        else {
-            return (TokenResponse.noStoredCredentials, nil)
-        }
-        
         if let token = ConnectManager.shared.token ?? ConnectManager.shared.getStoredToken() {
-            print(NetworkMonitor.shared.connected)
             if NetworkMonitor.shared.connected, await NetworkMonitor.shared.canConnectToServer() {
                 if token.expirationDate.add(.hour, value: -1) > Date() {
                     return (TokenResponse.success, token)
@@ -168,8 +161,19 @@ public extension ConnectManager {
             }
         }
 
+        return try await fetchNewToken(with: info)
+    }
+    
+    static func fetchNewToken(with info: LoginConnectionInfo) async throws -> (TokenResponse, Token?) {
+        guard let email = UserDefaults.standard.string(forKey: "AC_last_login"),
+              let password = AuthManager.retrieveFromKeychain(account: email)
+        else {
+            return (TokenResponse.noStoredCredentials, nil)
+        }
+        
         let credentials = CredentialsData(email: email, password: password)
         return try await ConnectManager.shared.requestNewToken(with: info, and: credentials)
+
     }
     
     static var decoder: JSONDecoder {
