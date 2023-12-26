@@ -13,8 +13,8 @@ public enum StorageItemStatus: String, Codable {
     case uploading
     case pendingUpload
     case pendingDownload
-    case uploadPaused
-    case downloadPaused
+    case uploadReady
+    case downloadReady
     case downloaded
     case issue
 }

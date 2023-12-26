@@ -31,6 +31,8 @@ public class StorageConnection {
     
     public var reference: ReferenceLocation
     
+    public var info: LoginConnectionInfo?
+    
     public var isConnected: Bool {
         NetworkMonitor.shared.connected
     }

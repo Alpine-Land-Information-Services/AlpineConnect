@@ -61,8 +61,7 @@ public final class StorageDirectoryConnection: StorageConnection {
         case 200...299:
             return try await decodeSuccessfulResponse(from: data)
         case 400...599:
-            try await decodeErrorResponse(from: data)
-            return nil
+            return try await decodeErrorResponse(from: data, from: directory)
         default:
             throw ConnectError("Unregognized HTTP response code: \(httpResponse.statusCode)", type: .storage)
         }
@@ -78,8 +77,16 @@ private extension StorageDirectoryConnection {
         return item
     }
     
-    func decodeErrorResponse(from data: Data) async throws {
+    func decodeErrorResponse(from data: Data, from directory: String) async throws -> StorageItemKind? {
         let problem = try ConnectManager.decoder.decode(ConnectionProblem.self, from: data)
-        presentAlert(from: problem)
+        if problem.detail == "Session not authorized (Access token is disabled, a newer session exists)" {
+            guard let info else { return nil }
+            await getToken(with: info, attemptFetchNew: true)
+            return try await fetchItems(in: directory)
+        }
+        else {
+            presentAlert(from: problem)
+            return nil
+        }
     }
 }
