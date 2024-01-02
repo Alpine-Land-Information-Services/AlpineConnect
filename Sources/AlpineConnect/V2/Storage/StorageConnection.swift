@@ -15,6 +15,8 @@ public class StorageConnection {
         StorageManager.shared
     }
     
+    public var sortingCriterion = StorageSortingCriteria.downloaded
+    
     public var sessionToken: Token?
     public var items = [StorageItem]()
     

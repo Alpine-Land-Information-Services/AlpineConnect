@@ -15,3 +15,7 @@ public enum StorageItemType {
     case folder
     case json
 }
+
+public enum StorageSortingCriteria {
+    case date, downloaded, name, size
+}
