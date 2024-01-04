@@ -11,7 +11,7 @@ import Foundation
 public final class StorageDirectoryConnection: StorageConnection {
     
     var baseURLString: String {
-        switch reference {
+        switch location {
         case .myFolder:
             return "https://alpine-storage.azurewebsites.net/"
         case .cloud:

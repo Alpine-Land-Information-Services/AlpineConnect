@@ -9,13 +9,11 @@ import Foundation
 
 public struct StorageRequestResponse {
     
-    public init(queueOrder: Int, taskIdentifier: Int, savePath: String?) {
+    public init(queueOrder: Int, taskIdentifier: Int) {
         self.queueOrder = queueOrder
         self.taskIdentifier = taskIdentifier
-        self.savePath = savePath
     }
     
     public var queueOrder: Int
     public var taskIdentifier: Int
-    public var savePath: String?
 }

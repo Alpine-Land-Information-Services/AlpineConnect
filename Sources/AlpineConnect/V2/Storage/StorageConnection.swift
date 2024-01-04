@@ -31,7 +31,7 @@ public class StorageConnection {
     public var serverPath: String
     public var localPath: String?
     
-    public var reference: ReferenceLocation
+    public var location: ReferenceLocation
     
     public var info: LoginConnectionInfo?
     
@@ -46,7 +46,7 @@ public class StorageConnection {
     public init(reference: ReferenceLocation, serverPath: String, localPath: String? = nil) {
         self.serverPath = serverPath
         self.localPath = localPath
-        self.reference = reference
+        self.location = reference
     }
     
     public func refresh() {
