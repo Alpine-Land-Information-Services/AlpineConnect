@@ -48,7 +48,7 @@ public struct SyncView: View {
             }
         }
         .interactiveDismissDisabled(tracker.status != .none && tracker.status != .canceled)
-        .onChange(of: tracker.status) { newValue in
+        .onChange(of: tracker.status) { newValue, _ in
             if newValue == .none || newValue == .canceled {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                     dismiss()

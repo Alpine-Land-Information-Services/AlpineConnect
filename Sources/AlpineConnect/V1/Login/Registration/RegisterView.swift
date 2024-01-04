@@ -64,7 +64,7 @@ struct RegisterView: View {
                     }
                 }
                 .navigationTitle("User Registration")
-                .onChange(of: viewModel.open) { value in
+                .onChange(of: viewModel.open) { value, _ in
                     open = value
                 }
             }

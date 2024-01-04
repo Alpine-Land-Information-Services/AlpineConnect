@@ -232,12 +232,12 @@ public extension UIDevice {
             "iPhone14,6" : .iPhoneSE3,
         ]
         
-        guard let mcode = modelCode, let map = String(validatingUTF8: mcode), let model = modelMap[map] else { return Model.unrecognized }
+        guard let mcode = modelCode, let model = modelMap[mcode] 
+        else { return Model.unrecognized }
+        
         if model == .simulator {
-            if let simModelCode = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"] {
-                if let simMap = String(validatingUTF8: simModelCode), let simModel = modelMap[simMap] {
-                    return simModel
-                }
+            if let simModelCode = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"], let simModel = modelMap[simModelCode] {
+                return simModel
             }
         }
         return model

@@ -84,7 +84,7 @@ struct PasswordChangeView: View {
             Divider()
             SpinnerButton(label: "Change Password", action: viewModel.changePassword, isDisabled: viewModel.allFieldsFilled(), activated: $viewModel.showSpinner)
         }
-        .onChange(of: viewModel.newPassword) { pass in
+        .onChange(of: viewModel.newPassword) { pass, _ in
             let str = viewModel.checkPasswordScore(password: pass)
             viewModel.passwordStrenght = viewModel.checkPassStr(str).0
         }
