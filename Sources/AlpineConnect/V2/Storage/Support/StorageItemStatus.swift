@@ -27,4 +27,5 @@ public enum StorageItemIssueAction: String {
     case removeOrDownload
     case removeOrDownloadOrIgnore
     case delete
+    case fixInvalid
 }
