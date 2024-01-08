@@ -28,7 +28,7 @@ public class StorageConnection {
     public var status: StorageConnectionStatus = .initial
     public var refreshID = UUID()
         
-    public var serverPath: String
+    public var remotePath: String
     public var localPath: String?
     
     public var location: ReferenceLocation
@@ -44,7 +44,7 @@ public class StorageConnection {
     }
     
     public init(reference: ReferenceLocation, serverPath: String, localPath: String? = nil) {
-        self.serverPath = serverPath
+        self.remotePath = serverPath
         self.localPath = localPath
         self.location = reference
     }

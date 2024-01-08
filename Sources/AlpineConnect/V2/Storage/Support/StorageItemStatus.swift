@@ -19,6 +19,10 @@ public enum StorageItemStatus: String, Codable {
     case issue
 }
 
+public enum StorageIssueType: String {
+    case missingLocally
+}
+
 public enum StorageItemIssueAction: String {
     case removeOrUpload
     case chooseLocalOrCloud
