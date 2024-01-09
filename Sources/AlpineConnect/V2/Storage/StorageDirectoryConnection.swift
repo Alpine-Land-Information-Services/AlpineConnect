@@ -44,14 +44,10 @@ public final class StorageDirectoryConnection: StorageConnection {
     private func fetchItems(in directory: String) async throws -> StorageItemKind? {
         guard let sessionToken else { return nil }
         
-        var directory = directory
-        if directory == "user-files/" {
-            directory.append("jlebid@alpine-lis.com/")
-        }
-        
         guard let url = URL(string: baseURLString + directory + "?maxdepth=1") else {
             throw ConnectError("Could not create directory URL.", type: .storage)
         }
+        print(url)
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.addValue(manager.token, forHTTPHeaderField: "ApiKey")

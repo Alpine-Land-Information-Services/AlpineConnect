@@ -11,5 +11,6 @@ public struct StorageDirectory: Codable {
     
     public var type: String
     public var path: String
+    public var relativePath: String?
     public var contents: [StorageItemKind]
 }

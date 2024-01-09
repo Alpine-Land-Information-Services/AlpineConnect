@@ -149,6 +149,15 @@ public extension ConnectManager {
         ConnectManager.shared.credentialsExist
     }
     
+    func signout() {
+        token = nil
+        user = nil
+        isSignedIn = false
+
+        UserDefaults.standard.setValue(nil, forKey: "AC_last_login")
+        UserDefaults.standard.setValue(nil, forKey: "AC_backyard_token")        
+    }
+    
     static func getValidToken(with info: LoginConnectionInfo) async throws -> (TokenResponse, Token?) {
         if let token = ConnectManager.shared.token ?? ConnectManager.shared.getStoredToken() {
             if NetworkMonitor.shared.connected, await NetworkMonitor.shared.canConnectToServer() {

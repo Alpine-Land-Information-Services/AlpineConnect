@@ -35,6 +35,8 @@ public class StorageConnection {
     
     public var info: LoginConnectionInfo?
     
+    public var modelID: PersistentIdentifier?
+    
     public var isConnected: Bool {
         NetworkMonitor.shared.connected
     }
@@ -43,10 +45,11 @@ public class StorageConnection {
         sessionToken != nil && isConnected && status == .readyToFetch
     }
     
-    public init(reference: ReferenceLocation, serverPath: String, localPath: String? = nil) {
+    public init(reference: ReferenceLocation, serverPath: String, localPath: String? = nil, modelID: PersistentIdentifier? = nil) {
         self.remotePath = serverPath
         self.localPath = localPath
         self.location = reference
+        self.modelID = modelID
     }
     
     public func refresh() {

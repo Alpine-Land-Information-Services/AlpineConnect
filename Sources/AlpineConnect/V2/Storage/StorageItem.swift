@@ -20,6 +20,8 @@ public struct StorageItem: Codable, Hashable, Equatable, Identifiable {
     public var hash: String
     public var path: String
     public var contentType: String
+    
+    public var relativePath: String?
 
     public var created: Date
     public var lastModified: Date
