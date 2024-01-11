@@ -10,16 +10,7 @@ import Foundation
 @Observable
 public final class StorageDirectoryConnection: StorageConnection {
     
-    var baseURLString: String {
-        switch location {
-        case .myFolder:
-            return "https://alpine-storage.azurewebsites.net/"
-        case .cloud:
-            return "https://alpine-storage.azurewebsites.net/info/"
-        default:
-            fatalError()
-        }
-    }
+    var baseURLString = "https://alpine-storage.azurewebsites.net/info/"
         
     public func open(_ directory: String) async -> StorageItemKind? {
         do {
