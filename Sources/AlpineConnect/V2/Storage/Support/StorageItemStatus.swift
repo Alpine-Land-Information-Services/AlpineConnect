@@ -11,12 +11,15 @@ public enum StorageItemStatus: String, Codable {
     case cloud
     case downloading
     case uploading
-    case pendingUpload
-    case pendingDownload
+    case pendingUpload = "Pending Upload"
+    case pendingDownload = "Pending Download"
     case uploadReady
     case downloadReady
     case downloaded
     case issue
+    
+    case updating
+    case pendingUpdate = "Pending Update"
 }
 
 public enum StorageIssueType: String {

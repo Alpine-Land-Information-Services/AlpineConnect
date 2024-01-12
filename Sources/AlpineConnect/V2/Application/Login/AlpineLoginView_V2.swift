@@ -233,25 +233,25 @@ private extension AlpineLoginView_V2 {
     }
     
     func timeoutAlert() {
-        let offlineButton = AlertButton(label: "Sign In Offline") {
+        let offlineButton = ConnectAlertButton(label: "Sign In Offline") {
             loginPress(offline: true)
         }
-        let dismissButton = AlertButton(label: "Cancel", role: .cancel, action: {})
+        let dismissButton = ConnectAlertButton(label: "Cancel", role: .cancel, action: {})
         currentAlert = ConnectAlert(title: "Sign In Timeout", message: "Could not reach network in reasonable time.", buttons: [offlineButton], dismissButton: dismissButton)
     }
     
     func overrideKeychainAlert() {
-        let proceedButton = AlertButton(label: "Proceed") {
+        let proceedButton = ConnectAlertButton(label: "Proceed") {
             processLoginResponse(manager.overrideCredentials())
         }
-        let proceedNoOverride = AlertButton(label: "Proceed Without Override", role: .cancel, action: doSignIn)
+        let proceedNoOverride = ConnectAlertButton(label: "Proceed Without Override", role: .cancel, action: doSignIn)
         
         currentAlert = ConnectAlert(title: "New Sign In", message: "Your sign in will override previous stored credentials. \n\nGoing forward, any future attempts to sign in while offline will only work this account unless a new sign in is performed while online.", buttons: [proceedButton, proceedNoOverride])
     }
     
     func keychainSaveFailAlert() {
-        let continueButton = AlertButton(label: "Proceed Anyway", role: .destructive, action: doSignIn)
-        let cancel = AlertButton(label: "Cancel", role: .cancel, action: {})
+        let continueButton = ConnectAlertButton(label: "Proceed Anyway", role: .destructive, action: doSignIn)
+        let cancel = ConnectAlertButton(label: "Cancel", role: .cancel, action: {})
         currentAlert = ConnectAlert(title: "Could Not Save Credentials", message: "There was an issue attempting to save sign in information. \n\nOffline Sign In will be availible until saved. \n\nIf the Issue persists, contact support.", buttons: [continueButton], dismissButton: cancel)
     }
 }

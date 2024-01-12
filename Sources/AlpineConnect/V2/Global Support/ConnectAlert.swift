@@ -10,15 +10,15 @@ import SwiftUI
 public struct ConnectAlert {
     public var title: String
     public var message: String?
-    public var buttons: [AlertButton]?
+    public var buttons: [ConnectAlertButton]?
     
-    public var dismissButton: AlertButton?
+    public var dismissButton: ConnectAlertButton?
     
     public static var empty: ConnectAlert {
         ConnectAlert(title: "Empty Alert", message: "This is an error if presented.")
     }
     
-    public init(title: String, message: String? = nil, buttons: [AlertButton]? = nil, dismissButton: AlertButton? = nil) {
+    public init(title: String, message: String? = nil, buttons: [ConnectAlertButton]? = nil, dismissButton: ConnectAlertButton? = nil) {
         self.title = title
         self.message = message
         self.buttons = buttons
@@ -26,7 +26,7 @@ public struct ConnectAlert {
     }
 }
 
-public struct AlertButton {
+public struct ConnectAlertButton {
     
     var label: String
     var role: ButtonRole?

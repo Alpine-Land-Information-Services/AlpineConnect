@@ -44,7 +44,7 @@ public struct ConnectionProblem: Decodable {
 extension ConnectionProblem {
     
     static func timeout(offlineAction: @escaping () -> Void) -> ConnectionProblem {
-        let alert = ConnectAlert(title: "Timeout", message: "Could not connect to server in reasonable time.", buttons: [AlertButton(label: "Sign In Offline", action: offlineAction)], dismissButton: AlertButton(label: "Cancel", role: .cancel, action: {}))
+        let alert = ConnectAlert(title: "Timeout", message: "Could not connect to server in reasonable time.", buttons: [ConnectAlertButton(label: "Sign In Offline", action: offlineAction)], dismissButton: ConnectAlertButton(label: "Cancel", role: .cancel, action: {}))
         
         return ConnectionProblem(customAlert: alert)
     }
