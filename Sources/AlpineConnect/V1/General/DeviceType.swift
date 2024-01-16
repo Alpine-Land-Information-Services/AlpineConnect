@@ -7,7 +7,7 @@
 
 import UIKit
 
-public enum Model : String {
+public enum DeviceModel : String {
     
     //Simulator
     case simulator     = "simulator/sandbox",
@@ -89,7 +89,7 @@ public enum Model : String {
 
 public extension UIDevice {
     
-    var type: Model {
+    var type: DeviceModel {
         var systemInfo = utsname()
         uname(&systemInfo)
         let modelCode = withUnsafePointer(to: &systemInfo.machine) {
@@ -98,7 +98,7 @@ public extension UIDevice {
             }
         }
         
-        let modelMap : [String: Model] = [
+        let modelMap : [String: DeviceModel] = [
             
             //Simulator
             "i386"      : .simulator,
@@ -233,7 +233,7 @@ public extension UIDevice {
         ]
         
         guard let mcode = modelCode, let model = modelMap[mcode] 
-        else { return Model.unrecognized }
+        else { return DeviceModel.unrecognized }
         
         if model == .simulator {
             if let simModelCode = ProcessInfo().environment["SIMULATOR_MODEL_IDENTIFIER"], let simModel = modelMap[simModelCode] {

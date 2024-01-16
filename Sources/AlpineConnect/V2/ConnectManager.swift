@@ -16,7 +16,7 @@ public class ConnectManager: ObservableObject {
         NetworkMonitor.shared.connected
     }
         
-    @Published var user: ConnectUser?
+    @Published var user: ConnectUser!
     @Published public var token: Token?
     
     @Published var isSignedIn = false
@@ -27,6 +27,10 @@ public class ConnectManager: ObservableObject {
     private var postgresInfo: PostgresInfo?
     var isPostgresEnabled: Bool {
         postgresInfo != nil
+    }
+    
+    public var userID: String {
+        loginData.email
     }
     
     init() {

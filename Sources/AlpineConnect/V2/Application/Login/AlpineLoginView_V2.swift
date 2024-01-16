@@ -47,7 +47,7 @@ struct AlpineLoginView_V2: View {
         }
         .connectAlert(currentAlert, isPresented: $isAlertPresented)
         .onAppear {
-            
+            debugFillCheck()
         }
         .onDisappear {
             clear()
@@ -184,6 +184,19 @@ extension AlpineLoginView_V2 {
         }
     }
 
+}
+
+private extension AlpineLoginView_V2 {
+    
+    func debugFillCheck() {
+#if DEBUG
+        guard let email = UserDefaults.standard.string(forKey: "AC_last_login"),
+              let password = AuthManager.retrieveFromKeychain(account: email)
+        else { return }
+        self.email = email
+        self.password = password
+#endif
+    }
 }
 
 private extension AlpineLoginView_V2 {

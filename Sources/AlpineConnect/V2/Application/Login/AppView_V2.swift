@@ -17,24 +17,22 @@ public struct AppView_V2<App: View>: View {
     public init(info: LoginConnectionInfo, @ViewBuilder app: () -> App) {
         self.info = info
         self.app = app()
+        
+        print(code: .info, try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false))
+        print(code: .info, FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas")!.absoluteString)
     }
     
     public var body: some View {
         if manager.isSignedIn {
-            app
-                .transition(.opacity)
+            UserAppView(userID: manager.userID) {
+                app
+            }
+            .transition(.opacity)
         }
         else {
             AlpineLoginView_V2(info: info)
                 .transition(.move(edge: .bottom))
                 .environmentObject(manager)
-//                    .transition(.asymmetric(insertion: .slide, removal: .move(edge: .bottom)))
         }
     }
 }
-
-//#Preview {
-//    AppView_V2 {
-//        
-//    }
-//}
