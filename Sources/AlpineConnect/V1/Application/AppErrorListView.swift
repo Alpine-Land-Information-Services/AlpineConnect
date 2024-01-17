@@ -8,13 +8,15 @@
 import SwiftUI
 import AlpineUI
 import CoreData
+import SwiftData
 
 public struct AppErrorListView: View {
     
-    @FetchRequest private var errors: FetchedResults<AppError>
-
+//    @FetchRequest private var errors: FetchedResults<AppError>
+    @Query private var errors: [ApplicationError]
+    
     public init() {
-        self._errors = FetchRequest(entity: NSEntityDescription.entity(forEntityName: "AppError", in: .main())!, sortDescriptors: [NSSortDescriptor(keyPath: \AppError.date, ascending: false)], animation: .default)
+//        self._errors = FetchRequest(entity: NSEntityDescription.entity(forEntityName: "AppError", in: .main())!, sortDescriptors: [NSSortDescriptor(keyPath: \AppError.date, ascending: false)], animation: .default)
     }
     
     public var body: some View {
@@ -27,7 +29,7 @@ public struct AppErrorListView: View {
                         Text(error.onAction!)
                             .font(.callout)
                         Spacer()
-                        Text(error.date!.toString(format: "MMM d"))
+                        Text(error.date.toString(format: "MMM d"))
                             .font(.caption)
                             .foregroundColor(Color(uiColor: .systemGray))
                     }

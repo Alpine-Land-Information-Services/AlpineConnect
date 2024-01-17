@@ -34,6 +34,7 @@ struct UserAppView<App: View>: View {
         app
             .onAppear {
                 ConnectManager.shared.user = users.first
+                ConnectManager.shared.modelContainer = sharedModelContainer
             }
     }
 }

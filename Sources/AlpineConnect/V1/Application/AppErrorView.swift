@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AppErrorView: View {
     
-    var error: AppError
+    var error: ApplicationError
     
     var body: some View {
         ScrollView {
@@ -18,20 +18,20 @@ struct AppErrorView: View {
                     Text("Log:")
                         .font(.subheadline)
                     Spacer()
-                    Text(error.date!.toString(format: "MMM d, h:mm a"))
+                    Text(error.date.toString(format: "MMM d, h:mm a"))
                         .font(.caption)
                 }
                 Divider()
                     .padding(6)
-                Text(error.log! + "\n" + (error.customDescription ?? "No additional information."))
+                Text(error.systemLog ?? "No logged message." + "\n" + (error.additionalInfo ?? "No additional information."))
             }
             .padding()
         }
-        .navigationTitle(error.onAction!)
+        .navigationTitle(error.onAction ?? "No action specified")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: ReportIssueView(userName: CurrentUser.fullName, email: CurrentUser.email, title: error.onAction ?? "", text: (error.log ?? "") + "\n" + (error.customDescription ?? "No additional information."))) {
+                NavigationLink(destination: ReportIssueView(userName: CurrentUser.fullName, email: CurrentUser.email, title: error.onAction ?? "", text: (error.systemLog ?? "") + "\n" + (error.additionalInfo ?? "No additional information."))) {
                     Label("Report", systemImage: "ladybug")
                         .labelStyle(.titleAndIcon)
                         .foregroundColor(.orange)

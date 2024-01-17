@@ -7,6 +7,7 @@
 
 import Foundation
 import AlpineCore
+import SwiftData
 
 public class ConnectManager: ObservableObject {
     
@@ -23,6 +24,8 @@ public class ConnectManager: ObservableObject {
     
     private var loginData: CredentialsData!
     private var loginInfo: LoginConnectionInfo!
+    
+    public var modelContainer: ModelContainer!
     
     private var postgresInfo: PostgresInfo?
     var isPostgresEnabled: Bool {

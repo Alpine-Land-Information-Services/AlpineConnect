@@ -7,8 +7,11 @@
 
 import SwiftUI
 import AlpineUI
+import SwiftData
 
 open class AppControl: ObservableObject {
+    
+    @Environment(\.modelContext) private var context: ModelContext
     
     static public var shared = AppControl()
         
@@ -174,6 +177,7 @@ extension AppControl { //MARK: Alerts
     
     public static func makeError(onAction: String, error: Error, customDescription: String? = nil, showToUser: Bool = true) {
         AppError.add(onAction: onAction, log: error.log(), customDescription: customDescription)
+//        ApplicationError.add(onAction: onAction, error: error, customDescription: customDescription, in: context)
         if showToUser {
             AppControl.shared.errorAlert(title: onAction, error: error, customDescription: customDescription)
         }
