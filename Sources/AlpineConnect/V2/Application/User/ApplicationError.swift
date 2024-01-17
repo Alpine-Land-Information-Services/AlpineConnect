@@ -22,12 +22,12 @@ public class ApplicationError {
 //    var user: ConnectUser?
     
     private init(onAction: String?, error: Error, description: String?) {
-        if let err = error as? AlpineError {
-            self.typeName = err.getType()
-        }
-        self.systemLog = error.log()
-        self.onAction = onAction
-        self.additionalInfo = description
+//        if let err = error as? AlpineError {
+//            self.typeName = err.getType()
+//        }
+//        self.systemLog = error.log()
+//        self.onAction = onAction
+//        self.additionalInfo = description
 //        self.user = ConnectManager.shared.user
     }
     

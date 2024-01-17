@@ -28,6 +28,7 @@ public struct AppView_V2<App: View>: View {
                 app
             }
             .transition(.opacity)
+            .environmentObject(manager)
         }
         else {
             AlpineLoginView_V2(info: info)

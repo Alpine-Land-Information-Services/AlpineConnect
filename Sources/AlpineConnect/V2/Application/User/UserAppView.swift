@@ -13,6 +13,8 @@ struct UserAppView<App: View>: View {
     var userID: String
     
     @ViewBuilder var app: App
+    
+    @EnvironmentObject var manager: ConnectManager
 
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([ConnectUser.self])
@@ -33,8 +35,8 @@ struct UserAppView<App: View>: View {
     var body: some View {
         app
             .onAppear {
-                ConnectManager.shared.user = users.first
-                ConnectManager.shared.modelContainer = sharedModelContainer
+                manager.user = users.first
+                manager.modelContainer = sharedModelContainer
             }
     }
 }
