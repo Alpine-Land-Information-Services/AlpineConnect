@@ -193,7 +193,7 @@ extension SyncTracker {
             }
         }
         catch {
-            AppControl.makeError(onAction: "Fetching Object Count", error: error)
+            AppControlOld.makeError(onAction: "Fetching Object Count", error: error)
         }
     }
     

@@ -182,7 +182,7 @@ public class Login {
             }
         }
         catch {
-            AppControl.makeError(onAction: "Getting Server User", error: error, showToUser: false)
+            AppControlOld.makeError(onAction: "Getting Server User", error: error, showToUser: false)
             return Check.checkPostgresError(error)
         }
     }

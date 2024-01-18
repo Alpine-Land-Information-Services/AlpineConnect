@@ -140,6 +140,6 @@ public class SwiftUIUpdater: ObservableObject {
             alert = AppAlert(title: "No Connection", message: "Network connection required to check for updates.")
         }
         
-        AppControl.makeAlert(alert: alert)
+        AppControlOld.makeAlert(alert: alert)
     }
 }

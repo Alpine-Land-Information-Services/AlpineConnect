@@ -61,7 +61,7 @@ public class NetworkMonitor {
         if connected {
             return true
         }
-        AppControl.noConnectionAlert()
+        AppControlOld.noConnectionAlert()
         
         return false
     }

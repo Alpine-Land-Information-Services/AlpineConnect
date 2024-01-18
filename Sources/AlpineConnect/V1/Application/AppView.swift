@@ -10,7 +10,7 @@ import AlpineUI
 
 public struct AppView<App: View>: View {
     
-    @ObservedObject var control = AppControl.shared
+    @ObservedObject var control = AppControlOld.shared
     
     @Environment(\.horizontalSizeClass) var hSizeClass
     

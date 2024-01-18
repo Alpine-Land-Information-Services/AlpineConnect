@@ -14,32 +14,31 @@ public class ApplicationError {
     
     var guid = UUID()
     var date = Date()
-    var onAction: String?
-    var systemLog: String?
+    var file: String?
+    var function: String?
+    var line: Int?
+    var message: String?
     var additionalInfo: String?
     var typeName: String?
     
 //    var user: ConnectUser?
     
-    private init(onAction: String?, error: Error, description: String?) {
-//        if let err = error as? AlpineError {
-//            self.typeName = err.getType()
-//        }
-//        self.systemLog = error.log()
-//        self.onAction = onAction
-//        self.additionalInfo = description
-//        self.user = ConnectManager.shared.user
+    public init(error: Error, additionalText: String? = nil) {
+        if let err = error as? AlpineError {
+            self.typeName = err.getType()
+            self.file = err.file
+            self.function = err.function
+            self.line = err.line
+            self.message = err.message
+        } else {
+            self.message = error.log()
+        }
+        self.additionalInfo = additionalText
     }
     
-    static func add(onAction: String?, error: Error, additionalInfo: String?, in context: ModelContext) throws {
-        let error = ApplicationError(onAction: onAction, error: error, description: additionalInfo)
-        context.insert(error)
-        try context.save()
-    }
-    
-    static func add(error: Error, in context: ModelContext) throws {
-//        let error = ApplicationError(onAction: onAction, error: error, description: customDescription)
-//        context.insert(error)
-//        try context.save()
+    public static func add(error: Error, additionalInfo: String? = nil, in context: ModelContext) {
+        let err = ApplicationError(error: error, additionalText: additionalInfo)
+        context.insert(err)
+//        try? context.save()
     }
 }

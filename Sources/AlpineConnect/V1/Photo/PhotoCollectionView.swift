@@ -203,7 +203,7 @@ public struct PhotoCollectionButton: View {
 
     public var body: some View {
         Button {
-            AppControl.showSheet(view: PhotoCollectionView().environmentObject(viewModel))
+            AppControlOld.showSheet(view: PhotoCollectionView().environmentObject(viewModel))
         } label: {
             Image(systemName: "photo.on.rectangle")
         }
@@ -227,7 +227,7 @@ public struct PhotoCollectionBlock<Label: View>: View {
 
     public var body: some View {
         Button {
-            AppControl.showSheet(view: PhotoCollectionView().environmentObject(viewModel))
+            AppControlOld.showSheet(view: PhotoCollectionView().environmentObject(viewModel))
         } label: {
             label
                 .overlay {

@@ -54,6 +54,6 @@ class TokenManager {
         let alert = AppAlert(title: "No Token", message: "Login token is missing, to perform any actions that require connection to server - relogin is required while connected to network.", actions: [AlertAction(text: "Log Out Now", role: .regular, action: {
             UserManager.shared.userLoggedIn = false
         })])
-        AppControl.makeAlert(alert: alert)
+        AppControlOld.makeAlert(alert: alert)
     }
 }

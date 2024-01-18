@@ -18,6 +18,6 @@ class DBRescueViewModel: ObservableObject {
     func resetCointainer(_ container: NSPersistentContainer) {
         let alert = AppAlert(title: "Reset Container?", message: "This will delete your current database container and all data within it. \nAll not exported data will be lost.", dismiss: AlertAction(text: "Cancel", role: .dismiss, action: {}), actions: [
             AlertAction(text: "Reset", role: .destructive, action: {DBRescue.clearContainer(container)})])
-        AppControl.makeAlert(alert: alert)
+        AppControlOld.makeAlert(alert: alert)
     }
 }

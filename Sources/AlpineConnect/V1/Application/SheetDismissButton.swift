@@ -26,9 +26,9 @@ public struct SheetDismissButton: View {
         Button {
             switch type {
             case .fullscreen:
-                AppControl.shared.showCover = false
+                AppControlOld.shared.showCover = false
             case.sheet:
-                AppControl.shared.showSheet = false
+                AppControlOld.shared.showSheet = false
             }
             
             if let additionalAction {

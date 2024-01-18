@@ -1,5 +1,5 @@
 //
-//  AppControl.swift
+//  AppControlOld.swift
 //  AlpineConnect
 //
 //  Created by Jenya Lebid on 10/14/22.
@@ -7,13 +7,10 @@
 
 import SwiftUI
 import AlpineUI
-import SwiftData
 
-open class AppControl: ObservableObject {
+open class AppControlOld: ObservableObject {
     
-    @Environment(\.modelContext) private var context: ModelContext
-    
-    static public var shared = AppControl()
+    static public var shared = AppControlOld()
         
     @Published public var showRegularAlert = false
     @Published public var showSheetAlert = false
@@ -96,20 +93,20 @@ open class AppControl: ObservableObject {
     }
 }
 
-extension AppControl { //MARK: Popups
+extension AppControlOld { //MARK: Popups
     
     static public func showSheet(view: any View) {
         DispatchQueue.main.async {
             withAnimation {
-                if AppControl.shared.showSheet {
-                    AppControl.shared.showSheet.toggle()
+                if AppControlOld.shared.showSheet {
+                    AppControlOld.shared.showSheet.toggle()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.10) {
                         showSheet(view: view)
                     }
                 }
                 else {
-                    AppControl.shared.currentSheet = AnyView(view)
-                    AppControl.shared.showSheet.toggle()
+                    AppControlOld.shared.currentSheet = AnyView(view)
+                    AppControlOld.shared.showSheet.toggle()
                 }
             }
         }
@@ -118,19 +115,19 @@ extension AppControl { //MARK: Popups
     static public func showCover(view: any View) {
         DispatchQueue.main.async {
             withAnimation {
-                AppControl.shared.currentCover = AnyView(view)
-                AppControl.shared.showCover.toggle()
+                AppControlOld.shared.currentCover = AnyView(view)
+                AppControlOld.shared.showCover.toggle()
             }
         }
     }
 }
 
 
-extension AppControl { //MARK: Alerts
+extension AppControlOld { //MARK: Alerts
     
     public static func noConnectionAlert() {
         let alert = AppAlert(title: "Offline", message: "You are not connected to network, please connect to proceed.")
-        AppControl.shared.toggleAlert(alert)
+        AppControlOld.shared.toggleAlert(alert)
     }
     
     private func showAlertToggle() {
@@ -165,7 +162,7 @@ extension AppControl { //MARK: Alerts
         }
         
         let alert = AppAlert(title: "\(title) Error", message: "\(error.localizedDescription) \n-----\n Check error logs for detailed description.", dismiss: AlertAction(text: "Okay"), actions: [AlertAction(text: "Report", role: .alert, action: {
-            AppControl.showSheet(view: {
+            AppControlOld.showSheet(view: {
                 NavigationView {
                     ReportIssueView(userName: CurrentUser.fullName, email: CurrentUser.email, title: title, text: error.log() + "\n" + (customDescription ?? "No additional information."))
                 }
@@ -177,9 +174,8 @@ extension AppControl { //MARK: Alerts
     
     public static func makeError(onAction: String, error: Error, customDescription: String? = nil, showToUser: Bool = true) {
         AppError.add(onAction: onAction, log: error.log(), customDescription: customDescription)
-//        ApplicationError.add(onAction: onAction, error: error, customDescription: customDescription, in: context)
         if showToUser {
-            AppControl.shared.errorAlert(title: onAction, error: error, customDescription: customDescription)
+            AppControlOld.shared.errorAlert(title: onAction, error: error, customDescription: customDescription)
         }
     }
     
@@ -188,29 +184,29 @@ extension AppControl { //MARK: Alerts
                              dismiss: AlertAction(text: "Quit App", role: .regular, action: {
                      exit(0)
                  }))
-        AppControl.shared.toggleAlert(alert)
+        AppControlOld.shared.toggleAlert(alert)
     }
     
     public static func successfulSyncAlert() {
         let alert = AppAlert(title: "Sync Successful", message: "Local data has been sucessfully exported and updated.")
-        AppControl.shared.toggleAlert(alert)
+        AppControlOld.shared.toggleAlert(alert)
     }
     
     public static func makeSimpleAlert(title: String, message: String) {
         let alert = AppAlert(title: title, message: message)
-        AppControl.shared.toggleAlert(alert)
+        AppControlOld.shared.toggleAlert(alert)
     }
     
     public static func makeAlert(alert: AppAlert) {
-        AppControl.shared.toggleAlert(alert)
+        AppControlOld.shared.toggleAlert(alert)
     }
     
     public static func notDoneAlert() {
-        AppControl.makeSimpleAlert(title: "Not Implemented", message: "This functionality has not yet been added, check back later.")
+        AppControlOld.makeSimpleAlert(title: "Not Implemented", message: "This functionality has not yet been added, check back later.")
     }
 }
 
-extension AppControl {
+extension AppControlOld {
     
     static public func connectionRequiredAction(_ action: @escaping () -> ()) {
         guard NetworkMonitor.shared.connected else {

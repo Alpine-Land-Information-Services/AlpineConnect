@@ -43,11 +43,11 @@ public class DBRescue {
             return
         }
         
-        AppControl.makeError(onAction: "Database Container Init", error: db.error, showToUser: false)
+        AppControlOld.makeError(onAction: "Database Container Init", error: db.error, showToUser: false)
         
         DBRescueViewModel.shared.failedDB.append(db)
         if !DBRescueViewModel.shared.isShown {
-            AppControl.showSheet(view: DBRescueView())
+            AppControlOld.showSheet(view: DBRescueView())
         }
     }
     
@@ -61,11 +61,11 @@ public class DBRescue {
              try persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url, options: nil)
              
              DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                 AppControl.makeAlert(alert: restartAlert)
+                 AppControlOld.makeAlert(alert: restartAlert)
              }
              
          } catch {
-             AppControl.makeError(onAction: "Clearing Map Data", error: error)
+             AppControlOld.makeError(onAction: "Clearing Map Data", error: error)
          }
     }
     
@@ -116,11 +116,11 @@ public class DBRescue {
 
                 try statement.execute(parameterValues: [id, appName, userName, dataValue, uploadDate])
 
-                AppControl.makeSimpleAlert(title: "Database Sent", message: "Your local database was successfully sent.")
+                AppControlOld.makeSimpleAlert(title: "Database Sent", message: "Your local database was successfully sent.")
                 handler(true, "Export Successful")
             }
             catch {
-                AppControl.makeError(onAction: "Sending Database", error: error)
+                AppControlOld.makeError(onAction: "Sending Database", error: error)
                 handler(false, "\(error)")
             }
         }

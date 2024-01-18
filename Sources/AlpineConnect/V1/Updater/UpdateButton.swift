@@ -10,7 +10,7 @@ import SwiftUI
 public struct UpdateButton: View {
     
     @ObservedObject var viewModel: SwiftUIUpdater
-    @ObservedObject var control = AppControl.shared
+    @ObservedObject var control = AppControlOld.shared
         
     public init() {
         self.viewModel = SwiftUIUpdater()

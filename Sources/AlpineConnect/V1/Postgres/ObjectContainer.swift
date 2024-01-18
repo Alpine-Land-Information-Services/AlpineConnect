@@ -65,7 +65,7 @@ public class CDObjects {
                 result = try context.fetch(request).first as? CDObject
             }
             catch {
-                AppControl.makeError(onAction: "Fetching Feature", error: error, customDescription: "Could not find selected feature.")
+                AppControlOld.makeError(onAction: "Fetching Feature", error: error, customDescription: "Could not find selected feature.")
             }
             
             return result
