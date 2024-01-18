@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import Observation
 
-open class CurrentUser {
+@Observable
+open class CurrentDBUser {
     
     public enum Database: String {
         case production
@@ -41,7 +43,7 @@ open class CurrentUser {
     }
 }
 
-public extension CurrentUser {
+public extension CurrentDBUser {
     
     static var guid: UUID {
         UUID(uuidString: data["guid"] as! String)!
@@ -153,7 +155,7 @@ public extension CurrentUser {
     }
 }
 
-public extension CurrentUser {
+public extension CurrentDBUser {
     
     static func updateSyncDate(_ date: Date?) {
         switch database {

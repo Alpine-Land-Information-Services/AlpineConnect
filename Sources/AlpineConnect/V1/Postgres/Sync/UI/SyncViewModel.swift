@@ -74,7 +74,7 @@ class SyncViewModel: ObservableObject {
     }
     
     var greeting: String {
-        greetingText + ", " + CurrentUser.firstName.capitalized
+        greetingText + ", " + CurrentDBUser.firstName.capitalized
         
     }
 }

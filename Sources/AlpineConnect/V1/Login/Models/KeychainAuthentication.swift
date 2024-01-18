@@ -30,7 +30,7 @@ final class KeychainAuthentication {
     }
     
     func offlineCheck(email: String) -> LoginResponse {
-        guard CurrentUser.getUserDataFromDefaults(email: email) != nil else {
+        guard CurrentDBUser.getUserDataFromDefaults(email: email) != nil else {
             return .networkError
         }
         if userManager.userName == userManager.storedUserName && userManager.password == userManager.storedPassword {

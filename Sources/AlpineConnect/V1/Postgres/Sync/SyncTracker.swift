@@ -139,7 +139,7 @@ extension SyncTracker {
 public extension SyncTracker {
     
     var isInitial: Bool {
-        CurrentUser.lastSync == nil
+        CurrentDBUser.lastSync == nil
     }
     
     var status: SyncStatus {

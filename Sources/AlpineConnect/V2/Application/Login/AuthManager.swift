@@ -15,13 +15,18 @@ class AuthManager {
         self.credentials = credentials
     }
     
-    func attemptToSave() -> ConnectionResponse {
+    func attemptToSave(for serverUser: ServerUserResponse) -> ConnectionResponse {
+        ConnectManager.shared.user = ConnectUser(for: serverUser)
+        
         guard saveToKeychain(account: credentials.email, password: credentials.password) else {
             return ConnectionResponse(result: .moreDetail, detail: .keychainSaveFail)
         }
         
+        return saveUser()
+    }
+    
+    func saveUser() -> ConnectionResponse {
         UserDefaults.standard.setValue(credentials.email, forKey: "AC_last_login")
-        
         return ConnectionResponse(result: .success)
     }
     

@@ -164,7 +164,7 @@ extension AppControlOld { //MARK: Alerts
         let alert = AppAlert(title: "\(title) Error", message: "\(error.localizedDescription) \n-----\n Check error logs for detailed description.", dismiss: AlertAction(text: "Okay"), actions: [AlertAction(text: "Report", role: .alert, action: {
             AppControlOld.showSheet(view: {
                 NavigationView {
-                    ReportIssueView(userName: CurrentUser.fullName, email: CurrentUser.email, title: title, text: error.log() + "\n" + (customDescription ?? "No additional information."))
+                    ReportIssueView(userName: CurrentDBUser.fullName, email: CurrentDBUser.email, title: title, text: error.log() + "\n" + (customDescription ?? "No additional information."))
                 }
                 .navigationViewStyle(.stack)
             }())

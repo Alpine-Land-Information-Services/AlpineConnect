@@ -188,6 +188,6 @@ public class Login {
     }
     
     static func fillUserInfo(user: BackendUser) {
-        CurrentUser.makeUserData(email: user.email, name: user.firstName + " " + user.lastName, id: user.id)
+        CurrentDBUser.makeUserData(email: user.email, name: user.firstName + " " + user.lastName, id: user.id)
     }
 }

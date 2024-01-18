@@ -11,7 +11,7 @@ public class BackyardLogin {
     
     public struct Response: Decodable {
         let sessionToken: String
-        let user: ConnectUserOLD
+        let user: ServerUserResponse
     }
 
     var info: LoginConnectionInfo

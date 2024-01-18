@@ -1,5 +1,5 @@
 //
-//  ConnectUser.swift
+//  ConnectUser_CORE.swift
 //  AlpineConnect
 //
 //  Created by Jenya Lebid on 1/16/24.
@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 @Model
-public class ConnectUser {
+public class ConnectUser_MOVED_TO_CORE {
     
     @Attribute(.unique)
     public var id: String
@@ -18,6 +18,8 @@ public class ConnectUser {
 //    @Relationship(deleteRule: .cascade, inverse: \ApplicationError.user)
     @Relationship(deleteRule: .cascade)
     var errors: [ApplicationError] = []
+    
+//    var bools = [String: AnyHashable]()
     
     init(id: String) {
         self.id = id

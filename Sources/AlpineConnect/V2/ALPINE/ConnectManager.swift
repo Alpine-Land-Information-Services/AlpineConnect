@@ -17,7 +17,9 @@ public class ConnectManager: ObservableObject {
         NetworkMonitor.shared.connected
     }
         
-    @Published var user: ConnectUser!
+    @Published public var user: ConnectUser!
+    @Published var coreUser: ConnectUser_MOVED_TO_CORE! // IN MAIN CONTEXT
+    
     @Published public var token: Token?
     
     @Published var isSignedIn = false
@@ -31,6 +33,8 @@ public class ConnectManager: ObservableObject {
     var isPostgresEnabled: Bool {
         postgresInfo != nil
     }
+    
+    public var postgres: PostgresManager?
     
     public var userID: String {
         loginData.email
@@ -67,12 +71,26 @@ extension ConnectManager {
     
     func attemptOnlineLogin() async throws -> ConnectionResponse {
         let response = try await BackyardLogin(loginInfo, data: loginData).attemptLogin()
-        if let data = response.backyardData {
-            return try await processBackyardData(data)
-        }
-        else {
+        guard let data = response.backyardData else {
             return response
         }
+        
+        let processedResponse = try await processBackyardData(data)
+        guard processedResponse.result == .success else {
+            return processedResponse
+        }
+        
+        if let postgresInfo {
+            return try await attemptPostgresLogin(with: postgresInfo)
+        }
+        else {
+            return processedResponse
+        }
+    }
+    
+    private func attemptPostgresLogin(with info: PostgresInfo) async throws -> ConnectionResponse {
+        postgres = PostgresManager(info, credentials: loginData)
+        return await loginInfo.appInfo.userTableConnect()
     }
     
     private func processBackyardData(_ data: BackyardLogin.Response) async throws -> ConnectionResponse {
@@ -82,7 +100,7 @@ extension ConnectManager {
                 return ConnectionResponse(result: .moreDetail, detail: .overrideKeychain)
             }
         }
-        return AuthManager(credentials: loginData).attemptToSave()
+        return AuthManager(credentials: loginData).attemptToSave(for: data.user)
     }
     
     func attemptOfflineLogin() async -> ConnectionResponse {
@@ -145,7 +163,7 @@ extension ConnectManager {
 extension ConnectManager {
     
     func overrideCredentials() -> ConnectionResponse {
-        AuthManager(credentials: loginData).attemptToSave()
+        AuthManager(credentials: loginData).saveUser()
     }
 }
 
@@ -158,11 +176,12 @@ public extension ConnectManager {
     
     func signout() {
         token = nil
-        user = nil
+        coreUser = nil
         isSignedIn = false
+        user = nil
 
-        UserDefaults.standard.setValue(nil, forKey: "AC_last_login")
-        UserDefaults.standard.setValue(nil, forKey: "AC_backyard_token")        
+        UserDefaults.standard.setValue(nil, forKey: "AC_last_login") // why?
+        UserDefaults.standard.setValue(nil, forKey: "AC_backyard_token")
     }
     
     static func getValidToken(with info: LoginConnectionInfo) async throws -> (TokenResponse, Token?) {

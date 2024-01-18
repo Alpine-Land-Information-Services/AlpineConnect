@@ -93,7 +93,7 @@ public class SyncManager {
                 self.tracker.updateType(.none)
             }
             else if tracker.status != .error {
-                CurrentUser.updateSyncDate(tracker.currentSyncStartDate)
+                CurrentDBUser.updateSyncDate(tracker.currentSyncStartDate)
                 self.tracker.updateStatus(.none)
                 self.tracker.updateType(.none)
             }
@@ -249,9 +249,9 @@ extension SyncManager { //MARK: Cancel
     }
     
     func scheduleTimer() {
-        if CurrentUser.syncTimeout != 0 {
+        if CurrentDBUser.syncTimeout != 0 {
             DispatchQueue.main.async { [self] in
-                timer = Timer.scheduledTimer(timeInterval: TimeInterval(CurrentUser.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+                timer = Timer.scheduledTimer(timeInterval: TimeInterval(CurrentDBUser.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
             }
         }
     }
@@ -317,7 +317,7 @@ private extension SyncManager { //MARK: Import
         
         if tracker.status == .exportDone {
             DispatchQueue.main.async {
-                CurrentUser.requiresSync = false
+                CurrentDBUser.requiresSync = false
             }
         }
     }
@@ -420,7 +420,7 @@ private extension SyncManager { //MARK: Export
         await exectuteImport(importable: importable)
         
         if tracker.status == .importDone {
-            CurrentUser.requiresSync = false
+            CurrentDBUser.requiresSync = false
         }
     }
     
