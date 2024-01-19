@@ -23,8 +23,10 @@ struct UserAppView<App: View>: View {
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
             CoreAppControl.shared.modelContainer = container
+            
             return container
-        } catch {
+        } 
+        catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
@@ -42,9 +44,8 @@ struct UserAppView<App: View>: View {
     
     var body: some View {
         app
+            .environment(CoreAppControl.shared)
             .modelContainer(sharedModelContainer)
-            .onAppear {
-            }
     }
     
     func assingUser(id: String) -> CoreUser {

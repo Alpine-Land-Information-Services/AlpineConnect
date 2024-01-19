@@ -34,6 +34,25 @@ public class ConnectUser {
     }
 }
 
+public extension ConnectUser {
+    
+    var guid: UUID {
+        let id = data["guid"] as? String ?? "00000000-0000-0000-0000-000000000000"
+        return UUID(uuidString: id)!
+    }
+    
+    var lastSync: Date? {
+        data["last_sync"] as? Date
+    }
+    
+    var fullName: String {
+        let first = data["first_name"] as? String ?? "No First Name"
+        let last = data["last_name"] as? String ?? "No Last Name"
+        
+        return first + " " + last
+    }
+}
+
 private extension ConnectUser {
     
     static func makeUser(for serverUser: ServerUserResponse) -> [String: Any] {

@@ -17,12 +17,12 @@ public class ConnectManager: ObservableObject {
         NetworkMonitor.shared.connected
     }
         
-    @Published public var user: ConnectUser!
-//    @Published var coreUser: CoreUser! // IN MAIN CONTEXT
-    
+    @Published public var user: ConnectUser!    
     @Published public var token: Token?
     
     @Published var isSignedIn = false
+    
+    @Published public var id = UUID()
     
     private var loginData: CredentialsData!
     private var loginInfo: LoginConnectionInfo!
@@ -40,6 +40,10 @@ public class ConnectManager: ObservableObject {
     
     init() {
         NetworkMonitor.shared.start()
+    }
+    
+    static func reset() {
+        ConnectManager.shared = ConnectManager()
     }
 }
 
@@ -173,13 +177,13 @@ public extension ConnectManager {
     }
     
     func signout() {
-        token = nil
-        CoreAppControl.shared.user = nil
         isSignedIn = false
-        user = nil
-
-        UserDefaults.standard.setValue(nil, forKey: "AC_last_login") // why?
         UserDefaults.standard.setValue(nil, forKey: "AC_backyard_token")
+    }
+    
+    static func signout() {
+        ConnectManager.reset()
+        CoreAppControl.reset()
     }
     
     static func getValidToken(with info: LoginConnectionInfo) async throws -> (TokenResponse, Token?) {

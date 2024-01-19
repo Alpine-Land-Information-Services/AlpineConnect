@@ -37,6 +37,11 @@ public struct AppView_V2<App: View>: View {
                 app(manager.userID)
             }
             .transition(.opacity)
+            .onDisappear {
+                if !manager.isSignedIn {
+                    ConnectManager.signout()
+                }
+            }
         }
         else {
             AlpineLoginView_V2(info: info)
