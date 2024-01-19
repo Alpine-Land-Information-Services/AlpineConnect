@@ -18,7 +18,7 @@ public class ConnectManager: ObservableObject {
     }
         
     @Published public var user: ConnectUser!
-    @Published var coreUser: ConnectUser_MOVED_TO_CORE! // IN MAIN CONTEXT
+//    @Published var coreUser: CoreUser! // IN MAIN CONTEXT
     
     @Published public var token: Token?
     
@@ -26,8 +26,6 @@ public class ConnectManager: ObservableObject {
     
     private var loginData: CredentialsData!
     private var loginInfo: LoginConnectionInfo!
-    
-    public var modelContainer: ModelContainer!
     
     private var postgresInfo: PostgresInfo?
     var isPostgresEnabled: Bool {
@@ -176,7 +174,7 @@ public extension ConnectManager {
     
     func signout() {
         token = nil
-        coreUser = nil
+        CoreAppControl.shared.user = nil
         isSignedIn = false
         user = nil
 

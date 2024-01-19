@@ -18,11 +18,11 @@ public class ConnectError: AlpineError {
     }
     
     public override func getType() -> String {
-        "\(String(describing: Self.self))-\(type.rawValue)"
+        "\(type.rawValue)"
     }
 }
 
 public enum ConnectErrorType: String {
-    case login
-    case storage
+    case login = "Login Error"
+    case storage = "Storage Error"
 }

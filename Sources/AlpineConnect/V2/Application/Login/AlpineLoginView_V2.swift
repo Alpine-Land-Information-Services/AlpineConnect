@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AlpineUI
+import AlpineCore
 
 struct AlpineLoginView_V2: View {
     
@@ -183,7 +184,6 @@ extension AlpineLoginView_V2 {
             manager.isSignedIn = true
         }
     }
-
 }
 
 private extension AlpineLoginView_V2 {

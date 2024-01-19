@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import AlpineCore
 
 struct UserAppView<App: View>: View {
     
@@ -16,30 +17,40 @@ struct UserAppView<App: View>: View {
     
     @EnvironmentObject var manager: ConnectManager
 
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([ConnectUser_MOVED_TO_CORE.self])
-        
+    let sharedModelContainer: ModelContainer = {
+        let schema = Schema([CoreUser.self])
         let modelConfiguration = ModelConfiguration("Connect User Data", schema: schema, isStoredInMemoryOnly: false)
-        
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-            ConnectManager.shared.modelContainer = container
+            CoreAppControl.shared.modelContainer = container
             return container
-            
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
-        
     }()
     
     @Environment(\.modelContext) private var modelContext
-    @Query private var users: [ConnectUser_MOVED_TO_CORE]
+    
+    @Query private var users: [CoreUser]
+    
+    init(userID: String, @ViewBuilder app: () -> App ) {
+        self.userID = userID
+        self.app = app()
+        _users = Query(filter: #Predicate<CoreUser> { $0.id == userID })
+        CoreAppControl.shared.user = users.first ?? assingUser(id: userID)
+    }
     
     var body: some View {
         app
             .modelContainer(sharedModelContainer)
             .onAppear {
-                manager.coreUser = users.first
             }
+    }
+    
+    func assingUser(id: String) -> CoreUser {
+        let user = CoreUser(id: id)
+        sharedModelContainer.mainContext.insert(user)
+        try? sharedModelContainer.mainContext.save()
+        return user
     }
 }

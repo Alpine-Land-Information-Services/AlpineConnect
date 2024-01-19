@@ -47,5 +47,3 @@ private extension ConnectUser {
         return data
     }
 }
-
-
