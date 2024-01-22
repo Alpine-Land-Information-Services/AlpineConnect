@@ -8,6 +8,7 @@
 import CoreData
 import AlpineCore
 import PostgresClientKit
+import PopupKit
 
 public class SyncManager {
     
@@ -63,7 +64,7 @@ public class SyncManager {
     
     public func sync(type: SyncType, isBackground: Bool = false, doBefore: (() -> ())?, doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), doAfter: (() -> ())?) async {
         guard tracker.internalStatus == .none else {
-            AppControlOld.makeSimpleAlert(title: "Already Syncing", message: "Please wait for the current sync to complete.")
+            Core.makeSimpleAlert(title: "Already Syncing", message: "Please wait for the current sync to complete.")
             return
         }
         
@@ -106,7 +107,7 @@ public class SyncManager {
         
         guard await NetworkMonitor.shared.canConnectToServer() else {
             if isForeground {
-                AppControlOld.makeSimpleAlert(title: "Connection Timeout", message: "Cannot connect to server in reasonable time, please try again later.")
+                Core.makeSimpleAlert(title: "Connection Timeout", message: "Cannot connect to server in reasonable time, please try again later.")
             }
             tracker.updateStatus(.error)
             return
@@ -126,7 +127,7 @@ public class SyncManager {
         case .exportOnly, .exportOnlyNoUI:
             await exportOnly(doInBetween: doInBetween, exportable: exportable)
         case .none:
-            AppControlOld.makeSimpleAlert(title: "Invalid Status", message: "Sync type cannot be 'none'.")
+            Core.makeSimpleAlert(title: "Invalid Status", message: "Sync type cannot be 'none'.")
         }
         
         guard tracker.status != .error && !isSyncCanceled else {
@@ -193,7 +194,7 @@ private extension SyncManager {
             }
         }
         catch {
-            AppControlOld.makeError(onAction: "Sync Actions Save", error: error, showToUser: isForeground)
+            Core.makeError(error: error, additionalInfo: "Sync Actions Save", showToUser: isForeground)
         }
     }
     
@@ -208,7 +209,7 @@ private extension SyncManager {
     
     func allowSync() -> Bool {
         guard !tracker.isDoingSomeSync else {
-            AppControlOld.makeSimpleAlert(title: "Syncing", message: "Please wait for the sync process to complete before proceeding.")
+            Core.makeSimpleAlert(title: "Syncing", message: "Please wait for the sync process to complete before proceeding.")
             return false
         }
         return true
@@ -275,22 +276,28 @@ extension SyncManager { //MARK: Cancel
     
     func userSyncCancelAlert() {
         guard activeConnection != nil else {
-            AppControlOld.makeSimpleAlert(title: "Not Syncing", message: "Cannot cancel as there is no sync in progress.")
+            Core.makeSimpleAlert(title: "Not Syncing", message: "Cannot cancel as there is no sync in progress.")
             return
         }
         
-        let alert = AppAlert(title: "Cancel Sync?", message: "Current sync process will be canceled.", dismiss: AlertAction(text: "No", role: .dismiss, action: {}), actions: [AlertAction(text: "Proceed", role: .alert, action: {
+        let alert = CoreAlert(title: "Cancel Sync?",
+                              message: "Current sync process will be canceled.",
+                              buttons: [AlertButton.no,
+                                        AlertButton(title: "Proceed", style: .destructive, action: {
             self.cancelSync()
         })])
         
-        AppControlOld.makeAlert(alert: alert)
+        Core.makeAlert(alert)
     }
     
     func promptForCancel() {
-        let alert = AppAlert(title: "Sync Timeout", message: "Current sync process is taking longer than the timeout threshold. \n\n Would you like to cancel or continue the process?", dismiss: AlertAction(text: "Continue", role: .dismiss, action: {}), actions: [AlertAction(text: "Cancel It", role: .alert, action: {
+        let alert = CoreAlert(title: "Sync Timeout",
+                              message: "Current sync process is taking longer than the timeout threshold. \n\n Would you like to cancel or continue the process?",
+                              buttons: [AlertButton(title: "Continue", style: .cancel, action: {}),
+                                        AlertButton(title: "Cancel It", style: .destructive, action: {
             self.cancelSync()
         })])
-        AppControlOld.makeAlert(alert: alert)
+        Core.makeAlert(alert)
     }
 }
 
@@ -343,7 +350,7 @@ private extension SyncManager { //MARK: Import
         }
         catch {
             self.tracker.updateStatus(.error)
-            AppControlOld.makeError(onAction: "Saving Import Data", error: error, showToUser: isForeground)
+            Core.makeError(error: error, additionalInfo: "Saving Import Data", showToUser: isForeground)
         }
         
         try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
@@ -389,7 +396,7 @@ private extension SyncManager { //MARK: Import
                 catch {
                     self.nonCancelAction {
                         self.tracker.updateStatus(.error)
-                        AppControlOld.makeError(onAction: "Data Import", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
+                        Core.makeError(error: error, additionalInfo: self.currentQuery, showToUser: self.isForeground)
                     }
                     continuation.resume()
                 }
@@ -446,12 +453,11 @@ private extension SyncManager { //MARK: Export
         catch {
             nonCancelAction {
                 self.tracker.updateStatus(.error)
-                AppControlOld.makeError(onAction: "Saving Export Data", error: error, showToUser: self.isForeground)
+                Core.makeError(error: error, additionalInfo: "Saving Export Data", showToUser: self.isForeground)
             }
         }
         
         try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
-
     }
     
     func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
@@ -489,7 +495,7 @@ private extension SyncManager { //MARK: Export
                 catch {
                     self.nonCancelAction {
                         self.tracker.updateStatus(.error)
-                        AppControlOld.makeError(onAction: "Data Export", error: error, customDescription: self.currentQuery, showToUser: self.isForeground)
+                        Core.makeError(error: error, additionalInfo: self.currentQuery, showToUser: self.isForeground)
                     }
                     context.performAndWait {
                         context.rollback()

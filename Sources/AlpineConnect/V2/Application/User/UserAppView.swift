@@ -16,7 +16,7 @@ struct UserAppView<App: View>: View {
     @ViewBuilder var app: App
     
     @EnvironmentObject var manager: ConnectManager
-
+    
     let sharedModelContainer: ModelContainer = {
         let schema = Schema([CoreUser.self])
         let modelConfiguration = ModelConfiguration("Connect User Data", schema: schema, isStoredInMemoryOnly: false)
