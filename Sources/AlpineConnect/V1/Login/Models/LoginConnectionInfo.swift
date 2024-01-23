@@ -24,17 +24,38 @@ public struct LoginConnectionInfo {
 
 public struct PostgresInfo {
     
-    public init(host: String, databaseType: String, databaseName: String, timeout: Int?) {
+    public init(host: String, databaseName: String? = nil, dbNames: DBNames, timeout: Int?) {
         self.host = host
-        self.databaseType = databaseType
         self.databaseName = databaseName
         self.timeout = timeout
+        self.dbNames = dbNames
     }
     
     var host: String
-    var databaseType: String
-    var databaseName: String
+    var databaseName: String?
     var timeout: Int?
+    
+    var dbNames: DBNames
+}
+
+public struct DBNames {
+    
+    public init(productionName: String, sandboxName: String) {
+        self.productionName = productionName
+        self.sandboxName = sandboxName
+    }
+    
+    private var productionName: String
+    private var sandboxName: String
+    
+    func getName(from type: DatabaseType) -> String {
+        switch type {
+        case .production:
+            return productionName
+        case .sandbox:
+            return sandboxName
+        }
+    }
 }
 
 public struct LoginPageInfo {

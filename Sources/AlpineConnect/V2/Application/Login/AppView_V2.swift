@@ -42,6 +42,7 @@ public struct AppView_V2<App: View>: View {
                     ConnectManager.signout()
                 }
             }
+            .uiOrientationGetter
         }
         else {
             AlpineLoginView_V2(info: info)

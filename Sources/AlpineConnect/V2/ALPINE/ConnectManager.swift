@@ -82,16 +82,18 @@ extension ConnectManager {
             return processedResponse
         }
         
-        if let postgresInfo {
-            return try await attemptPostgresLogin(with: postgresInfo)
-        }
-        else {
+        //MARK: Connect user is initiated.
+        
+        guard var postgresInfo else {
             return processedResponse
         }
+        
+        postgresInfo.databaseName = user.database.rawValue
+        return try await attemptPostgresLogin(with: postgresInfo, dbName: postgresInfo.dbNames.getName(from: user.database))
     }
     
-    private func attemptPostgresLogin(with info: PostgresInfo) async throws -> ConnectionResponse {
-        postgres = PostgresManager(info, credentials: loginData)
+    private func attemptPostgresLogin(with info: PostgresInfo, dbName: String) async throws -> ConnectionResponse {
+        postgres = PostgresManager(info, credentials: loginData, dbName: dbName)
         return await loginInfo.appInfo.userTableConnect()
     }
     
