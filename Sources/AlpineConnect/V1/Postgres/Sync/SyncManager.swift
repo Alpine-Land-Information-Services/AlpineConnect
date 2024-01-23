@@ -62,7 +62,11 @@ public class SyncManager {
         }
     }
     
-    public func sync(type: SyncType, isBackground: Bool = false, doBefore: (() -> ())?, doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), doAfter: (() -> ())?) async {
+    public func sync(type: SyncType, isBackground: Bool = false,
+                     doBefore: (() -> ())?,
+                     doInBetween: ((_ context: NSManagedObjectContext) throws -> ()),
+                     doAfter: (() -> ())?) async
+    {
         guard tracker.internalStatus == .none else {
             Core.makeSimpleAlert(title: "Already Syncing", message: "Please wait for the current sync to complete.")
             return
@@ -94,7 +98,7 @@ public class SyncManager {
                 self.tracker.updateType(.none)
             }
             else if tracker.status != .error {
-                CurrentDBUser.updateSyncDate(tracker.currentSyncStartDate)
+                Connect.user.lastSync = tracker.currentSyncStartDate
                 self.tracker.updateStatus(.none)
                 self.tracker.updateType(.none)
             }
@@ -252,7 +256,7 @@ extension SyncManager { //MARK: Cancel
     func scheduleTimer() {
         if CurrentDBUser.syncTimeout != 0 {
             DispatchQueue.main.async { [self] in
-                timer = Timer.scheduledTimer(timeInterval: TimeInterval(CurrentDBUser.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+                timer = Timer.scheduledTimer(timeInterval: TimeInterval(Connect.user.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
             }
         }
     }
@@ -324,7 +328,7 @@ private extension SyncManager { //MARK: Import
         
         if tracker.status == .exportDone {
             DispatchQueue.main.async {
-                CurrentDBUser.requiresSync = false
+                Connect.user.requiresSync = false
             }
         }
     }
@@ -361,7 +365,7 @@ private extension SyncManager { //MARK: Import
         tracker.updateStatus(.importing)
         
         await withCheckedContinuation({ continuation in
-            NetworkManager.shared.pool?.withConnection { con_from_pool in
+            ConnectManager.shared.postgres?.pool?.withConnection { con_from_pool in
                 do {
                     try context.performAndWait {
                         let connection = try con_from_pool.get()
@@ -427,7 +431,7 @@ private extension SyncManager { //MARK: Export
         await exectuteImport(importable: importable)
         
         if tracker.status == .importDone {
-            CurrentDBUser.requiresSync = false
+            Connect.user.requiresSync = false
         }
     }
     

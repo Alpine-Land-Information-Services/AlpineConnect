@@ -139,7 +139,7 @@ extension SyncTracker {
 public extension SyncTracker {
     
     var isInitial: Bool {
-        CurrentDBUser.lastSync == nil
+        Connect.user.lastSync == nil
     }
     
     var status: SyncStatus {
@@ -158,7 +158,7 @@ public extension SyncTracker {
     func updateType(_ type: SyncManager.SyncType) {
         DispatchQueue.main.async {
             withAnimation {
-                print("updated type to\(type)")
+                print("updated type to \(type)")
                 self.syncType = type
             }
         }
