@@ -15,13 +15,39 @@ public protocol Importable: Syncable {
     static var selectQuery: String { get }
     static var shallCountRecords: Bool { get }
     
+    static var isAtlasObject: Bool { get }
+    
+    static var atlasSyncPredicate: NSPredicate { get }
+    static var atlasSyncBatchSize: Int { get }
+    
     static func needUpdate(in context: NSManagedObjectContext) -> Bool
     static func processPGResult(cursor: Cursor, in context: NSManagedObjectContext) throws
+    
+    static func performAtlasSynchronization(with data: [AtlasSynchronizer.FeatureSyncData]) async throws
 }
 
 public extension Importable {
     static var importable: Importable.Type {
         self as Importable.Type
+    }
+}
+
+public extension Importable { //MARK: Atlas
+    
+    static var isAtlasObject: Bool {
+        false
+    }
+    
+    static var atlasSyncBatchSize: Int {
+        100
+    }
+
+    static var atlasSyncPredicate: NSPredicate {
+        NSPredicate(format: "a_syncDate > %@", syncManager.tracker.currentSyncStartDate as CVarArg)
+    }
+    
+    static func performAtlasSynchronization(with data: [AtlasSynchronizer.FeatureSyncData]) async throws {
+        fatalError(#function + " must be implemented in client.")
     }
 }
 

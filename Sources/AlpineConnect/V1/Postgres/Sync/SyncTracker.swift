@@ -22,6 +22,8 @@ public class SyncTracker: ObservableObject {
         case importing
         case importDone
         
+        case atlasSync
+        
         case actions
         case saving
         
@@ -36,6 +38,7 @@ public class SyncTracker: ObservableObject {
         enum RecordType: String {
             case `import`
             case export
+            case atlasSync
         }
         
         var id = UUID()
@@ -146,11 +149,15 @@ public extension SyncTracker {
         internalStatus
     }
     
-    func updateStatus(_ status: SyncStatus) {
+    func updateStatus(_ status: SyncStatus, message: String? = nil) {
         internalStatus = status
+
         DispatchQueue.main.async {
             withAnimation {
                 self.slowStatus = status
+            }
+            if let message {
+                self.statusMessage = message
             }
         }
     }

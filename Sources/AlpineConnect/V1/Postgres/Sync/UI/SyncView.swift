@@ -12,7 +12,7 @@ public struct SyncView: View {
     
     @StateObject var viewModel: SyncViewModel
     @ObservedObject var tracker: SyncTracker
-
+    
     @Environment(\.dismiss) var dismiss
     
     public init(for sync: SyncManager) {
@@ -48,7 +48,7 @@ public struct SyncView: View {
             }
         }
         .interactiveDismissDisabled(tracker.status != .none && tracker.status != .canceled)
-        .onChange(of: tracker.status) { newValue, _ in
+        .onChange(of: tracker.status) { _, newValue in
             if newValue == .none || newValue == .canceled {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                     dismiss()
@@ -164,30 +164,3 @@ public struct SyncView: View {
         }
     }
 }
-
-//struct SyncView_Previews: PreviewProvider {
-//        
-//    static var previews: some View {
-//        SyncTest()
-//    }
-//    
-//    struct SyncTest: View {
-//        
-//        var body: some View {
-//            VStack {
-//                
-//            }
-//            .sheet(isPresented: .constant(true)) {
-//                SyncView(for: <#Sync#>)
-//            }
-//            .onAppear {
-//                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .import, recordsCount: 0))
-//                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 0))
-//                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .import, recordsCount: 123))
-//                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 123))
-//                SyncTracker.shared.syncRecords.append(SyncTracker.SyncableRecord(name: "Test Site Calling", type: .export, recordsCount: 123))
-//
-//            }
-//        }
-//    }
-//}

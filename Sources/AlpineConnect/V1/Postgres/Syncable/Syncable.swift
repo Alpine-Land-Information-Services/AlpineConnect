@@ -16,10 +16,16 @@ public protocol Syncable: CDObject {
     
     static var syncManager: SyncManager { get }
     
+    static var isSavedIndependently: Bool { get }
+    
     var isLocal: Bool { get }
 }
 
 public extension Syncable {
+    
+    static var isSavedIndependently: Bool {
+        false
+    }
     
     static var isImportable: Bool {
         self as? Importable.Type != nil

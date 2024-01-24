@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 import PopupKit
 import AlpineCore
@@ -17,18 +18,34 @@ public struct AppView_V2<App: View>: View {
     
     var info: LoginConnectionInfo
     
+    let sharedModelContainer: ModelContainer = {
+        let schema = Schema([CoreUser.self])
+        let modelConfiguration = ModelConfiguration("Connect User Data", schema: schema, isStoredInMemoryOnly: false)
+        do {
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            CoreAppControl.shared.modelContainer = container
+            return container
+        }
+        catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
+    }()
+    
     public init(info: LoginConnectionInfo, @ViewBuilder app: @escaping (_ userID: String) -> App) {
         self.info = info
         self.app = app
-        
+        UIApplication.shared.connectedScenes.first?.inputView?.tintColor = .cyan
+
         print(code: .info, try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false))
         print(code: .info, FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas")!.absoluteString)
     }
     
     public var body: some View {
         host
-            .environmentObject(manager)
             .popupPresenter
+            .uiOrientationGetter
+            .environmentObject(manager)
+            .modelContainer(sharedModelContainer)
     }
     
     @ViewBuilder var host: some View {
@@ -42,7 +59,6 @@ public struct AppView_V2<App: View>: View {
                     ConnectManager.signout()
                 }
             }
-            .uiOrientationGetter
         }
         else {
             AlpineLoginView_V2(info: info)

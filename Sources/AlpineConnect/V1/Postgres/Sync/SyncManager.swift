@@ -223,7 +223,9 @@ private extension SyncManager {
 public extension SyncManager {
     
     func showUI() {
-        AppControlOld.showSheet(view: SyncView(for: self))
+        Core.presentSheet {
+            SyncView(for: self)
+        }
     }
     
     func clear() {
@@ -357,12 +359,13 @@ private extension SyncManager { //MARK: Import
             Core.makeError(error: error, additionalInfo: "Saving Import Data", showToUser: isForeground)
         }
         
+        await atlasSync(for: importable)
+        
         try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
     }
     
     func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
-        tracker.statusMessage("Importing")
-        tracker.updateStatus(.importing)
+        tracker.updateStatus(.importing, message: "Importing")
         
         await withCheckedContinuation({ continuation in
             ConnectManager.shared.postgres?.pool?.withConnection { con_from_pool in
@@ -465,11 +468,10 @@ private extension SyncManager { //MARK: Export
     }
     
     func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
-        tracker.updateStatus(.exporting)
-        tracker.statusMessage("Exporting")
+        tracker.updateStatus(.exporting, message: "Exporting")
         
         await withCheckedContinuation { continuation in
-            NetworkManager.shared.pool?.withConnection { result in
+            ConnectManager.shared.postgres?.pool?.withConnection { result in
                 do {
                     let connection = try result.get()
                     self.activeConnection = connection
@@ -505,6 +507,23 @@ private extension SyncManager { //MARK: Export
                         context.rollback()
                     }
                     continuation.resume()
+                }
+            }
+        }
+    }
+}
+
+extension SyncManager {
+    
+    func atlasSync(for objects: [Importable.Type]) async {
+        self.tracker.updateStatus(.atlasSync, message: "Performing Atlas Synchronization")
+        for object in objects {
+            if object.isAtlasObject {
+                do {
+                    try await AtlasSynchronizer(for: object, syncManager: self).synchronize(in: context)
+                }
+                catch {
+                    fatalError()
                 }
             }
         }
