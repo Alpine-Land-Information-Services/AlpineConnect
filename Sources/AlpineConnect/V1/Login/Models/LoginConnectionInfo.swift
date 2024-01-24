@@ -24,18 +24,20 @@ public struct LoginConnectionInfo {
 
 public struct PostgresInfo {
     
-    public init(host: String, databaseName: String? = nil, dbNames: DBNames, timeout: Int?) {
+    public init(host: String, databaseType: DatabaseType? = nil, dbNames: DBNames, timeout: Int?) {
         self.host = host
-        self.databaseName = databaseName
+        self.databaseType = databaseType ?? .production
         self.timeout = timeout
         self.dbNames = dbNames
     }
     
     var host: String
-    var databaseName: String?
-    var timeout: Int?
-    
     var dbNames: DBNames
+    var databaseType: DatabaseType
+    var databaseName: String {
+        dbNames.getName(from: databaseType)
+    }
+    var timeout: Int?
 }
 
 public struct DBNames {

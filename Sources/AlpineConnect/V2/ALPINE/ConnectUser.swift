@@ -59,7 +59,7 @@ public extension ConnectUser {
     
     var lastSync: Date? {
         get {
-            switch database {
+            switch databaseType {
             case .production:
                 return value(for: "last_sync") as? Date
             case .sandbox:
@@ -67,7 +67,7 @@ public extension ConnectUser {
             }
         }
         set {
-            switch database {
+            switch databaseType {
             case .production:
                 setValue(newValue, for: "last_sync", doSave: false)
             case .sandbox:
@@ -80,7 +80,7 @@ public extension ConnectUser {
         }
     }
     
-    var database: DatabaseType {
+    var databaseType: DatabaseType {
         get {
             let db = value(for: "database") as? String ?? DatabaseType.production.rawValue
             return DatabaseType(rawValue: db) ?? .production

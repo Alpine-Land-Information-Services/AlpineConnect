@@ -12,7 +12,7 @@ public class PostgresManager {
     
     public var pool: ConnectionPool?
     
-    init(_ info: PostgresInfo, credentials: CredentialsData, dbName: String) {
+    init(_ info: PostgresInfo, credentials: CredentialsData) {
         
         var connectionPoolConfiguration = ConnectionPoolConfiguration()
         connectionPoolConfiguration.maximumConnections = 10
@@ -24,10 +24,10 @@ public class PostgresManager {
 
         var configuration = PostgresClientKit.ConnectionConfiguration()
         configuration.host = info.host
-        configuration.database = dbName
+        configuration.database = info.databaseName
         configuration.user = credentials.email
         configuration.credential = .scramSHA256(password: credentials.password)
-        configuration.applicationName = dbName
+        configuration.applicationName = info.databaseName
         
         pool = ConnectionPool(connectionPoolConfiguration: connectionPoolConfiguration, connectionConfiguration: configuration)
     }
