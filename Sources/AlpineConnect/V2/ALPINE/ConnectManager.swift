@@ -43,7 +43,14 @@ public class ConnectManager: ObservableObject {
     }
     
     static func reset() {
-        ConnectManager.shared = ConnectManager()
+        shared.isSignedIn = false
+        shared.id = UUID()
+        shared.user = nil
+        shared.token = nil
+        shared.loginData = nil
+        shared.loginInfo = nil
+        shared.postgresInfo = nil
+        shared.postgres = nil
     }
 }
 
