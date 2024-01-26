@@ -12,16 +12,10 @@ import AlpineCore
 
 public class AtlasSynchronizer {
     
-    public struct FeatureSyncData {
-        public var layerName: String
-        public var guid: UUID
-        public var wkt: String
-    }
-
     var syncManager: SyncManager
-    var objectType: Importable.Type
+    var objectType: AtlasSyncable.Type
     
-    init(for objectType: Importable.Type, syncManager: SyncManager) {
+    init(for objectType: AtlasSyncable.Type, syncManager: SyncManager) {
         self.objectType = objectType
         self.syncManager = syncManager
     }
@@ -29,7 +23,7 @@ public class AtlasSynchronizer {
     func synchronize(in context: NSManagedObjectContext) async throws {
         var totalObjectsCount = 0
         try context.performAndWait {
-            totalObjectsCount = try objectType.getCount(using: objectType.atlasSyncPredicate, in: context)
+            totalObjectsCount = try objectType.getCount(using: objectType.syncPredicate, in: context)
         }
         syncManager.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: totalObjectsCount)
 
@@ -37,14 +31,16 @@ public class AtlasSynchronizer {
             return
         }
 
-        let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.atlasSyncPredicate, sortDescriptors: nil, with: objectType.atlasSyncBatchSize, isModifying: false)
+        let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.syncPredicate, sortDescriptors: nil, with: objectType.syncBatchSize, isModifying: false)
         
-        var objects: [Importable]? = []
-        var featureData = [FeatureSyncData]()
+        var objects: [AtlasSyncable]? = []
+        var featureData = [AtlasFeatureData]()
+        
+        try await objectType.createLayerIfNecessary()
         
         repeat {
             try context.performAndWait {
-                objects = try batchFetcher.fetchObjectBatch(in: context) as? [Importable]
+                objects = try batchFetcher.fetchObjectBatch(in: context) as? [AtlasSyncable]
                 objects?.forEach { $0.observeDeallocation() }
                 if let objects = objects {
                     featureData = try createAtlasData(from: objects)
@@ -56,16 +52,20 @@ public class AtlasSynchronizer {
             
         } while objects != nil
 
+        try objectType.clearCache()
         syncManager.tracker.endRecordSync()
     }
     
-    func createAtlasData(from objects: [Importable]) throws -> [FeatureSyncData] {
-        var data = [FeatureSyncData]()
+    func createAtlasData(from objects: [AtlasSyncable]) throws -> [AtlasFeatureData] {
+        var data = [AtlasFeatureData]()
         for object in objects {
-            guard let geometry = object.value(forKey: "a_geometry") as? String else {
+            guard let geometry = object.geometry else {
                 continue
             }
-            data.append(FeatureSyncData(layerName: object.displayName, guid: object.guid, wkt: geometry))
+            
+            let fields = [AtlasFieldData(name: "UNIQ_ID", value: object.guid.uuidString)]
+            let featureData = AtlasFeatureData(wkt: geometry, fields: fields)
+            data.append(featureData)
         }
         
         return data

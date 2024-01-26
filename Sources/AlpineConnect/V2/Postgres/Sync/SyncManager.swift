@@ -515,10 +515,10 @@ private extension SyncManager { //MARK: Export
 
 extension SyncManager {
     
-    func atlasSync(for objects: [Importable.Type]) async {
+    func atlasSync(for importables: [Importable.Type]) async {
         self.tracker.updateStatus(.atlasSync, message: "Performing Atlas Synchronization")
-        for object in objects {
-            if object.isAtlasObject {
+        for importable in importables {
+            if let object = importable as? AtlasSyncable.Type {
                 do {
                     try await AtlasSynchronizer(for: object, syncManager: self).synchronize(in: context)
                 }
