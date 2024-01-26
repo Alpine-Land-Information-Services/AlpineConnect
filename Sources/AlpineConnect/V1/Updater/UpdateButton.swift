@@ -23,12 +23,12 @@ public struct UpdateButton: View {
             Text("Check for Update")
                 .foregroundColor(.accentColor)
         }
-        .onChange(of: viewModel.showAlert) { show, _ in
+        .onChange(of: viewModel.showAlert) { _, show in
             if show {
                 viewModel.newAlert()
             }
         }
-        .onChange(of: control.showAlert) { show, _ in
+        .onChange(of: control.showAlert) { _, show in
             if !show {
                 viewModel.showAlert = false
             }

@@ -59,7 +59,7 @@ struct PasswordChangeView: View {
                 }
             }
         }
-        .onChange(of: viewModel.dismiss) { _ in
+        .onChange(of: viewModel.dismiss) { _, _ in
             presentationMode.wrappedValue.dismiss()
         }
         .navigationViewStyle(.stack)
@@ -84,7 +84,7 @@ struct PasswordChangeView: View {
             Divider()
             SpinnerButton(label: "Change Password", action: viewModel.changePassword, isDisabled: viewModel.allFieldsFilled(), activated: $viewModel.showSpinner)
         }
-        .onChange(of: viewModel.newPassword) { pass, _ in
+        .onChange(of: viewModel.newPassword) { _, pass in
             let str = viewModel.checkPasswordScore(password: pass)
             viewModel.passwordStrenght = viewModel.checkPassStr(str).0
         }

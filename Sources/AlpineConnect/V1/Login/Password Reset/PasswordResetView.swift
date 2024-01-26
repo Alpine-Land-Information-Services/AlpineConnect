@@ -43,7 +43,7 @@ struct PasswordResetView: View {
                     Button("Cancel", action: {open.toggle()})
                 }
             }
-            .onChange(of: viewModel.open) { value, _ in
+            .onChange(of: viewModel.open) { _, value in
                 open = value
             }
             .alert(viewModel.alert().0, isPresented: $viewModel.showAlert, actions: {

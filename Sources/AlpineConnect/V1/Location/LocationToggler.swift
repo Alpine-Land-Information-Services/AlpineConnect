@@ -14,7 +14,7 @@ struct LocationToggler: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .onChange(of: scenePhase) { newValue, _ in
+            .onChange(of: scenePhase) { _, newValue in
                 switch newValue {
                 case .active:
                     Location.shared.resume()

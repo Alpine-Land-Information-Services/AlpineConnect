@@ -161,7 +161,7 @@ public struct PhotoCollectionBlock<Label: View>: View {
                     }
                 }
         }
-        .onChange(of: viewModel.takingPhoto) { taking, _ in
+        .onChange(of: viewModel.takingPhoto) { _, taking in
             if !taking {
                 changed.toggle()
             }
