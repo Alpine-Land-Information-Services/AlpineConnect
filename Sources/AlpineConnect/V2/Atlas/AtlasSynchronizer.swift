@@ -63,7 +63,8 @@ public class AtlasSynchronizer {
                 continue
             }
             
-            let fields = [AtlasFieldData(name: "UNIQ_ID", value: object.guid.uuidString)]
+            let fields = [AtlasFieldData(name: "UNIQ_ID", value: object.guid.uuidString),
+                          AtlasFieldData(name: "OBJECT_TYPE", value: objectType.entityName)]
             let featureData = AtlasFeatureData(wkt: geometry, fields: fields)
             data.append(featureData)
         }

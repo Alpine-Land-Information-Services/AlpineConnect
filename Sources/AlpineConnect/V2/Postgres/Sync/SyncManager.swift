@@ -523,7 +523,7 @@ extension SyncManager {
                     try await AtlasSynchronizer(for: object, syncManager: self).synchronize(in: context)
                 }
                 catch {
-                    fatalError()
+                    Core.shared.makeError(error: error)
                 }
             }
         }

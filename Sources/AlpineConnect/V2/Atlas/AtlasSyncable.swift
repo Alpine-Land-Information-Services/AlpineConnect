@@ -12,6 +12,8 @@ public protocol AtlasSyncable: AtlasObject, Importable {
     
     static var syncBatchSize: Int { get }
     static var syncPredicate: NSPredicate { get }
+    
+    static var isEditable: Bool { get }
         
     static func performAtlasSynchronization(with data: [AtlasFeatureData]) async throws
     static func createLayerIfNecessary() async throws
