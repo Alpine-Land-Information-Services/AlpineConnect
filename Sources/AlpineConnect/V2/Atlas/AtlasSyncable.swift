@@ -19,6 +19,8 @@ public protocol AtlasSyncable: AtlasObject, Importable {
     static func createLayerIfNecessary() async throws
     
     static func clearCache() throws
+    
+    func updateWithGeometry(_ geometry: String?)
 }
 
 public extension AtlasSyncable {
