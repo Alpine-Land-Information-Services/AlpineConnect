@@ -22,7 +22,7 @@ public class AppReset {
         case g
     }
     
-    private static let currectAppResetCode = "314_"
+    private static let currectAppResetCode = "b3_a.d.p.g"
     private static let appResetCodeKey = "AC_app_reset_code"
     
     public static func checkNeedReset() {
@@ -30,19 +30,26 @@ public class AppReset {
             if code == currectAppResetCode {
                 return
             }
-            
-            let components = currectAppResetCode.components(separatedBy: "_")
-            if components.count == 2 {
-                let deletion = components[1].components(separatedBy: ".")
-                for item in deletion {
-                    if let source = DeleteSource(rawValue: item) {
-                        delete(from: source)
-                    }
+            performReset()
+        }
+        else {
+            performReset()
+        }
+        
+        UserDefaults.standard.setValue(currectAppResetCode, forKey: appResetCodeKey)
+        UserDefaults.standard.synchronize()
+    }
+    
+    private static func performReset() {
+        let components = currectAppResetCode.components(separatedBy: "_")
+        if components.count == 2 {
+            let deletion = components[1].components(separatedBy: ".")
+            for item in deletion {
+                if let source = DeleteSource(rawValue: item) {
+                    delete(from: source)
                 }
             }
         }
-        UserDefaults.standard.setValue(currectAppResetCode, forKey: appResetCodeKey)
-        UserDefaults.standard.synchronize()
     }
     
     private static func delete(from source: DeleteSource) {

@@ -16,4 +16,5 @@ public extension Notification.Name {
     
     static let AC_DataSessionComplete = Notification.Name("AC_DataSessionComplete")
 
+    static let AC_SyncComplete = Notification.Name("AC_SyncComplete")
 }

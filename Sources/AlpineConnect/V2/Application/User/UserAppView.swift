@@ -29,11 +29,17 @@ struct UserAppView<App: View>: View {
     }
     
     var body: some View {
-        app
-            .environment(CoreAppControl.shared)
-            .onAppear {
-                CoreAppControl.shared.user = users.first ?? assingUser(id: userID)
-            }
+        if CoreAppControl.shared.user == nil {
+            ProgressView()
+                .scaleEffect(2)
+                .onAppear {
+                    CoreAppControl.shared.user = users.first ?? assingUser(id: userID)
+                }
+        }
+        else {
+            app
+                .environment(CoreAppControl.shared)
+        }
     }
     
     func assingUser(id: String) -> CoreUser {
