@@ -45,9 +45,9 @@ public class CDObjects {
                 doAfter()
             }
             
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(.viewUpdate(with: "reloadSidebar"))
-            }
+//            DispatchQueue.main.async {
+//                NotificationCenter.default.post(.viewUpdate(with: "reloadSidebar"))
+//            }
             return .success(())
         }
     }
@@ -70,5 +70,11 @@ public class CDObjects {
             
             return result
         }
+    }
+}
+
+extension ObjectContainer {
+    public var atlasSyncableObjects: [AtlasSyncable.Type] {
+        objects.filter({ $0 is AtlasSyncable.Type}) as! [AtlasSyncable.Type]
     }
 }

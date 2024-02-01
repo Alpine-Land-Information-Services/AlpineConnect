@@ -181,7 +181,7 @@ private extension SyncManager {
     
     func sortTypes(_ objects: [CDObject.Type]) -> ([Importable.Type], [any Exportable.Type]) {
         let importable = objects.filter({$0 is Importable.Type})
-        let exportable =  objects.filter({$0 is any Exportable.Type})
+        let exportable = objects.filter({$0 is any Exportable.Type})
         
         return (importable as! [Importable.Type], exportable as! [any Exportable.Type])
     }
@@ -528,5 +528,11 @@ extension SyncManager {
             }
         }
     }
+    
+    // deleting only *.fgb files from project folder
+    public func atlasClear(for atlasSyncable: [AtlasSyncable.Type]) throws {
+        for syncable in atlasSyncable {
+            try syncable.deleteLayer()
+        }
+    }
 }
-

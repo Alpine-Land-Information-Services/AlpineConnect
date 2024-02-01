@@ -34,6 +34,10 @@ public extension CGSize {
     func center() -> CGPoint {
         CGPoint(x: self.width / 2, y: self.height / 2)
     }
+    
+    func proportion() -> Double {
+        width != 0 ? height / width : 0        
+    }
 }
 
 

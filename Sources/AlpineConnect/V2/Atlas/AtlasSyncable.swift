@@ -19,6 +19,7 @@ public protocol AtlasSyncable: AtlasObject, Importable {
     static func createLayerIfNecessary() async throws
     
     static func clearCache() throws
+    static func deleteLayer() throws
     
     func updateWithGeometry(_ geometry: String?)
 }
