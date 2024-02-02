@@ -42,13 +42,14 @@ public class AtlasSynchronizer {
             try context.performAndWait {
                 objects = try batchFetcher.fetchObjectBatch(in: context) as? [AtlasSyncable]
                 objects?.forEach { $0.observeDeallocation() }
-                if let objects = objects {
+                if let objects {
                     featureData = try createAtlasData(from: objects)
                 }
             }
             
             try await objectType.performAtlasSynchronization(with: featureData)
             syncManager.tracker.progressUpdate(adding: Double(featureData.count))
+            featureData.removeAll()
             
         } while objects != nil
 
