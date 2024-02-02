@@ -21,6 +21,7 @@ public class PostgresManager {
         connectionPoolConfiguration.allocatedConnectionTimeout = info.timeout
         connectionPoolConfiguration.dispatchQueue = DispatchQueue.global()
         connectionPoolConfiguration.metricsResetWhenLogged = false
+        connectionPoolConfiguration.metricsLoggingInterval = nil
 
         var configuration = PostgresClientKit.ConnectionConfiguration()
         configuration.host = info.host
