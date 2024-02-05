@@ -20,7 +20,7 @@ class Exporter {
     }
 
     deinit {
-        print("Releasing Exporter for \(objectType.entityName)")
+//        print("Releasing Exporter for \(objectType.entityName)")
     }
 
     func export(with connection: Connection, in context: NSManagedObjectContext) throws {

@@ -17,7 +17,7 @@ public protocol Importable: Syncable {
     
     static func needUpdate(in context: NSManagedObjectContext) -> Bool
     static func processPGResult(cursor: Cursor, in context: NSManagedObjectContext) throws
-    
+    static func cleanObsoleteData(in context: NSManagedObjectContext) -> Bool
 }
 
 public extension Importable {
@@ -26,25 +26,6 @@ public extension Importable {
     }
 }
 
-//public extension Importable { //MARK: Atlas
-//    
-//    static var isAtlasObject: Bool {
-//        false
-//    }
-//    
-//    static var atlasSyncBatchSize: Int {
-//        100
-//    }
-//
-//    static var atlasSyncPredicate: NSPredicate {
-//        NSPredicate(format: "a_syncDate > %@", syncManager.tracker.currentSyncStartDate as CVarArg)
-//    }
-//    
-//    static func performAtlasSynchronization(with data: [AtlasSynchronizer.FeatureSyncData]) async throws {
-//        fatalError(#function + " must be implemented in client.")
-//    }
-//}
-
 public extension Importable {
     
     static func needUpdate(in context: NSManagedObjectContext) -> Bool {
@@ -52,6 +33,10 @@ public extension Importable {
     }
     
     static var shallCountRecords: Bool { true }
+    
+    static func cleanObsoleteData(in context: NSManagedObjectContext) -> Bool {
+        return false
+    }
 }
 
 public extension Importable {
@@ -75,7 +60,7 @@ public extension Importable {
                 guard recCount != 0 else { return true }
             }
             else {
-                print("---------------->>> \(Self.entityName)")
+                print("-- import  >>>  \(Self.entityName)")
             }
                         
             let statement = try connection.prepareStatement(text: text)
@@ -108,7 +93,7 @@ public extension Importable {
         for row in c_cursor {
             recCount = try row.get().columns[0].int()
         }
-        print("---------------->>> \(Self.entityName): \(recCount)")
+//        print("---------------->>> \(Self.entityName): \(recCount)")
         
         return recCount
     }

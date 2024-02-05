@@ -361,6 +361,8 @@ private extension SyncManager { //MARK: Import
         
         await atlasSync(for: importable)
         
+        await doClean(in: context, objects: importable)
+        
         try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
     }
     
@@ -409,6 +411,18 @@ private extension SyncManager { //MARK: Import
                 }
             }
         })
+    }
+    
+    func doClean(in context: NSManagedObjectContext, objects: [Importable.Type]) async {
+        var needSave = false
+        context.performAndWait {
+            for object in objects {
+                needSave = object.cleanObsoleteData(in: context) || needSave
+            }
+            if needSave {
+                try? context.persistentSave()
+            }
+        }
     }
 }
 

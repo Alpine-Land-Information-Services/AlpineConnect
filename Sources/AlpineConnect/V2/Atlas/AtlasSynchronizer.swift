@@ -34,22 +34,24 @@ public class AtlasSynchronizer {
         let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.syncPredicate, sortDescriptors: nil, with: objectType.syncBatchSize, isModifying: false)
         
         var objects: [AtlasSyncable]? = []
-        var featureData = [AtlasFeatureData]()
+        var featuresData = [AtlasFeatureData]()
+        var deleteFeatures = [UUID]()
         
         try await objectType.createLayerIfNecessary()
         
         repeat {
             try context.performAndWait {
                 objects = try batchFetcher.fetchObjectBatch(in: context) as? [AtlasSyncable]
-                objects?.forEach { $0.observeDeallocation() }
+//                objects?.forEach { $0.observeDeallocation() }
                 if let objects {
-                    featureData = try createAtlasData(from: objects)
+                    (featuresData, deleteFeatures) = try createAtlasData(from: objects)
                 }
             }
-            
-            try await objectType.performAtlasSynchronization(with: featureData)
-            syncManager.tracker.progressUpdate(adding: Double(featureData.count))
-            featureData.removeAll()
+            guard !featuresData.isEmpty || !deleteFeatures.isEmpty else { break } 
+            try await objectType.performAtlasSynchronization(with: featuresData, deleting: deleteFeatures)
+            syncManager.tracker.progressUpdate(adding: Double(featuresData.count + deleteFeatures.count))
+            featuresData.removeAll()
+            deleteFeatures.removeAll()
             
         } while objects != nil
 
@@ -57,19 +59,23 @@ public class AtlasSynchronizer {
         syncManager.tracker.endRecordSync()
     }
     
-    func createAtlasData(from objects: [AtlasSyncable]) throws -> [AtlasFeatureData] {
+    func createAtlasData(from objects: [AtlasSyncable]) throws -> ([AtlasFeatureData], [UUID]) {
         var data = [AtlasFeatureData]()
+        var delete = [UUID]()
         for object in objects {
+            if object.deleted {
+                delete.append(object.guid)
+                continue
+            }
             guard let geometry = object.geometry else {
                 continue
             }
-            
             let fields = [AtlasFieldData(name: "UNIQ_ID", value: object.guid.uuidString),
                           AtlasFieldData(name: "OBJECT_TYPE", value: objectType.entityName)]
             let featureData = AtlasFeatureData(wkt: geometry, fields: fields)
             data.append(featureData)
         }
         
-        return data
+        return (data, delete)
     }
 }
