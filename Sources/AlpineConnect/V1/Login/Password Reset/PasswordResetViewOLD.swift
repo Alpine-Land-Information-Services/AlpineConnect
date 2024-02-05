@@ -1,5 +1,5 @@
 //
-//  PasswordResetView.swift
+//  PasswordResetViewOLD.swift
 //  AlpineConnect
 //
 //  Created by Jenya Lebid on 7/13/22.
@@ -8,7 +8,7 @@
 import SwiftUI
 import AlpineUI
 
-struct PasswordResetView: View {
+struct PasswordResetViewOLD: View {
     
     @StateObject var viewModel: PasswordResetViewModel
     
@@ -59,6 +59,6 @@ struct PasswordResetView: View {
 
 struct PasswordResetView_Previews: PreviewProvider {
     static var previews: some View {
-        PasswordResetView(open: .constant(true))
+        PasswordResetViewOLD(open: .constant(true))
     }
 }

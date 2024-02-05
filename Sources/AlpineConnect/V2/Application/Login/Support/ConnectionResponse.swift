@@ -33,9 +33,9 @@ public struct ConnectionResponse {
 
 public enum ConnectionDetail {
     case timeout
-    case enableKeychain
     case overrideKeychain
     case keychainSaveFail
+    case biometrics
 }
 
 public enum ConnectionResult {

@@ -6,27 +6,39 @@
 //
 
 import Foundation
+import LocalAuthentication
 
 class AuthManager {
     
-    var credentials: CredentialsData
+    var supportBiometricAuthType: LABiometryType = .none
     
-    init(credentials: CredentialsData) {
-        self.credentials = credentials
+    var bioType: String {
+        switch supportBiometricAuthType {
+        case .touchID:
+            return "Touch ID"
+        case .faceID:
+            return "Face ID"
+        default:
+            return "Unknown"
+        }
     }
     
-    func attemptToSave(for serverUser: ServerUserResponse) -> ConnectionResponse {
+    var biometricsAuthorized: Bool {
+        UserDefaults().bool(forKey: "AC_is_biometrics_authorized")
+    }
+
+    func attemptToSave(for serverUser: ServerUserResponse, with credentials: CredentialsData) -> ConnectionResponse {
         ConnectManager.shared.user = ConnectUser(for: serverUser)
         
         guard saveToKeychain(account: credentials.email, password: credentials.password) else {
             return ConnectionResponse(result: .moreDetail, detail: .keychainSaveFail)
         }
         
-        return saveUser()
+        return saveUser(with: credentials.email)
     }
     
-    func saveUser() -> ConnectionResponse {
-        UserDefaults.standard.setValue(credentials.email, forKey: "AC_last_login")
+    func saveUser(with email: String) -> ConnectionResponse {
+        UserDefaults.standard.setValue(email, forKey: "AC_last_login")
         return ConnectionResponse(result: .success)
     }
     
@@ -62,5 +74,81 @@ class AuthManager {
         }
         
         return nil
+    }
+}
+
+extension AuthManager {
+    
+    func authorizeBiometrics() {
+        UserDefaults().setValue(true, forKey: "AC_is_biometrics_authorized")
+    }
+    
+    func setRemindLaterForBiometrics() {
+        UserDefaults().setValue(Date(), forKey: "AC_last_biometrics_ask_date")
+    }
+    
+    func isBiometricEnabledOnDevice() async -> Bool {
+        await withCheckedContinuation { continuation in
+            let context = LAContext()
+            var contextError: NSError?
+            
+            if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
+                self.supportBiometricAuthType = context.biometryType
+                continuation.resume(returning: true)
+            }
+            else {
+                continuation.resume(returning: false)
+            }
+        }
+    }
+    
+    func askForBioMetricAuthenticationSetup() async -> Bool {
+        guard !biometricsAuthorized else { return false }
+        guard await checkIfPromptForBioSetUp() else { return false }
+        
+        if await isBiometricEnabledOnDevice() {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    
+    func checkIfPromptForBioSetUp() async -> Bool {
+        if let lastAskedDate = fetchLastBioAskDate() {
+            let numberOfDays = Date().daysBetweenDates(startDate: lastAskedDate)
+            if numberOfDays < 3 {
+                return false
+            } else {
+                return true
+            }
+        } else {
+            return true
+        }
+    }
+    
+    func fetchLastBioAskDate() -> Date? {
+        if let date = UserDefaults().value(forKey: "AC_last_biometrics_ask_date") as? Date {
+            return date
+        } else {
+            return nil
+        }
+    }
+}
+
+extension AuthManager {
+    
+    func runBioAuth(completionHandler: @escaping(Bool) -> ()) {
+        let context = LAContext()
+        var contextError: NSError?
+        if context.canEvaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, error: &contextError) {
+            context.evaluatePolicy(LAPolicy.deviceOwnerAuthenticationWithBiometrics, localizedReason: "Confirm To Sign In") { result, error in
+                if result {
+                    completionHandler(true)
+                } else {
+                    completionHandler(false)
+                }
+            }
+        }
     }
 }

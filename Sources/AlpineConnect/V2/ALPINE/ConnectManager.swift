@@ -21,11 +21,14 @@ public class ConnectManager: ObservableObject {
     @Published public var token: Token?
     
     @Published var isSignedIn = false
-    
+    @Published public var inOfflineMode = false
+
     @Published public var id = UUID()
     
     private var loginData: CredentialsData!
     private var loginInfo: LoginConnectionInfo!
+    var authManager: AuthManager = AuthManager()
+    
     
     private var postgresInfo: PostgresInfo?
     var isPostgresEnabled: Bool {
@@ -44,6 +47,7 @@ public class ConnectManager: ObservableObject {
     
     static func reset() {
         shared.isSignedIn = false
+        shared.inOfflineMode = false
         shared.id = UUID()
         shared.user = nil
         shared.token = nil
@@ -63,19 +67,30 @@ extension ConnectManager {
     }
     
     func attemptLogin(offline: Bool) async throws -> ConnectionResponse {
-        guard await NetworkMonitor.shared.canConnectToServer() else {
-            return ConnectionResponse(result: .moreDetail, detail: .timeout)
-        }
         guard loginData != nil, loginInfo != nil else {
             return ConnectionResponse(result: .fail, problem: ConnectionProblem.missingInfo())
         }
         
+        var response: ConnectionResponse
+        
         if isConnected && !offline {
-            return try await attemptOnlineLogin()
+            guard await NetworkMonitor.shared.canConnectToServer() else {
+                return ConnectionResponse(result: .moreDetail, detail: .timeout)
+            }
+            
+            response = try await attemptOnlineLogin()
         }
         else {
-            return await attemptOfflineLogin()
+            response = await attemptOfflineLogin()
         }
+        
+        if response.result == .success {
+            if await authManager.askForBioMetricAuthenticationSetup() {
+                response = ConnectionResponse(result: .moreDetail, detail: ConnectionDetail.biometrics)
+            }
+        }
+        
+        return response
     }
     
     func attemptOnlineLogin() async throws -> ConnectionResponse {
@@ -106,16 +121,70 @@ extension ConnectManager {
     
     private func processBackyardData(_ data: BackyardLogin.Response) async throws -> ConnectionResponse {
         createToken(from: data.sessionToken)
-        if let lastLogin = UserDefaults.standard.string(forKey: "AC_last_login") {
+        if let lastLogin = Connect.lastSavedLogin {
             if lastLogin != loginData.email {
                 return ConnectionResponse(result: .moreDetail, detail: .overrideKeychain)
             }
         }
-        return AuthManager(credentials: loginData).attemptToSave(for: data.user)
+        
+        return authManager.attemptToSave(for: data.user, with: loginData)
     }
     
     func attemptOfflineLogin() async -> ConnectionResponse {
-        fatalError()
+        guard let lastLogin = ConnectManager.lastSavedLogin else {
+            return ConnectionResponse(result: .fail, problem: ConnectionProblem(customAlert: ConnectAlert(title: "No Users Found", message: "To perform an offline sign in, an online sign in is required at least once.")))
+        }
+        guard loginData.email == lastLogin else {
+            return ConnectionResponse(result: .fail, problem: ConnectionProblem(customAlert: ConnectAlert(title: "Incorrect User", message: "Only \(lastLogin) is able to sign in while offline.")))
+        }
+        guard let storedPassword = AuthManager.retrieveFromKeychain(account: lastLogin) else {
+            return ConnectionResponse(result: .fail, problem: ConnectionProblem(customAlert: ConnectAlert(title: "No Stored Credentials", message: "Unable verify \(lastLogin) sign in data.")))
+        }
+        guard storedPassword == loginData.password else {
+            return ConnectionResponse(result: .fail, problem: ConnectionProblem(customAlert: ConnectAlert(title: "Incorrect Password", message: "Your password is incorrect.")))
+        }
+        guard let user = ConnectUser(for: lastLogin) else {
+            return ConnectionResponse(result: .fail, problem: ConnectionProblem(customAlert: ConnectAlert(title: "User Record Not Found", message: "Could not find existing record for \(lastLogin)")))
+        }
+        
+        self.user = user
+        inOfflineMode = true
+
+        return ConnectionResponse(result: .success)
+    }
+}
+
+public extension ConnectManager {
+    
+    func attemptOnlineConnection() async {
+        guard isConnected else {
+            Core.makeSimpleAlert(title: "Offline", message: "Cannot attempt online connection, you are offline.")
+            return
+        }
+        guard await NetworkMonitor.shared.canConnectToServer() else {
+            Core.makeSimpleAlert(title: "Server Connection Failed", message: "Could not establish connection with server, you might be in an area with poor connection.")
+            return
+        }
+        
+        do {
+            let response = try await attemptOnlineLogin()
+            switch response.result {
+            case .success:
+                Core.makeSimpleAlert(title: "Connection Successful", message: "You are now connected to Alpine Server.")
+            case .fail, .moreDetail:
+                if let problem = response.problem {
+                    let message = """
+                    Details:\n\n
+                    \(problem.title ?? "Unknown")\n\n
+                    \(problem.detail ?? "Unknown")
+                    """
+                    Core.makeSimpleAlert(title: "Connection Problem", message: message)
+                }
+            }
+        }
+        catch {
+            Core.shared.makeError(error: error)
+        }
     }
 }
 
@@ -156,25 +225,12 @@ extension ConnectManager {
             UserDefaults.standard.setValue(token?.encoded, forKey: "AC_backyard_token")
         }
     }
-    
-    func checkForBiometrics() -> ConnectionResponse {
-        guard !UserDefaults.standard.bool(forKey: "AC_biometrics_enabled") else {
-            return ConnectionResponse(result: .success)
-        }
-        
-        if let lastAskDate = UserDefaults.standard.value(forKey: "AC_last_keychain_ask_date") as? Date {
-            if !Date().isNumberOfDays(3, since: lastAskDate) {
-                return ConnectionResponse(result: .success)
-            }
-        }
-        return ConnectionResponse(result: .moreDetail, detail: .enableKeychain)
-    }
 }
 
 extension ConnectManager {
     
     func overrideCredentials() -> ConnectionResponse {
-        AuthManager(credentials: loginData).saveUser()
+        authManager.saveUser(with: loginData.email)
     }
 }
 
@@ -183,6 +239,10 @@ public extension ConnectManager {
     
     static var isAbleToGetToken: Bool {
         ConnectManager.shared.credentialsExist
+    }
+    
+    static var lastSavedLogin: String? {
+        UserDefaults.standard.string(forKey: "AC_last_login")
     }
     
     func signout() {

@@ -25,6 +25,14 @@ public class ConnectUser {
         data = Dictionary.getFromDefaults(key: serverUser.email) ?? Self.makeUser(for: serverUser)
     }
     
+    internal init?(for email: String) {
+        self.email = email
+        guard let data = Dictionary<String, Any>.getFromDefaults(key: email) else {
+            return nil
+        }
+        self.data = data
+    }
+    
     public func save() {
         data.saveToDefaults(key: email)
     }
@@ -82,7 +90,7 @@ public extension ConnectUser {
     
     var databaseType: DatabaseType {
         get {
-            let db = value(for: "database") as? String ?? DatabaseType.production.rawValue
+            let db = value(for: "database") as? String ?? DatabaseType.sandbox.rawValue // CHANGED TO SANDBOX FOR TESTING
             return DatabaseType(rawValue: db) ?? .production
         }
         set {

@@ -9,7 +9,7 @@ import Foundation
 
 public struct LoginConnectionInfo {
     
-    public init(appInfo: AppInfo, loginPageInfo: LoginPageInfo, postgresInfo: PostgresInfo?, trackingInfo: TrackingInfo?) {
+    public init(appInfo: AppInfo, loginPageInfo: LoginPageInfo, postgresInfo: PostgresInfo?, trackingInfo: TrackingInfo) {
         self.appInfo = appInfo
         self.loginPageInfo = loginPageInfo
         self.postgresInfo = postgresInfo
@@ -19,7 +19,7 @@ public struct LoginConnectionInfo {
     public var appInfo: AppInfo
     public var loginPageInfo: LoginPageInfo
     public var postgresInfo: PostgresInfo?
-    public var trackingInfo: TrackingInfo?
+    public var trackingInfo: TrackingInfo
 }
 
 public struct PostgresInfo {

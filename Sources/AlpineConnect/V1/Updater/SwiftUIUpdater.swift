@@ -20,35 +20,7 @@ public class SwiftUIUpdater: ObservableObject {
         
     }
     
-//    static public func checkForUpdate() {
-//        let monitor = NWPathMonitor()
-//        monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
-//        monitor.pathUpdateHandler = { path in
-//            if path.status == .satisfied {
-//                Updater.shared.checkVersion(name: Tracker.appName(), automatic: false, showMessage: { result, updateRequired in
-//                    if result || updateRequired {
-//                        switch Updater.shared.updateStatus {
-//                        case .error:
-//                            AppControl.makeSimpleAlert(title: "Something Went Wrong", message: "Please try again later.")
-//                        case .latestVersion:
-//                            AppControl.makeSimpleAlert(title: "No Updates", message: "You are on the latest version")
-//                        case .notConnected:
-//                            AppControl.makeSimpleAlert(title: "Not Connected", message: "Network connection required to check for updates.")
-//                        case .updatedAvailble:
-//                            let alert = AppAlert(title: "Update Available", message: <#T##String#>, dismiss: <#T##AlertAction#>, actions: <#T##[AlertAction]#>)
-//                        case .updateRequired:
-//                        }
-//                    }
-//                })
-//            }
-//            else {
-//                AppControl.makeSimpleAlert(title: "Not Connected", message: "Network connection required to check for updates.")
-//            }
-//        }
-//        monitor.cancel()
-//    }
-    
-    public func checkForUpdate(automatic: Bool) {
+    public func checkForUpdate(automatic: Bool, onComplete: @escaping () -> Void) {
         let monitor = NWPathMonitor()
         monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
         monitor.pathUpdateHandler = { path in
@@ -58,7 +30,7 @@ public class SwiftUIUpdater: ObservableObject {
                         self.alertToggle(show: true)
                     }
                     else {
-                        self.authenticationToggle()
+                        onComplete()
                     }
                 })
             }
@@ -66,7 +38,7 @@ public class SwiftUIUpdater: ObservableObject {
                 self.updater.updateStatus = .notConnected
                 if automatic {
                     self.alertToggle(show: false)
-                    self.authenticationToggle()
+                    onComplete()
                 }
                 else {
                     self.alertToggle(show: true)
@@ -76,11 +48,11 @@ public class SwiftUIUpdater: ObservableObject {
         monitor.cancel()
     }
     
-    func authenticationToggle() {
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(name: NSNotification.Name("UpdateStatus"), object: nil)
-        }
-    }
+//    func authenticationToggle() {
+//        DispatchQueue.main.async {
+//            NotificationCenter.default.post(name: NSNotification.Name("UpdateStatus"), object: nil)
+//        }
+//    }
     
     
     func alertToggle(show: Bool) {

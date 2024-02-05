@@ -18,7 +18,7 @@ public struct UpdateButton: View {
     
     public var body: some View {
         Button {
-            viewModel.checkForUpdate(automatic: false)
+            viewModel.checkForUpdate(automatic: false, onComplete: {})
         } label: {
             Text("Check for Update")
                 .foregroundColor(.accentColor)

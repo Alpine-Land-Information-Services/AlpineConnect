@@ -23,10 +23,17 @@ public struct UpdateCheckModifier: ViewModifier {
     public func body(content: Content) -> some View {
         content
             .task {
-                viewModel.checkForUpdate(automatic: automatic)
+                viewModel.checkForUpdate(automatic: automatic, onComplete: dissmissAction)
             }
             .alert(isPresented: $viewModel.showAlert) {
                 viewModel.alert(dismissAction: dissmissAction)
             }
+    }
+}
+
+extension View {
+    
+    func updateChecker(DBPassword: String, onDismiss: @escaping () -> Void) -> some View {
+        modifier(UpdateCheckModifier(automatic: true, dismissAction: onDismiss, DBPassword: DBPassword))
     }
 }

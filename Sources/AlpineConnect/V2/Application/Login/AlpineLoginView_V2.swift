@@ -20,6 +20,9 @@ struct AlpineLoginView_V2: View {
     @State private var isAlertPresented = false
     @State private var attemptingLogin = false
     
+    @State private var isRegistrationPresented = false
+    @State private var isPasswordResetPresented = false
+
     @State private var currentAlert = ConnectAlert.empty
     
     var info: LoginConnectionInfo
@@ -45,6 +48,7 @@ struct AlpineLoginView_V2: View {
             .padding(6)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             .ignoresSafeArea(.keyboard, edges: .all)
+            .updateChecker(DBPassword: info.trackingInfo.password, onDismiss: promptBioLogin)
         }
         .connectAlert(currentAlert, isPresented: $isAlertPresented)
         .onAppear {
@@ -52,6 +56,12 @@ struct AlpineLoginView_V2: View {
         }
         .onDisappear {
             clear()
+        }
+        .sheet(isPresented: $isRegistrationPresented) {
+            RegistationView()
+        }
+        .sheet(isPresented: $isPasswordResetPresented) {
+            PasswordResetView()
         }
     }
     
@@ -99,12 +109,12 @@ struct AlpineLoginView_V2: View {
             .padding(6)
             HStack {
                 Button("Register") {
-                    
+                    isRegistrationPresented.toggle()
                 }
                 Divider()
                     .frame(height: 20, alignment: .center)
                 Button("Forgot Password?") {
-                    
+                    isPasswordResetPresented.toggle()
                 }
             }
             .padding(.bottom, 8)
@@ -188,14 +198,30 @@ extension AlpineLoginView_V2 {
 
 private extension AlpineLoginView_V2 {
     
-    func debugFillCheck() {
-#if DEBUG
+    func promptBioLogin() {
+        guard manager.authManager.biometricsAuthorized else { return }
+        manager.authManager.runBioAuth { success in
+            if success {
+                fillFields()
+                loginPress()
+            }
+        }
+        
+    }
+    
+    func fillFields() {
         guard let email = UserDefaults.standard.string(forKey: "AC_last_login"),
               let password = AuthManager.retrieveFromKeychain(account: email)
         else { return }
         self.email = email
         self.password = password
-#endif
+    }
+    
+    
+    func debugFillCheck() {
+    #if DEBUG
+        fillFields()
+    #endif
     }
 }
 
@@ -234,12 +260,12 @@ private extension AlpineLoginView_V2 {
         switch detail {
         case .timeout:
             timeoutAlert()
-        case .enableKeychain:
-            return
         case .overrideKeychain:
             overrideKeychainAlert()
         case .keychainSaveFail:
             keychainSaveFailAlert()
+        case .biometrics:
+            biometricsAlert()
         }
         
         isAlertPresented.toggle()
@@ -266,6 +292,23 @@ private extension AlpineLoginView_V2 {
         let continueButton = ConnectAlertButton(label: "Proceed Anyway", role: .destructive, action: doSignIn)
         let cancel = ConnectAlertButton(label: "Cancel", role: .cancel, action: {})
         currentAlert = ConnectAlert(title: "Could Not Save Credentials", message: "There was an issue attempting to save sign in information. \n\nOffline Sign In will be availible until saved. \n\nIf the Issue persists, contact support.", buttons: [continueButton], dismissButton: cancel)
+    }
+    
+    func biometricsAlert() {
+        let setUp = ConnectAlertButton(label: "Enable", action: {
+            manager.authManager.authorizeBiometrics()
+            doSignIn()
+        })
+        let remindLater = ConnectAlertButton(label: "Remind Me In 3 Days", action: {
+            manager.authManager.setRemindLaterForBiometrics()
+            doSignIn()
+        })
+
+        let continueButton = ConnectAlertButton(label: "Not Now", action: doSignIn)
+        
+        let alert = ConnectAlert(title: "Enable \(manager.authManager.bioType)", message: "To skip entering password each time, allow for \(manager.authManager.bioType) sign in?", buttons: [setUp, remindLater], dismissButton: continueButton)
+        
+        currentAlert = alert
     }
 }
 
