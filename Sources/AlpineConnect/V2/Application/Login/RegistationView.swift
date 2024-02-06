@@ -12,7 +12,7 @@ import AlpineCore
 
 struct RegistationView: View {
     
-    @State private var registrationURL = URL(string: "https://alpinesupport-preview.azurewebsites.net/account/register/webview")!
+    @State private var registrationURL = URL(string: "https://alpinesupport-preview.azurewebsites.net/Account/Register/Webview")!
     @Environment(\.dismiss) var dismiss
     
     var body: some View {

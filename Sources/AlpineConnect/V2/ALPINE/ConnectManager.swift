@@ -38,7 +38,8 @@ public class ConnectManager: ObservableObject {
     public var postgres: PostgresManager?
     
     public var userID: String {
-        loginData.email
+        user.databaseType == .production ?
+        loginData.email : "\(loginData.email)-Sandbox"
     }
     
     init() {
