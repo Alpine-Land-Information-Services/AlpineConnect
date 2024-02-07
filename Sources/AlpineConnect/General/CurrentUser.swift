@@ -130,7 +130,7 @@ public extension CurrentUser {
     }
     
     static var fullName: String {
-        data["name"] as! String
+        data["name"] as? String ?? "Noname" //TODO: for some reasore there is no name on the first app run
     }
     
     static var firstName: String {
