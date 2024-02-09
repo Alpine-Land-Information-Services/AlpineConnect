@@ -80,7 +80,7 @@ public class SyncManager {
         let (importable, exportable) = sortTypes(container.objects)
         
         tracker.currentSyncStartDate = Date()
-        tracker.totalRecordsToSync = getRecordCount(for: type, importable: importable, exportable: exportable)
+        tracker.totalRecordsToSync = getRecordCount(for: type, importable: importable, exportable: exportable) + container.atlasObjects.count
 
         scheduleTimer()
         if showUI(for: type) {

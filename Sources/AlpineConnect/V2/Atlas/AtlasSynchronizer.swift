@@ -21,6 +21,8 @@ public class AtlasSynchronizer {
     }
     
     func synchronize(in context: NSManagedObjectContext) async throws {
+        try await objectType.createLayerIfNecessary()
+        
         var totalObjectsCount = 0
         try context.performAndWait {
             totalObjectsCount = try objectType.getCount(using: objectType.syncPredicate, in: context)
@@ -36,8 +38,6 @@ public class AtlasSynchronizer {
         var objects: [AtlasSyncable]? = []
         var featuresData = [AtlasFeatureData]()
         var deleteFeatures = [UUID]()
-        
-        try await objectType.createLayerIfNecessary()
         
         repeat {
             try context.performAndWait {

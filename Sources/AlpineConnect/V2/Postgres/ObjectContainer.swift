@@ -16,11 +16,14 @@ public class ObjectContainer {
     public var importHelperObjects = [ExecutionHelper.Type]()
     public var exportHelperObjects = [ExecutionHelper.Type]()
     
-    public init(objects: [CDObject.Type], nonClearables: [CDObject.Type] = [], importHelpers: [ExecutionHelper.Type] = [], exportHelpers: [ExecutionHelper.Type] = []) {
+    public var atlasObjects = [AtlasObject.Type]()
+    
+    public init(objects: [CDObject.Type], nonClearables: [CDObject.Type] = [], importHelpers: [ExecutionHelper.Type] = [], exportHelpers: [ExecutionHelper.Type] = [], atlasObjects: [AtlasSyncable.Type] = []) {
         self.objects = objects
         self.nonClearableObjects = nonClearables
         self.importHelperObjects = importHelpers
         self.exportHelperObjects = exportHelpers
+        self.atlasObjects = atlasObjects
     }
 }
 

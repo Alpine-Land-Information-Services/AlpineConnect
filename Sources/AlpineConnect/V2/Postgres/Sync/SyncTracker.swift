@@ -38,7 +38,7 @@ public class SyncTracker: ObservableObject {
         enum RecordType: String {
             case `import`
             case export
-            case atlasSync
+            case atlasSync = "Atlas Sync"
         }
         
         var id = UUID()
