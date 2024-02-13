@@ -108,7 +108,7 @@ fileprivate struct ChangelogModifier: ViewModifier {
             }
         }
         else {
-            isChangelogPresented.toggle()
+            UserDefaults.standard.setValue(Tracker.appBuild(), forKey: "AC_previous_app_build")
         }
     }
 }
