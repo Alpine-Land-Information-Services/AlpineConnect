@@ -21,7 +21,7 @@ public struct AppView_V2<App: View>: View {
     
     let sharedModelContainer: ModelContainer = {
         let schema = Schema([CoreUser.self])
-        let modelConfiguration = ModelConfiguration("Connect User Data", schema: schema, isStoredInMemoryOnly: false)
+        let modelConfiguration = ModelConfiguration("Connect User Data", schema: schema, isStoredInMemoryOnly: false) //TODO: rename to "Core User Data" 
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
             CoreAppControl.shared.modelContainer = container

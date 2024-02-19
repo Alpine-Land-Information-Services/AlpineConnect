@@ -22,10 +22,11 @@ public class AppReset {
         case g
     }
     
-    private static let currectAppResetCode = "b3_a.d.p.g"
+    private static var currectAppResetCode = "b3_a.d.p.g"
     private static let appResetCodeKey = "AC_app_reset_code"
     
-    public static func checkNeedReset() {
+    public static func checkNeedReset(code: String) {
+        currectAppResetCode = code
         if let code = UserDefaults.standard.value(forKey: appResetCodeKey) as? String {
             if code == currectAppResetCode {
                 return
