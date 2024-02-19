@@ -22,7 +22,7 @@ public class AppReset {
         case g
     }
     
-    private static var currectAppResetCode = "b3_a.d.p.g"
+    private static var currectAppResetCode = ""
     private static let appResetCodeKey = "AC_app_reset_code"
     
     public static func checkNeedReset(code: String) {
