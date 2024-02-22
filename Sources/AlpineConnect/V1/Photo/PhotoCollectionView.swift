@@ -150,7 +150,10 @@ public struct PhotoCollectionBlock<Label: View>: View {
 
     public var body: some View {
         Button {
-            AppControlOld.showSheet(view: PhotoCollectionView().environmentObject(viewModel))
+            Core.presentSheet {
+                PhotoCollectionView()
+                    .environmentObject(viewModel)
+            }
         } label: {
             label
                 .overlay {
@@ -168,9 +171,3 @@ public struct PhotoCollectionBlock<Label: View>: View {
         }
     }
 }
-
-//struct PhotoCollectionView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        PhotoCollectionView()
-//    }
-//}
