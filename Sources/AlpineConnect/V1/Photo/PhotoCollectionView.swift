@@ -128,7 +128,7 @@ public struct PhotoCollectionButton: View {
                     .environmentObject(viewModel)
             }
         } label: {
-            Image(systemName: "photo.on.rectangle")
+            Label("Photos", systemImage: "photo.on.rectangle")
         }
     }
 }
