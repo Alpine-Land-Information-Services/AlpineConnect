@@ -20,6 +20,7 @@ public class AtlasSynchronizer {
         self.syncManager = syncManager
     }
     
+    
     func synchronize(in context: NSManagedObjectContext) async throws {
         try await objectType.createLayerIfNecessary()
         
@@ -50,6 +51,7 @@ public class AtlasSynchronizer {
             guard !featuresData.isEmpty || !deleteFeatures.isEmpty else { break } 
             try await objectType.performAtlasSynchronization(with: featuresData, deleting: deleteFeatures)
             syncManager.tracker.progressUpdate(adding: Double(featuresData.count + deleteFeatures.count))
+            
             featuresData.removeAll()
             deleteFeatures.removeAll()
             
@@ -70,8 +72,14 @@ public class AtlasSynchronizer {
             guard let geometry = object.geometry else {
                 continue
             }
-            let fields = [AtlasFieldData(name: "UNIQ_ID", value: object.guid.uuidString),
+            
+            var fields = [AtlasFieldData(name: "UNIQ_ID", value: object.guid.uuidString),
                           AtlasFieldData(name: "OBJECT_TYPE", value: objectType.entityName)]
+            
+            for field in type(of: object).syncFields {
+                fields.append(AtlasFieldData(name: field.layerFieldName, value: object.value(forKey: field.objectFieldName) ?? "_INVALID_FIELD_NAME_"))
+            }
+            
             let featureData = AtlasFeatureData(wkt: geometry, fields: fields)
             data.append(featureData)
         }
