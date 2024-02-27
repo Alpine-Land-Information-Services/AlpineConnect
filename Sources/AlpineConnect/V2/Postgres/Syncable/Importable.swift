@@ -76,7 +76,7 @@ public extension Importable {
             
         } catch {
             syncManager.nonCancelAction {
-                Core.makeError(error: error, additionalInfo: "\(Self.entityName) Import" + (syncManager.currentQuery ?? ""))
+                Core.makeError(error: error, additionalInfo: "\(Self.entityName) Import: " + (syncManager.currentQuery ?? ""))
             }
         }
         

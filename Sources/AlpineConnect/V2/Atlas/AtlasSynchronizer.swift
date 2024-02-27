@@ -20,7 +20,6 @@ public class AtlasSynchronizer {
         self.syncManager = syncManager
     }
     
-    
     func synchronize(in context: NSManagedObjectContext) async throws {
         try await objectType.createLayerIfNecessary()
         
