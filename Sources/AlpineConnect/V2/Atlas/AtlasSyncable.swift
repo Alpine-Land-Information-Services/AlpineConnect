@@ -8,45 +8,12 @@
 import CoreData
 import AlpineCore
 
-public struct AtlasSyncField {
-    
-    public var layerFieldName: String
-    public var objectFieldName: String
-    public var fieldType: Any.Type
-    
-    public init(layerFieldName: String, objectFieldName: String, fieldType: Any.Type) {
-        self.layerFieldName = layerFieldName
-        self.objectFieldName = objectFieldName
-        self.fieldType = fieldType
-    }
-    
-    
-    public func convertToLayerType() -> Any.Type {
-        switch fieldType {
-        case is UUID.Type:
-            return String.self
-        default:
-            return fieldType
-        }
-    }
-//    
-//    public func convertToLayerFieldValue(value: Any?) -> Any {
-//        switch fieldType {
-//        case is UUID.Type:
-//            let guid = value as? UUID
-//            return guid?.uuidString ?? "_INVALID_FIELD_VALUE_"
-//        default:
-//            return value ?? "_INVALID_FIELD_VALUE_"
-//        }
-//    }
-}
-
 public protocol AtlasSyncable: AtlasObject, Importable {
     
     static var syncBatchSize: Int { get }
     static var syncPredicate: NSPredicate { get }
     
-    static var isEditable: Bool { get }
+    static var syncFields: [AtlasSyncField] { get }
     
     static func performAtlasSynchronization(with data: [AtlasFeatureData], deleting: [UUID]) async throws
     static func createLayerIfNecessary() async throws
@@ -54,9 +21,8 @@ public protocol AtlasSyncable: AtlasObject, Importable {
     static func clearCache() throws
     static func deleteLayer() throws
     
-    func updateWithGeometry(_ geometry: String?)
     
-    static var syncFields: [AtlasSyncField] { get }
+    func deleteOnError()
 }
 
 public extension AtlasSyncable {
@@ -83,6 +49,28 @@ public extension AtlasSyncable {
 
 public extension AtlasSyncable {
     
+    func deleteOnError() {
+        
+    }
+}
+
+public extension AtlasSyncable {
+    
+    static var layerName: String {
+        displayName
+    }
+    
+    static var fileExtension: String {
+        "fgb"
+    }
+    
+    static var connectionPath: String {
+        "Layers/"
+    }
+}
+
+public extension AtlasSyncable {
+    
     static var syncBatchSize: Int {
         100
     }
@@ -93,5 +81,28 @@ public extension AtlasSyncable {
     
     static var syncPredicate: NSPredicate {
         NSPredicate(format: "a_syncDate > %@", syncManager.tracker.currentSyncStartDate as CVarArg)
+    }
+}
+
+public struct AtlasSyncField {
+    
+    public var layerFieldName: String
+    public var objectFieldName: String
+    public var fieldType: Any.Type
+    
+    public init(layerFieldName: String, objectFieldName: String, fieldType: Any.Type) {
+        self.layerFieldName = layerFieldName
+        self.objectFieldName = objectFieldName
+        self.fieldType = fieldType
+    }
+    
+    
+    public func convertToLayerType() -> Any.Type {
+        switch fieldType {
+        case is UUID.Type:
+            return String.self
+        default:
+            return fieldType
+        }
     }
 }
