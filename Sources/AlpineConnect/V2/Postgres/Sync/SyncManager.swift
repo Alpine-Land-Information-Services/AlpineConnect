@@ -79,7 +79,7 @@ public class SyncManager {
         tracker.updateType(type)
         let (importable, exportable) = sortTypes(container.objects)
         
-        tracker.currentSyncStartDate = Date()
+        tracker.currentSyncStartTime = Date()
         tracker.totalRecordsToSync = getRecordCount(for: type, importable: importable, exportable: exportable) + container.atlasObjects.count
 
         scheduleTimer()
@@ -98,7 +98,7 @@ public class SyncManager {
                 self.tracker.updateType(.none)
             }
             else if tracker.status != .error {
-                Connect.user.lastSync = tracker.currentSyncStartDate
+                Connect.user.lastSync = tracker.currentSyncStartTime
                 self.tracker.updateStatus(.none)
                 self.tracker.updateType(.none)
             }

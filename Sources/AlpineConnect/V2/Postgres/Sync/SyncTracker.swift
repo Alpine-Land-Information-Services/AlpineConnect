@@ -47,7 +47,7 @@ public class SyncTracker: ObservableObject {
         var recordsCount: Double
     }
     
-    public var currentSyncStartDate = Date()
+    public var currentSyncStartTime = Date()
     
     @Published public var showSync = false
     @Published public var syncType = SyncManager.SyncType.none {

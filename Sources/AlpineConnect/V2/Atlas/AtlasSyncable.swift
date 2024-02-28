@@ -80,7 +80,7 @@ public extension AtlasSyncable {
     }
     
     static var syncPredicate: NSPredicate {
-        NSPredicate(format: "a_syncDate > %@", syncManager.tracker.currentSyncStartDate as CVarArg)
+        NSPredicate(format: "a_syncDate > %@", syncManager.tracker.currentSyncStartTime as CVarArg)
     }
 }
 
