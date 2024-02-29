@@ -28,7 +28,9 @@ class AuthManager {
     }
 
     func attemptToSave(for serverUser: ServerUserResponse, with credentials: CredentialsData) -> ConnectionResponse {
-        ConnectManager.shared.user = ConnectUser(for: serverUser)
+        DispatchQueue.main.sync {
+            ConnectManager.shared.user = ConnectUser(for: serverUser)
+        }
         
         guard saveToKeychain(account: credentials.email, password: credentials.password) else {
             return ConnectionResponse(result: .moreDetail, detail: .keychainSaveFail)
