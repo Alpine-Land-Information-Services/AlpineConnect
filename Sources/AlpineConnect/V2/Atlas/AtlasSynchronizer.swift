@@ -33,7 +33,11 @@ public class AtlasSynchronizer {
             return
         }
 
-        let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.syncPredicate, sortDescriptors: nil, with: objectType.syncBatchSize, isModifying: false)
+        let batchFetcher = CDBatchFetcher(for: objectType.entityName, 
+                                          using: objectType.syncPredicate,
+                                          sortDescriptors: nil,
+                                          with: objectType.syncBatchSize, 
+                                          isModifying: false)
         
         var objects: [AtlasSyncable]? = []
         var featuresData = [AtlasFeatureData]()
@@ -64,7 +68,7 @@ public class AtlasSynchronizer {
         var data = [AtlasFeatureData]()
         var delete = [UUID]()
         for object in objects {
-            if object.deleted {
+            if object.deleted_no_context {
                 delete.append(object.guid)
                 continue
             }

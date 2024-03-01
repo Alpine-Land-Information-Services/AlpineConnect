@@ -73,7 +73,7 @@ public extension AtlasSyncable {
 public extension AtlasSyncable {
     
     static var syncBatchSize: Int {
-        100
+        1000
     }
     
     static var syncPredicate: NSPredicate {
@@ -100,7 +100,6 @@ public struct AtlasSyncField {
         self.objectFieldName = objectFieldName
         self.fieldType = fieldType
     }
-    
     
     public func convertToLayerType() -> Any.Type {
         switch fieldType {
