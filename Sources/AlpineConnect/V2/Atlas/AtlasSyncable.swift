@@ -21,6 +21,7 @@ public protocol AtlasSyncable: AtlasObject, Importable {
     static func clearCache() throws
     static func deleteLayer() throws
     
+    func selectOnMap()
     
     func deleteOnError()
 }
@@ -75,12 +76,16 @@ public extension AtlasSyncable {
         100
     }
     
+    static var syncPredicate: NSPredicate {
+        NSPredicate(format: "a_syncDate > %@", syncManager.tracker.currentSyncStartTime as CVarArg)
+    }
+    
     static func performAtlasSynchronization(with data: [AtlasFeatureData], deleting: [UUID]) async throws {
         fatalError(#function + " must be implemented in client.")
     }
     
-    static var syncPredicate: NSPredicate {
-        NSPredicate(format: "a_syncDate > %@", syncManager.tracker.currentSyncStartTime as CVarArg)
+    func selectOnMap() {
+        fatalError(#function + " must be implemented in client.")
     }
 }
 
