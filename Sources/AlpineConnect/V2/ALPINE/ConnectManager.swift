@@ -148,8 +148,10 @@ extension ConnectManager {
             return ConnectionResponse(result: .fail, problem: ConnectionProblem(customAlert: ConnectAlert(title: "User Record Not Found", message: "Could not find existing record for \(lastLogin)")))
         }
         
-        self.user = user
-        inOfflineMode = true
+        DispatchQueue.main.sync {
+            self.user = user
+            inOfflineMode = true
+        }
 
         return ConnectionResponse(result: .success)
     }

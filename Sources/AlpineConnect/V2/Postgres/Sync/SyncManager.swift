@@ -80,6 +80,8 @@ public class SyncManager {
         let (importable, exportable) = sortTypes(container.objects)
         
         tracker.currentSyncStartTime = Date()
+        print(code: .red, "start time: \(tracker.currentSyncStartTime)")
+        print(code: .red, "last  sync: \(Connect.user.lastSync)")
         tracker.totalRecordsToSync = getRecordCount(for: type, importable: importable, exportable: exportable) + container.atlasObjects.count
 
         scheduleTimer()
