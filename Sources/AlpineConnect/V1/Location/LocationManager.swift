@@ -56,17 +56,22 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
         manager.startUpdatingHeading()
     }
     
-    func resume() {
+    public func resume() {
         guard !isActive else { return }
         manager.startUpdatingLocation()
         manager.startUpdatingHeading()
         isActive = true
     }
 
-    func stop() {
+    public func stop() {
         manager.stopUpdatingLocation()
         manager.stopUpdatingHeading()
         isActive = false
+    }
+    
+    public func stopIfNoUsers() {
+        guard locationUsers.isEmpty else { return }
+        stop()
     }
     
     public func addLocationUser(id: UUID, description: String) {

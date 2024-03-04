@@ -56,7 +56,7 @@ class LoginViewModel: ObservableObject {
     
     func setLoginConnectionInfo() {
         NetworkMonitor.shared.start()
-        Location.shared.start()
+//        Location.shared.start()
 //        LoginConnectionInfo.shared = info
         authenthication.fetchCredentialsFromKeyChain()
     }

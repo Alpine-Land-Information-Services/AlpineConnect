@@ -10,18 +10,15 @@ import SwiftUI
 struct LocationToggler: ViewModifier {
     
     @Environment(\.scenePhase) var scenePhase
-    @ObservedObject var location = Location.shared
 
     func body(content: Content) -> some View {
         content
             .onChange(of: scenePhase) { _, newValue in
                 switch newValue {
                 case .active:
-                    Location.shared.resume()
+                    LocationManager.shared.resume()
                 default:
-                    if Location.shared.locationUsers.isEmpty {
-                        Location.shared.stop()
-                    }
+                    LocationManager.shared.stopIfNoUsers()
                 }
             }
     }

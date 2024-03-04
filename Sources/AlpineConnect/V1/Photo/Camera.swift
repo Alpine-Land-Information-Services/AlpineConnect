@@ -7,15 +7,23 @@
 
 import UIKit
 import SwiftUI
+import CoreData
 
 public protocol PhotoObject {
     
     var name: String { get }
+    var photoFetchPredicate: NSPredicate { get }
+    
+    static var photoFetchContext: NSManagedObjectContext { get }
     
     func getPhotos() async -> [Camera.Photo]
     func addPhoto(_ : Camera.Photo) async
-    
     func deletePhoto(_ photo: Camera.Photo)
+    
+    func assignPhoto(_ photo: NSManagedObject)
+}
+
+public extension PhotoObject {
 }
 
 
