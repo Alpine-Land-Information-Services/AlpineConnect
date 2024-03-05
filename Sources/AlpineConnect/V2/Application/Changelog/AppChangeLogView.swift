@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AlpineUI
+import AlpineCore
 
 struct AppChangeLogView: View {
     
@@ -22,12 +23,31 @@ struct AppChangeLogView: View {
         Tracker.appBuild()
     }
     
-
-    
-    private var previousVersion: String? {
-        UserDefaults.standard.string(forKey: "AC_previous_app_build")
+    var core: CoreAppControl {
+        CoreAppControl.shared
     }
     
+    private var previousBuild: String? {
+        core.defaults.appBuild
+    }
+    
+    private var previousVersion: String? {
+        core.defaults.appVersion
+    }
+    
+    var previousFullVersion: String {
+        if let previousVersion, let previousBuild {
+            return previousVersion + " " + previousBuild
+        }
+        else {
+            return "Not Recorded"
+        }
+    }
+    
+    var currentVersion: String {
+        version + " " + build
+    }
+        
     var appChangelogURL: URL
     var showAtlas: Bool
     
@@ -38,9 +58,9 @@ struct AppChangeLogView: View {
             NavigationStack {
                 List {
                     HStack {
-                        Text(fullVersion(build: previousVersion ?? "Version Not Recorded"))
+                        Text(previousFullVersion)
                         Image(systemName: "arrow.forward")
-                        Text(fullVersion(build: build))
+                        Text(currentVersion)
                     }
                     .frame(maxWidth: .infinity)
                     .font(.headline)
@@ -71,20 +91,21 @@ struct AppChangeLogView: View {
                     DismissButton()
                 }
                 .onDisappear {
-                    UserDefaults.standard.setValue(build, forKey: "AC_previous_app_build")
+                    core.defaults.appBuild = build
+                    core.defaults.appVersion = version
                 }
             }
         }
-    }
-    
-    func fullVersion(build: String) -> String {
-        version + " (\(build))"
     }
 }
 
 fileprivate struct ChangelogModifier: ViewModifier {
     
     @State private var isChangelogPresented = false
+    
+    var core: CoreAppControl {
+        CoreAppControl.shared
+    }
     
     var appURL: String
     var includeAtlas: Bool
@@ -102,13 +123,14 @@ fileprivate struct ChangelogModifier: ViewModifier {
     }
     
     func checkIfToPresent() {
-        if let lastBuild = UserDefaults.standard.string(forKey: "AC_previous_app_build") {
+        if let lastBuild = core.defaults.appBuild {
             if lastBuild != Tracker.appBuild() {
                 isChangelogPresented.toggle()
             }
         }
         else {
-            UserDefaults.standard.setValue(Tracker.appBuild(), forKey: "AC_previous_app_build")
+            core.defaults.appBuild = Tracker.appBuild()
+            core.defaults.appVersion = Tracker.appVersion()
         }
     }
 }

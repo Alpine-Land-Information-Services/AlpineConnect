@@ -210,7 +210,7 @@ private extension AlpineLoginView_V2 {
     }
     
     func fillFields() {
-        guard let email = UserDefaults.standard.string(forKey: "AC_last_login"),
+        guard let email = manager.core.defaults.lastUser,
               let password = AuthManager.retrieveFromKeychain(account: email)
         else { return }
         self.email = email

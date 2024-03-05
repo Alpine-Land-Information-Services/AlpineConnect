@@ -13,6 +13,10 @@ public class ConnectManager: ObservableObject {
     
     public static var shared = ConnectManager()
     
+    public var core: CoreAppControl {
+        CoreAppControl.shared
+    }
+    
     var isConnected: Bool {
         NetworkMonitor.shared.connected
     }
@@ -28,7 +32,6 @@ public class ConnectManager: ObservableObject {
     private var loginData: CredentialsData!
     private var loginInfo: LoginConnectionInfo!
     var authManager: AuthManager = AuthManager()
-    
     
     private var postgresInfo: PostgresInfo?
     var isPostgresEnabled: Bool {
@@ -194,7 +197,7 @@ public extension ConnectManager {
 extension ConnectManager {
     
     var credentialsExist: Bool {
-        UserDefaults.standard.string(forKey: "AC_last_login") != nil
+        core.defaults.lastUser != nil
     }
     
     public func getStoredToken() -> Token? {
@@ -245,7 +248,7 @@ public extension ConnectManager {
     }
     
     static var lastSavedLogin: String? {
-        UserDefaults.standard.string(forKey: "AC_last_login")
+        CoreAppControl.shared.defaults.lastUser
     }
     
     func signout() {
@@ -274,7 +277,7 @@ public extension ConnectManager {
     }
     
     static func fetchNewToken(with info: LoginConnectionInfo) async throws -> (TokenResponse, Token?) {
-        guard let email = UserDefaults.standard.string(forKey: "AC_last_login"),
+        guard let email = lastSavedLogin,
               let password = AuthManager.retrieveFromKeychain(account: email)
         else {
             return (TokenResponse.noStoredCredentials, nil)

@@ -16,7 +16,6 @@ struct UserAppView<App: View>: View {
     @ViewBuilder var app: App
     
     @EnvironmentObject var manager: ConnectManager
-    
     @Environment(\.modelContext) private var modelContext
     
     @Query private var users: [CoreUser]
@@ -39,6 +38,7 @@ struct UserAppView<App: View>: View {
         else {
             app
                 .environment(CoreAppControl.shared)
+                .locationToggler
         }
     }
     

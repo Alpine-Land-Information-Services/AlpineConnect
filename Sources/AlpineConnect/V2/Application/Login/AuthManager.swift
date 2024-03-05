@@ -7,6 +7,7 @@
 
 import Foundation
 import LocalAuthentication
+import AlpineCore
 
 class AuthManager {
     
@@ -40,7 +41,7 @@ class AuthManager {
     }
     
     func saveUser(with email: String) -> ConnectionResponse {
-        UserDefaults.standard.setValue(email, forKey: "AC_last_login")
+        CoreAppControl.shared.defaults.lastUser = email
         return ConnectionResponse(result: .success)
     }
     
