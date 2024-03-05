@@ -80,7 +80,7 @@ public class AtlasSynchronizer {
                           AtlasFieldData(name: "OBJECT_TYPE", value: objectType.entityName)]
             
             for field in type(of: object).syncFields {
-                fields.append(AtlasFieldData(name: field.layerFieldName, value: object.value(forKey: field.objectFieldName) ?? "_INVALID_FIELD_NAME_"))
+                fields.append(AtlasFieldData(name: field.layerFieldName, value: object.value(forKey: field.objectFieldName) ?? "")) //"_INVALID_FIELD_NAME_"
             }
             
             let featureData = AtlasFeatureData(wkt: geometry, fields: fields)

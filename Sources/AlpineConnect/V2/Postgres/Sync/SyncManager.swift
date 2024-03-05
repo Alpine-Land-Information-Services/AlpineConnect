@@ -361,7 +361,7 @@ private extension SyncManager { //MARK: Import
             Core.makeError(error: error, additionalInfo: "Saving Import Data", showToUser: isForeground)
         }
         
-        await atlasSync(for: importable)
+        await atlasSync(for: container.atlasObjects)
         
         await doClean(in: context, objects: importable)
         
@@ -531,10 +531,10 @@ private extension SyncManager { //MARK: Export
 
 extension SyncManager {
     
-    func atlasSync(for importables: [Importable.Type]) async {
+    func atlasSync(for objects: [AtlasObject.Type]) async {
         self.tracker.updateStatus(.atlasSync, message: "Performing Atlas Synchronization")
-        for importable in importables {
-            if let object = importable as? AtlasSyncable.Type {
+        for object in objects {
+            if let object = object as? AtlasSyncable.Type {
                 do {
                     try await AtlasSynchronizer(for: object, syncManager: self).synchronize(in: context)
                 }
