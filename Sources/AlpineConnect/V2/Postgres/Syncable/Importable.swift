@@ -14,6 +14,7 @@ public protocol Importable: Syncable {
     static var pgTableName: String { get }
     static var selectQuery: String { get }
     static var shallCountRecords: Bool { get }
+//    static var wasUpdated: Bool { get set }
     
     static func needUpdate(in context: NSManagedObjectContext) -> Bool
     static func processPGResult(cursor: Cursor, in context: NSManagedObjectContext) throws
@@ -56,7 +57,7 @@ public extension Importable {
             if shallCountRecords {
                 let recCount = try getRecordsCount(query: text, connection: connection)
                 syncManager.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: recCount)
-                
+                print(text)
                 guard recCount != 0 else { return true }
             }
             else {

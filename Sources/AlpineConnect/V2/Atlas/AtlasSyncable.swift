@@ -12,6 +12,7 @@ public protocol AtlasSyncable: AtlasObject, Importable {
     
     static var syncBatchSize: Int { get }
     static var syncPredicate: NSPredicate { get }
+    static var clearPredicate: NSPredicate { get }
     
     static var syncFields: [AtlasSyncField] { get }
     
@@ -73,11 +74,15 @@ public extension AtlasSyncable {
 public extension AtlasSyncable {
     
     static var syncBatchSize: Int {
-        1000
+        5000
     }
     
     static var syncPredicate: NSPredicate {
         NSPredicate(format: "a_syncDate > %@", syncManager.tracker.currentSyncStartTime as CVarArg)
+    }
+    
+    static var clearPredicate: NSPredicate {
+        NSPredicate(value: false)
     }
     
     static func performAtlasSynchronization(with data: [AtlasFeatureData], deleting: [UUID]) async throws {

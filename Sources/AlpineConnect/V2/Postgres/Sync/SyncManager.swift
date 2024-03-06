@@ -487,6 +487,11 @@ private extension SyncManager { //MARK: Export
         tracker.updateStatus(.exporting, message: "Exporting")
         
         await withCheckedContinuation { continuation in
+            guard ConnectManager.shared.postgres?.pool !=  nil else {
+                continuation.resume()
+                return
+            }
+            
             ConnectManager.shared.postgres?.pool?.withConnection { result in
                 do {
                     let connection = try result.get()

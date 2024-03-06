@@ -26,6 +26,7 @@ public class AtlasSynchronizer {
         var totalObjectsCount = 0
         try context.performAndWait {
             totalObjectsCount = try objectType.getCount(using: objectType.syncPredicate, in: context)
+                                + (try objectType.getCount(using: objectType.clearPredicate, in: context))
         }
         syncManager.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: totalObjectsCount)
 
@@ -42,6 +43,7 @@ public class AtlasSynchronizer {
         var objects: [AtlasSyncable]? = []
         var featuresData = [AtlasFeatureData]()
         var deleteFeatures = [UUID]()
+        var clearFeatures = try createClearData(in: context)
         
         repeat {
             try context.performAndWait {
@@ -51,6 +53,9 @@ public class AtlasSynchronizer {
                     (featuresData, deleteFeatures) = try createAtlasData(from: objects)
                 }
             }
+            deleteFeatures.append(contentsOf: clearFeatures)
+            clearFeatures.removeAll()
+            
             guard !featuresData.isEmpty || !deleteFeatures.isEmpty else { break } 
             try await objectType.performAtlasSynchronization(with: featuresData, deleting: deleteFeatures)
             syncManager.tracker.progressUpdate(adding: Double(featuresData.count + deleteFeatures.count))
@@ -88,5 +93,10 @@ public class AtlasSynchronizer {
         }
         
         return (data, delete)
+    }
+    
+    func createClearData(in context: NSManagedObjectContext) throws -> [UUID] {
+        let objects = objectType.findObjects(by: objectType.clearPredicate, in: context) as! [AtlasSyncable]
+        return objects.map { $0.guid }
     }
 }
