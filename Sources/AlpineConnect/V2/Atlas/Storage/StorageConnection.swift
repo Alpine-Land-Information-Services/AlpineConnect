@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import AlpineCore
 
 @Observable
 public class StorageConnection {

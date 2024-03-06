@@ -7,6 +7,7 @@
 
 import CoreLocation
 import UIKit
+import SwiftUI
 
 public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     
@@ -24,6 +25,8 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
     @Published public var lastLocation: CLLocation? // in degrees, 4326
     @Published public var lastHeading: CLHeading?
     
+    @Published public var autorizationStatus: CLAuthorizationStatus
+    
     public var locationUsers = [UUID: String]()
     
     public var degrees: Double = .zero {
@@ -33,15 +36,26 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
     }
     
     private override init() {
+        autorizationStatus = manager.authorizationStatus
+        
         super.init()
         start()
+    }
+    
+    func requestAuthorization() {
+        manager.requestWhenInUseAuthorization()
+    }
+    
+    public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        withAnimation {
+            autorizationStatus = manager.authorizationStatus
+        }
     }
     
     func start() {
         guard !isActive else { return }
         isActive = true
 
-        manager.requestWhenInUseAuthorization()
         manager.delegate = self
         manager.requestLocation()
         manager.allowsBackgroundLocationUpdates = true
@@ -90,9 +104,11 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        if let heading = manager.heading {
-            lastHeading = heading
-            degrees = -1 * heading.magneticHeading
+        DispatchQueue.main.async { [self] in
+            if let heading = manager.heading {
+                lastHeading = heading
+                degrees = -1 * heading.magneticHeading
+            }
         }
     }
 

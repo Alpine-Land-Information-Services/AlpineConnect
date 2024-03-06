@@ -56,6 +56,7 @@ public struct AppView_V2<App: View>: View {
         if manager.isSignedIn {
             UserAppView(userID: manager.userID) {
                 app(manager.userID)
+                    .environmentObject(LocationManager.shared)
             }
             .transition(.opacity)
             .onDisappear {

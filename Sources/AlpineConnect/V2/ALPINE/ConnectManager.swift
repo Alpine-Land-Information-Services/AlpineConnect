@@ -201,7 +201,7 @@ extension ConnectManager {
     }
     
     public func getStoredToken() -> Token? {
-        if let tokenData = UserDefaults.standard.value(forKey: "AC_backyard_token") as? Data {
+        if let tokenData = core.defaults.backyardToken {
             return try? JSONDecoder().decode(Token.self, from: tokenData)
         }
         
@@ -228,7 +228,7 @@ extension ConnectManager {
         DispatchQueue.main.async { [self] in
             let expDate = Calendar.current.date(byAdding: .hour, value: 8, to: Date())!
             token = Token(rawValue: value, expirationDate: expDate)
-            UserDefaults.standard.setValue(token?.encoded, forKey: "AC_backyard_token")
+            core.defaults.backyardToken = token?.encoded
         }
     }
 }
@@ -253,7 +253,7 @@ public extension ConnectManager {
     
     func signout() {
         isSignedIn = false
-        UserDefaults.standard.setValue(nil, forKey: "AC_backyard_token")
+        core.defaults.backyardToken = nil
     }
     
     static func signout() {
