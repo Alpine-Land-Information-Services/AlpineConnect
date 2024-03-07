@@ -361,10 +361,9 @@ private extension SyncManager { //MARK: Import
             Core.makeError(error: error, additionalInfo: "Saving Import Data", showToUser: isForeground)
         }
         
-        await atlasSync(for: container.atlasObjects)
-        
         await doClean(in: context, objects: importable)
-        
+        await atlasSync(for: container.atlasObjects)
+
         try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
     }
     

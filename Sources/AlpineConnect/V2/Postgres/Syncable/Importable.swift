@@ -57,7 +57,7 @@ public extension Importable {
             if shallCountRecords {
                 let recCount = try getRecordsCount(query: text, connection: connection)
                 syncManager.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: recCount)
-                print(text)
+//                print(text)
                 guard recCount != 0 else { return true }
             }
             else {
@@ -80,7 +80,6 @@ public extension Importable {
                 Core.makeError(error: error, additionalInfo: "\(Self.entityName) Import:\n" + (syncManager.currentQuery ?? ""))
             }
         }
-        
         return result
     }
     
@@ -95,7 +94,6 @@ public extension Importable {
             recCount = try row.get().columns[0].int()
         }
 //        print("---------------->>> \(Self.entityName): \(recCount)")
-        
         return recCount
     }
     

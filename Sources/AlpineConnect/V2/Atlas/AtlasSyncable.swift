@@ -11,7 +11,7 @@ import AlpineCore
 public protocol AtlasSyncable: AtlasObject, Importable {
     
     static var syncBatchSize: Int { get }
-    static var syncPredicate: NSPredicate? { get }
+    static var cleanPredicate: NSPredicate? { get set }
     
     static var syncFields: [AtlasSyncField] { get }
     
@@ -74,14 +74,6 @@ public extension AtlasSyncable {
     
     static var syncBatchSize: Int {
         5000
-    }
-    
-    static var syncPredicate: NSPredicate? {
-        nil
-    }
-    
-    static var clearPredicate: NSPredicate {
-        NSPredicate(value: false)
     }
     
     static func performAtlasSynchronization(with data: [AtlasFeatureData], deleting: [UUID]) async throws {

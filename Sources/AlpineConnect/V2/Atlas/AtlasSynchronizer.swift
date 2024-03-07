@@ -23,22 +23,19 @@ public class AtlasSynchronizer {
     func synchronize(in context: NSManagedObjectContext) async throws {
         try await objectType.createLayer()
         
+        guard objectType.cleanPredicate != nil else { return }
+        
         var totalObjectsCount = 0
-        try context.performAndWait {
-            totalObjectsCount = try objectType.getCount(using: objectType.syncPredicate, in: context)
-        }
+        totalObjectsCount = try objectType.getCount(using: nil, in: context, performInContext: true)
         syncManager.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: totalObjectsCount)
 
-        guard totalObjectsCount > 0 else {
-            return
-        }
+        guard totalObjectsCount > 0 else { return }
 
         let batchFetcher = CDBatchFetcher(for: objectType.entityName, 
-                                          using: objectType.syncPredicate,
+                                          using: nil,
                                           sortDescriptors: nil,
                                           with: objectType.syncBatchSize, 
                                           isModifying: false)
-        
         var objects: [AtlasSyncable]? = []
         var featuresData = [AtlasFeatureData]()
         
@@ -50,7 +47,6 @@ public class AtlasSynchronizer {
                     featuresData = try createAtlasData(from: objects)
                 }
             }
-            
             try await objectType.performAtlasSynchronization(with: featuresData)
             syncManager.tracker.progressUpdate(adding: Double(featuresData.count))
             
@@ -68,18 +64,15 @@ public class AtlasSynchronizer {
             guard let geometry = object.geometry else {
                 continue
             }
-            
             var fields = [AtlasFieldData(name: "UNIQ_ID", value: object.guid.uuidString),
                           AtlasFieldData(name: "OBJECT_TYPE", value: objectType.entityName)]
             
             for field in type(of: object).syncFields {
                 fields.append(AtlasFieldData(name: field.layerFieldName, value: object.value(forKey: field.objectFieldName) ?? "")) //"_INVALID_FIELD_NAME_"
             }
-            
             let featureData = AtlasFeatureData(wkt: geometry, fields: fields)
             data.append(featureData)
         }
-        
         return data
     }
 }
