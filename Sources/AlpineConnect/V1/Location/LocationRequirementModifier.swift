@@ -1,5 +1,5 @@
 //
-//  LocationRequiremenModifier.swift
+//  LocationRequirementModifier.swift
 //  AlpineConnect
 //
 //  Created by Jenya Lebid on 3/6/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LocationRequiremenModifier: ViewModifier {
+struct LocationRequirementModifier: ViewModifier {
     
     @EnvironmentObject var manager: LocationManager
     
@@ -80,6 +80,6 @@ struct LocationRequiremenModifier: ViewModifier {
 public extension View {
     
     var locationRequirementTracker: some View {
-        modifier(LocationRequiremenModifier())
+        modifier(LocationRequirementModifier())
     }
 }

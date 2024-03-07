@@ -6,42 +6,75 @@
 //
 
 import Foundation
+import AlpineCore
 
 public class AppReset {
-    // "code_a.d.p.g"
+    
+    // "code_s.d.p.g"
     // delete files from:
-    // a: "Application Support"  in application's Library folder
+    // s: "Sandbox Folder"       delete the whole app folder
     // d: "Documents"            in application's folder
     // p: "Preferences"          in application's Library folder
     // g: Application Group      in "group.com.alpinelis.atlas"
     
     private enum DeleteSource: String {
-        case a
+        case s
         case d
         case p
         case g
     }
     
-    private static var currectAppResetCode = ""
-    private static let appResetCodeKey = "AC_app_reset_code"
-    
-    public static func checkNeedReset(code: String) {
-        currectAppResetCode = code
-        if let code = UserDefaults.standard.value(forKey: appResetCodeKey) as? String {
-            if code == currectAppResetCode {
-                return
-            }
-            performReset()
-        }
-        else {
-            performReset()
-        }
-        
-        UserDefaults.standard.setValue(currectAppResetCode, forKey: appResetCodeKey)
-        UserDefaults.standard.synchronize()
+    static var core: CoreAppControl {
+        CoreAppControl.shared
     }
     
-    private static func performReset() {
+    private static var currectAppResetCode = ""
+    
+    public static func checkToReset(code: String) {
+        currectAppResetCode = code
+        
+        if let code = core.defaults.resetCode {
+            guard code != currectAppResetCode else { return }
+            createResetAlert()
+        }
+        else {
+            createResetAlert()
+        }
+    }
+    
+    public static func forceReset(code: String) {
+        currectAppResetCode = code
+        createResetAlert()
+    }
+    
+    public static func setCode(_ code: String) {
+        guard code != core.defaults.resetCode else { return }
+
+        core.defaults.resetCode = code
+    }
+}
+
+private extension AppReset {
+    
+    static func createResetAlert() {
+        let alert = CoreAlert(title: "App Reset Required", message: "This update requires clearning all of your application data.",
+                              buttons: [CoreAlertButton(title: "Clear", style: .destructive, action: {
+            performReset()
+        })])
+        Core.makeAlert(alert)
+    }
+    
+    static func resetComplete() {
+        let alert = CoreAlert(title: "Reset Successful", message: "Application restart required to continue.",
+                              buttons: [CoreAlertButton(title: "Quit App", action: {
+            
+            core.defaults.resetWithCode(currectAppResetCode)
+            exit(0)
+        })])
+        Core.makeAlert(alert)
+    }
+    
+    static func performReset() {
         let components = currectAppResetCode.components(separatedBy: "_")
         if components.count == 2 {
             let deletion = components[1].components(separatedBy: ".")
@@ -50,14 +83,16 @@ public class AppReset {
                     delete(from: source)
                 }
             }
+            resetComplete()
         }
     }
     
     private static func delete(from source: DeleteSource) {
         var url: URL?
         switch source {
-        case .a:
-            url = try? FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+        case .s:
+            url = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            url = url?.deletingLastPathComponent()
         case .d:
             url = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
         case .p:

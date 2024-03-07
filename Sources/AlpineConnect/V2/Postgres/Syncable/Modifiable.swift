@@ -15,6 +15,8 @@ public protocol Modifiable: CDObject {
     func update(missingRequirements: Bool, isChanged: Bool, in context: NSManagedObjectContext)
     func deleteObject(in context: NSManagedObjectContext?)
     func getAllDependentElements() -> [Any]
+    
+    func modifyRelation(with geometry: String?)
 }
 
 public extension Modifiable {
@@ -49,4 +51,8 @@ public extension Modifiable {
             delete(in: context, doSave: false)
         }
      }
+    
+    func modifyRelation(with geometry: String?) {
+        
+    }
 }
