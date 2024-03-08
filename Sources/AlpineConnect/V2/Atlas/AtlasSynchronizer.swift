@@ -23,7 +23,10 @@ public class AtlasSynchronizer {
     func synchronize(in context: NSManagedObjectContext) async throws {
         try await objectType.createLayer()
         
-        guard objectType.cleanPredicate != nil else { return }
+        guard objectType.cleanPredicate != nil else { 
+            syncManager.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: 0)
+            return 
+        }
         
         var totalObjectsCount = 0
         totalObjectsCount = try objectType.getCount(using: nil, in: context, performInContext: true)
