@@ -115,6 +115,18 @@ public extension ConnectUser {
             setValue(newValue, for: "requires_sync")
         }
     }
+    
+    
+    var notExportedCount: Int {
+        get {
+            value(for: "not_exported_count") as? Int ?? 0
+        }
+        set {
+            setValue(newValue, for: "not_exported_count")
+        }
+    }
+    
+    
 }
 
 private extension ConnectUser {

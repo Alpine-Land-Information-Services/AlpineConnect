@@ -35,7 +35,7 @@ struct ResetModifier: ViewModifier {
             AppReset.forceReset(code: currentCode)
         }
         else if core.defaults.resetCode == nil {
-            AppReset.setCode("w0_a.d.p")
+            AppReset.setCode(currentCode)
         }
         
         AppReset.checkToReset(code: currentCode)
