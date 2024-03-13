@@ -58,6 +58,10 @@ public extension ConnectUser {
         data["first_name"] as? String ?? "No First Name"
     }
     
+    var lastName: String {
+        data["last_name"] as? String ?? "No Last Name"
+    }
+    
     var fullName: String {
         let first = data["first_name"] as? String ?? "No First Name"
         let last = data["last_name"] as? String ?? "No Last Name"
