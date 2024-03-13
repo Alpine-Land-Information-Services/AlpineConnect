@@ -20,6 +20,7 @@ public class ConnectUser {
     
     public var email: String
     
+    
     internal init(for serverUser: ServerUserResponse) { // user is created on login and should not be initialized elsewhere.
         self.email = serverUser.email
         data = Dictionary.getFromDefaults(key: serverUser.email) ?? Self.makeUser(for: serverUser)
