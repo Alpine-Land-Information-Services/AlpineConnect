@@ -127,11 +127,11 @@ extension ConnectManager {
         createToken(from: data.sessionToken)
         if let lastLogin = Connect.lastSavedLogin {
             if lastLogin != loginData.email {
-                return ConnectionResponse(result: .moreDetail, detail: .overrideKeychain)
+                return ConnectionResponse(result: .moreDetail, detail: .overrideKeychain) // users do not match but connect user is not init here yet
             }
         }
         
-        return authManager.attemptToSave(for: data.user, with: loginData)
+        return authManager.attemptToSave(for: data.user, with: loginData) // connect user is init here
     }
     
     func attemptOfflineLogin() async -> ConnectionResponse {

@@ -33,19 +33,19 @@ public struct SyncView: View {
                 syncedRecords
             }
             .background(Color(uiColor: .systemGray6))
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Menu {
-                        Button(role: .destructive) {
-                            tracker.manager.userSyncCancelAlert()
-                        } label: {
-                            Label("Cancel Sync", systemImage: "exclamationmark.octagon")
-                        }
-                    } label: {
-                        Label("Options", systemImage: "ellipsis.circle")
-                    }
-                }
-            }
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    Menu {
+//                        Button(role: .destructive) {
+//                            tracker.manager.userSyncCancelAlert()
+//                        } label: {
+//                            Label("Cancel Sync", systemImage: "exclamationmark.octagon")
+//                        }
+//                    } label: {
+//                        Label("Options", systemImage: "ellipsis.circle")
+//                    }
+//                }
+//            }
         }
         .interactiveDismissDisabled(tracker.status != .none && tracker.status != .canceled)
         .onChange(of: tracker.status) { _, newValue in

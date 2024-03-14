@@ -107,7 +107,7 @@ public class StorageConnection {
             self.status = status
         }
         catch {
-            fatalError()
+            Core.shared.makeError(error: error)
         }
     }
 

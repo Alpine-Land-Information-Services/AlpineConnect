@@ -285,7 +285,7 @@ private extension AlpineLoginView_V2 {
         }
         let proceedNoOverride = ConnectAlertButton(label: "Proceed Without Override", role: .cancel, action: doSignIn)
         
-        currentAlert = ConnectAlert(title: "New Sign In", message: "Your sign in will override previous stored credentials. \n\nGoing forward, any future attempts to sign in while offline will only work for this account unless a new sign in is performed while online.", buttons: [proceedButton, proceedNoOverride])
+        currentAlert = ConnectAlert(title: "New Sign In", message: "Your sign in will override previous stored credentials. \n\nGoing forward, any future attempts to sign in while offline will only work for this account unless a new sign in is performed while online.", buttons: [proceedButton], dismissButton: proceedNoOverride)
     }
     
     func keychainSaveFailAlert() {

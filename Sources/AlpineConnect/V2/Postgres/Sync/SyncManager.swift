@@ -81,10 +81,10 @@ public class SyncManager {
         
         tracker.currentSyncStartTime = Date()
         print(code: .red, "start time: \(tracker.currentSyncStartTime)")
-        print(code: .red, "last  sync: \(Connect.user.lastSync)")
+        print(code: .red, "last  sync: \(String(describing: Connect.user.lastSync))")
         tracker.totalRecordsToSync = getRecordCount(for: type, importable: importable, exportable: exportable) + container.atlasObjects.count
 
-        scheduleTimer()
+//        scheduleTimer() // Sync timeout functionality
         if showUI(for: type) {
             showUI()
         }
