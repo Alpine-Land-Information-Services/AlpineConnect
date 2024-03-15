@@ -33,6 +33,8 @@ public class ConnectManager: ObservableObject {
     private var loginInfo: LoginConnectionInfo!
     var authManager: AuthManager = AuthManager()
     
+    public var didSignInOnline = false
+    
     private var postgresInfo: PostgresInfo?
     var isPostgresEnabled: Bool {
         postgresInfo != nil
@@ -59,6 +61,7 @@ public class ConnectManager: ObservableObject {
         shared.loginInfo = nil
         shared.postgresInfo = nil
         shared.postgres = nil
+        shared.didSignInOnline = false
     }
 }
 
@@ -103,19 +106,25 @@ extension ConnectManager {
             return response
         }
         
-        let processedResponse = try await processBackyardData(data)
-        guard processedResponse.result == .success else {
-            return processedResponse
+        DispatchQueue.main.sync {
+            ConnectManager.shared.user = ConnectUser(for: data.user)
+            ConnectManager.shared.didSignInOnline = true
         }
         
         //MARK: Connect user is initiated.
         
         guard postgresInfo != nil else {
-            return processedResponse
+            return try await processBackyardData(data)
         }
         
         self.postgresInfo!.databaseType = user.databaseType
-        return try await attemptPostgresLogin(with: self.postgresInfo!)
+        
+        let postgresResponse = try await attemptPostgresLogin(with: self.postgresInfo!)
+        guard postgresResponse.result == .success else {
+            return postgresResponse
+        }
+        
+        return try await processBackyardData(data)
     }
     
     private func attemptPostgresLogin(with info: PostgresInfo) async throws -> ConnectionResponse {
@@ -125,10 +134,6 @@ extension ConnectManager {
     
     private func processBackyardData(_ data: BackyardLogin.Response) async throws -> ConnectionResponse {
         createToken(from: data.sessionToken)
-        
-        DispatchQueue.main.sync {
-            ConnectManager.shared.user = ConnectUser(for: data.user)
-        }
         
         if let lastLogin = Connect.lastSavedLogin {
             if lastLogin != loginData.email {
