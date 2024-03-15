@@ -125,13 +125,18 @@ extension ConnectManager {
     
     private func processBackyardData(_ data: BackyardLogin.Response) async throws -> ConnectionResponse {
         createToken(from: data.sessionToken)
+        
+        DispatchQueue.main.sync {
+            ConnectManager.shared.user = ConnectUser(for: data.user)
+        }
+        
         if let lastLogin = Connect.lastSavedLogin {
             if lastLogin != loginData.email {
-                return ConnectionResponse(result: .moreDetail, detail: .overrideKeychain) // users do not match but connect user is not init here yet
+                return ConnectionResponse(result: .moreDetail, detail: .overrideKeychain)
             }
         }
         
-        return authManager.attemptToSave(for: data.user, with: loginData) // connect user is init here
+        return authManager.saveUser(with: loginData) //MARK: Connect user is init here
     }
     
     func attemptOfflineLogin() async -> ConnectionResponse {
@@ -236,7 +241,7 @@ extension ConnectManager {
 extension ConnectManager {
     
     func overrideCredentials() -> ConnectionResponse {
-        authManager.saveUser(with: loginData.email)
+        authManager.saveUser(with: loginData)
     }
 }
 

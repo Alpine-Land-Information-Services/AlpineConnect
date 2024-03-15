@@ -28,20 +28,23 @@ class AuthManager {
         UserDefaults().bool(forKey: "AC_is_biometrics_authorized")
     }
 
-    func attemptToSave(for serverUser: ServerUserResponse, with credentials: CredentialsData) -> ConnectionResponse {
-        DispatchQueue.main.sync {
-            ConnectManager.shared.user = ConnectUser(for: serverUser)
-        }
+//    func attemptToSave(for serverUser: ServerUserResponse, with credentials: CredentialsData) -> ConnectionResponse {
+////        DispatchQueue.main.sync {
+////            ConnectManager.shared.user = ConnectUser(for: serverUser)
+////        }
+//        
+//
+//        
+//        return saveUser(with: credentials.email)
+//    }
+    
+    func saveUser(with credentials: CredentialsData) -> ConnectionResponse {
         
         guard saveToKeychain(account: credentials.email, password: credentials.password) else {
             return ConnectionResponse(result: .moreDetail, detail: .keychainSaveFail)
         }
         
-        return saveUser(with: credentials.email)
-    }
-    
-    func saveUser(with email: String) -> ConnectionResponse {
-        CoreAppControl.shared.defaults.lastUser = email
+        CoreAppControl.shared.defaults.lastUser = credentials.email
         return ConnectionResponse(result: .success)
     }
     

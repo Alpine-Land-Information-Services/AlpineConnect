@@ -280,7 +280,7 @@ private extension AlpineLoginView_V2 {
     }
     
     func overrideKeychainAlert() {
-        let proceedButton = ConnectAlertButton(label: "Proceed") {
+        let proceedButton = ConnectAlertButton(label: "Override") {
             processLoginResponse(manager.overrideCredentials())
         }
         let proceedNoOverride = ConnectAlertButton(label: "Proceed Without Override", role: .cancel, action: doSignIn)
