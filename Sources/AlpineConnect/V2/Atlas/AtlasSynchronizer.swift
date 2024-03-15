@@ -12,25 +12,25 @@ import AlpineCore
 
 public class AtlasSynchronizer {
     
-    var syncManager: SyncManager
+    var syncManager: SyncManager?
     var objectType: AtlasSyncable.Type
     
-    init(for objectType: AtlasSyncable.Type, syncManager: SyncManager) {
+    public init(for objectType: AtlasSyncable.Type, syncManager: SyncManager?) {
         self.objectType = objectType
         self.syncManager = syncManager
     }
     
-    func synchronize(in context: NSManagedObjectContext) async throws {
+    public func synchronize(in context: NSManagedObjectContext) async throws {
         try await objectType.createLayer()
         
         guard objectType.cleanPredicate != nil else { 
-            syncManager.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: 0)
+            syncManager?.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: 0)
             return 
         }
         
         var totalObjectsCount = 0
         totalObjectsCount = try objectType.getCount(using: nil, in: context, performInContext: true)
-        syncManager.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: totalObjectsCount)
+        syncManager?.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: totalObjectsCount)
 
         guard totalObjectsCount > 0 else { return }
 
@@ -51,14 +51,14 @@ public class AtlasSynchronizer {
                 }
             }
             try await objectType.performAtlasSynchronization(with: featuresData)
-            syncManager.tracker.progressUpdate(adding: Double(featuresData.count))
+            syncManager?.tracker.progressUpdate(adding: Double(featuresData.count))
             
             featuresData.removeAll()
             
         } while objects != nil
 
         try objectType.clearCache()
-        syncManager.tracker.endRecordSync()
+        syncManager?.tracker.endRecordSync()
     }
     
     func createAtlasData(from objects: [AtlasSyncable]) throws -> [AtlasFeatureData] {
