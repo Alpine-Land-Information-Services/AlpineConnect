@@ -31,7 +31,7 @@ struct ResetModifier: ViewModifier {
     }
     
     func checkToResetData() {
-        if FileManager.default.fileExists(atPath: FS.appDoucumentsURL.appending(path: "Layers").path(percentEncoded: false)) {
+        if FileManager.default.fileExists(atPath: FS.appDocumentsURL.appending(path: "Layers").path(percentEncoded: false)) {
             AppReset.forceReset(code: currentCode)
         }
         else if core.defaults.resetCode == nil {
