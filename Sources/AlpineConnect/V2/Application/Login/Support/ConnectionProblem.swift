@@ -16,10 +16,10 @@ public struct ConnectionProblem: Decodable {
         case detail
     }
     
-    let type: String?
-    let title: String?
-    let status: Int?
-    let detail: String?
+    public let type: String?
+    public let title: String?
+    public let status: Int?
+    public let detail: String?
     
     var customAlert: ConnectAlert?
     
