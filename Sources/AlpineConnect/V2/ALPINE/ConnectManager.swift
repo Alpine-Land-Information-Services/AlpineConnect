@@ -224,8 +224,8 @@ extension ConnectManager {
         
         let response = try await BackyardLogin(info, data: credentials).attemptLogin()
         if let data = response.backyardData {
-            createToken(from: data.sessionToken)
-            return (TokenResponse.success, getStoredToken())
+            let token = createToken(from: data.sessionToken)
+            return (TokenResponse.success, token)
         }
         if let problem = response.problem {
             return (TokenResponse.serverIssue(problem.detail ?? "No details provided."), nil)
@@ -234,12 +234,14 @@ extension ConnectManager {
         return (TokenResponse.unknownIssue, nil)
     }
     
-    func createToken(from value: String) {
+    func createToken(from value: String) -> Token {
+        let expDate = Calendar.current.date(byAdding: .hour, value: 8, to: Date())!
+        let token = Token(rawValue: value, expirationDate: expDate)
         DispatchQueue.main.async { [self] in
-            let expDate = Calendar.current.date(byAdding: .hour, value: 8, to: Date())!
-            token = Token(rawValue: value, expirationDate: expDate)
-            core.defaults.backyardToken = token?.encoded
+            self.token = token
+            core.defaults.backyardToken = token.encoded
         }
+        return token
     }
 }
 
