@@ -113,7 +113,9 @@ public class NetworkMonitor {
     }
     
     public func canConnectToServer(_ server: String = serverURL) async -> Bool {
-        await withCheckedContinuation { continuation in
+        guard connected else { return false }
+        
+        return await withCheckedContinuation { continuation in
             canConnectToServer { connection in
                 continuation.resume(returning: connection)
             }

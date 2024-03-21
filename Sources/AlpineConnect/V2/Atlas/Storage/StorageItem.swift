@@ -29,4 +29,15 @@ public struct StorageItem: Codable, Hashable, Equatable, Identifiable {
     public static var demo: StorageItem {
         StorageItem(name: "county.fgb", type: "File", size: 52087, hash: "23423424", path: "234", contentType: "", created: Date(), lastModified: Date())
     }
+    
+    public var isPack: Bool {
+        let components = name.components(separatedBy: ".")
+        if let ext = components.last {
+            if ext == "zip" {
+                return true
+            }
+            return false
+        }
+        return false
+    }
 }
