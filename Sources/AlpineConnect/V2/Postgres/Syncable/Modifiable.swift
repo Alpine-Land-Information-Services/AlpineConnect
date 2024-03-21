@@ -55,4 +55,9 @@ public extension Modifiable {
     func modifyRelation(with geometry: String?) {
         
     }
+    
+    static func hasMissingRequirements(in context: NSManagedObjectContext) -> Bool {
+        let predicate = NSPredicate(format: "a_missingRequirements = TRUE")
+        return Self.findObject(by: predicate, in: context) != nil
+    }
 }
