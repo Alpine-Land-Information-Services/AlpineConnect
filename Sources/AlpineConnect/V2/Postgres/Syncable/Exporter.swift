@@ -43,7 +43,7 @@ class Exporter {
         repeat {
             try context.performAndWait {
                 objects = try batchFetcher.fetchObjectBatch(in: context) as? [any Exportable]
-                objects?.forEach { $0.observeDeallocation() }
+//                objects?.forEach { $0.observeDeallocation() }
                 if let objects = objects {
                     try export(objects, with: connection)
                     if objectType.isSavedIndependently  {
@@ -72,6 +72,7 @@ private extension Exporter {
     }
 
     func execute(_ query: String, with connection: Connection) throws {
+        guard !query.isEmpty else { return }
         syncManager.currentQuery = query
         let statement = try connection.prepareStatement(text: query)
         defer {statement.close()}
