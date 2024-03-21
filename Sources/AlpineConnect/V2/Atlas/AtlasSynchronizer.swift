@@ -50,6 +50,7 @@ public class AtlasSynchronizer {
                     featuresData = try createAtlasData(from: objects)
                 }
             }
+            guard !featuresData.isEmpty else { break }
             try await objectType.performAtlasSynchronization(with: featuresData)
             syncManager?.tracker.progressUpdate(adding: Double(featuresData.count))
             
