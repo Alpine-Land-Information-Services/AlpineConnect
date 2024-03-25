@@ -21,7 +21,8 @@ public struct AppView_V2<App: View>: View {
     
     let sharedModelContainer: ModelContainer = {
         let schema = Schema([CoreUser.self])
-        let modelConfiguration = ModelConfiguration("Core User Data", schema: schema, isStoredInMemoryOnly: false)
+        let storeURL = URL.documentsDirectory.appending(path: "Core App Data.sqlite")
+        let modelConfiguration = ModelConfiguration("Core App Data", schema: schema, groupContainer: .none)
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
             CoreAppControl.shared.modelContainer = container
@@ -35,7 +36,6 @@ public struct AppView_V2<App: View>: View {
     public init(info: LoginConnectionInfo, @ViewBuilder app: @escaping (_ userID: String) -> App) {
         self.info = info
         self.app = app
-        UIApplication.shared.connectedScenes.first?.inputView?.tintColor = .cyan
 
         print(code: .info, try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false))
         print(code: .info, FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas")!.absoluteString)
