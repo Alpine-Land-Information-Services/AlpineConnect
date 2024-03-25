@@ -28,14 +28,15 @@ public class AtlasSynchronizer {
             return 
         }
         
+        var pred = NSPredicate(format: "a_deleted = false")
         var totalObjectsCount = 0
-        totalObjectsCount = try objectType.getCount(using: nil, in: context, performInContext: true)
+        totalObjectsCount = try objectType.getCount(using: pred, in: context, performInContext: true)
         syncManager?.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: totalObjectsCount)
 
         guard totalObjectsCount > 0 else { return }
 
         let batchFetcher = CDBatchFetcher(for: objectType.entityName, 
-                                          using: nil,
+                                          using: pred,
                                           sortDescriptors: nil,
                                           with: objectType.syncBatchSize, 
                                           isModifying: false)
