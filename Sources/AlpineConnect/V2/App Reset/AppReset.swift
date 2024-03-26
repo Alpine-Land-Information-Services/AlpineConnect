@@ -12,12 +12,14 @@ public class AppReset {
     
     // "code_s.d.p.g"
     // delete files from:
+    // a: "Application Support"  in application's Library folder
     // s: "Sandbox Folder"       delete the whole app folder
     // d: "Documents"            in application's folder
     // p: "Preferences"          in application's Library folder
     // g: Application Group      in "group.com.alpinelis.atlas"
     
     private enum DeleteSource: String {
+        case a
         case s
         case d
         case p
@@ -90,20 +92,33 @@ private extension AppReset {
     }
     
     private static func delete(from source: DeleteSource) {
-        var url: URL?
+        var urls = [URL]()
         switch source {
         case .s:
-            url = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            var url = try? FileManager.default.url(for: .documentDirectory , in: .userDomainMask, appropriateFor: nil, create: false)
+            urls.append(url)
             url = url?.deletingLastPathComponent()
+            var urlFolder = url?.appending(component: "Library")
+            urls.append(urlFolder)
+            urlFolder = url?.appending(component: "SystemData")
+            urls.append(urlFolder)
+            urlFolder = url?.appending(component: "tmp")
+            urls.append(urlFolder)
         case .d:
-            url = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            let url = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            urls.append(url)
         case .p:
-            url = try? FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            var url = try? FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
             url = url?.appending(component: "Preferences")
+            urls.append(url)
+        case .a:
+            let url = try? FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            urls.append(url)
         case .g:
-            url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas")
+            urls.append(FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas"))
         }
-        if let url {
+        
+        for url in urls {
             try? FileManager.default.removeItem(at: url)
         }
     }

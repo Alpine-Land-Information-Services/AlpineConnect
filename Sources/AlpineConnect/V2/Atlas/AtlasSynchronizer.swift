@@ -28,7 +28,7 @@ public class AtlasSynchronizer {
             return 
         }
         
-        var pred = NSPredicate(format: "a_deleted = false")
+        let pred = NSPredicate(format: "a_deleted = false")
         var totalObjectsCount = 0
         totalObjectsCount = try objectType.getCount(using: pred, in: context, performInContext: true)
         syncManager?.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: totalObjectsCount)
