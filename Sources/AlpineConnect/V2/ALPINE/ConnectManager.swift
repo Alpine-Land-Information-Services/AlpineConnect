@@ -22,7 +22,7 @@ public class ConnectManager: ObservableObject {
     }
         
     @Published public var user: ConnectUser!    
-    @Published public var token: Token?
+    public var token: Token?
     
     @Published var isSignedIn = false
     @Published public var inOfflineMode = false
