@@ -98,11 +98,11 @@ private extension AppReset {
             var url = try? FileManager.default.url(for: .documentDirectory , in: .userDomainMask, appropriateFor: nil, create: false)
             urls.append(url)
             url = url?.deletingLastPathComponent()
-            var urlFolder = url?.appending(component: "Library")
-            urls.append(urlFolder)
-            urlFolder = url?.appending(component: "SystemData")
+            var urlFolder = url?.appending(component: "SystemData")
             urls.append(urlFolder)
             urlFolder = url?.appending(component: "tmp")
+            urls.append(urlFolder)
+            urlFolder = url?.appending(component: "Library")
             urls.append(urlFolder)
         case .d:
             let url = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
@@ -122,4 +122,11 @@ private extension AppReset {
             try? FileManager.default.removeItem(at: url)
         }
     }
+}
+
+public extension AppReset {
+    
+    static func forcedDeleteApplicationStorage() {
+        delete(from: .s)
+    } 
 }
