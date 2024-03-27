@@ -53,6 +53,10 @@ public extension ConnectUser {
         data["is_admin"] as? Bool ?? false
     }
     
+    var isAppAdmin: Bool {
+        data["is_application_admin"] as? Bool ?? false
+    }
+    
     var guid: UUID {
         let id = data["guid"] as? String ?? "00000000-0000-0000-0000-000000000000"
         return UUID(uuidString: id)!

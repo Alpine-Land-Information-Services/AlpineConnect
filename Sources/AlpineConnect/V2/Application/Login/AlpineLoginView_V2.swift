@@ -52,7 +52,7 @@ struct AlpineLoginView_V2: View {
         }
         .connectAlert(currentAlert, isPresented: $isAlertPresented)
         .onAppear {
-            debugFillCheck()
+            fieldsFillCheck()
         }
         .onDisappear {
             clear()
@@ -202,26 +202,30 @@ private extension AlpineLoginView_V2 {
         guard manager.authManager.biometricsAuthorized else { return }
         manager.authManager.runBioAuth { success in
             if success {
-                fillFields()
+                fillPassword()
                 loginPress()
             }
         }
         
     }
     
-    func fillFields() {
+    func fillPassword() {
         guard let email = manager.core.defaults.lastUser,
               let password = AuthManager.retrieveFromKeychain(account: email)
         else { return }
-        self.email = email
+        
         self.password = password
     }
     
     
-    func debugFillCheck() {
-    #if DEBUG
-        fillFields()
-    #endif
+    func fieldsFillCheck() {
+        if let email = manager.core.defaults.lastUser {
+            self.email = email
+        }
+        
+        #if DEBUG
+        fillPassword()
+        #endif
     }
 }
 
