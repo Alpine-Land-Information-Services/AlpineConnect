@@ -57,7 +57,7 @@ public extension Modifiable {
     }
     
     static func hasMissingRequirements(in context: NSManagedObjectContext) -> Bool {
-        let predicate = NSPredicate(format: "a_missingRequirements = TRUE")
+        let predicate = NSPredicate(format: "a_missingRequirements = TRUE AND a_deleted = FALSE")
         return Self.findObject(by: predicate, in: context) != nil
     }
 }

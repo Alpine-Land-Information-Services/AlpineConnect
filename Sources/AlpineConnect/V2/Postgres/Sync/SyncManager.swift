@@ -48,9 +48,9 @@ public class SyncManager {
         context.mergePolicy = SelectiveMergePolicy()
         tracker.manager = self
         self.database = database
-        DispatchQueue.global(qos: .background).async {
-            database.getNotExported()
-        }
+//        DispatchQueue.global(qos: .background).async {
+//            database.getNotExported()
+//        }
         
         NotificationCenter.default.addObserver(self, selector: #selector(contextDidSave(notification:)), name: NSNotification.Name.NSManagedObjectContextDidSave, object: context)
     }
@@ -233,7 +233,7 @@ public extension SyncManager {
     func clear() {
         tracker = SyncTracker()
         tracker.manager = self
-        database.getNotExported()
+//        database.getNotExported()
     }
     
     func nonSyncAction(_ action: () -> Void) {

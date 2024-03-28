@@ -21,8 +21,6 @@ public protocol Database: AnyObject {
     var poc: NSManagedObjectContext { get }
     
     var container: NSPersistentContainer { get }
-    
-    func getNotExported()
 }
 
 public extension Database {

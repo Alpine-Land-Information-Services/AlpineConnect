@@ -192,26 +192,25 @@ extension SyncTracker {
             self.notExported.removeIfExists(guid)
         }
     }
-
-    //TODO: is this still used???
-    public func fillNotExported(for objects: [CDObject.Type], in context: NSManagedObjectContext) async {
-        do {
-            let notExported = try await getNotExported(for: objects, in: context)
-            DispatchQueue.main.async {
-                self.notExported = notExported
-            }
-        }
-        catch {
-            Core.makeError(error: error, additionalInfo: "Fetching Object Count")
-        }
-    }
     
-    private func getNotExported(for objects: [CDObject.Type], in context: NSManagedObjectContext) async throws -> [UUID] {
-        var ids = [UUID]()
-        for object in objects {
-            ids.append(contentsOf: try await object.getNotExportedCount(in: context))
-        }
-        
-        return ids
-    }
+//    public func fillNotExported(for objects: [CDObject.Type], in context: NSManagedObjectContext) async {
+//        do {
+//            let notExported = try await getNotExported(for: objects, in: context)
+//            DispatchQueue.main.async {
+//                self.notExported = notExported
+//            }
+//        }
+//        catch {
+//            Core.makeError(error: error, additionalInfo: "Fetching Object Count")
+//        }
+//    }
+//    
+//    private func getNotExported(for objects: [CDObject.Type], in context: NSManagedObjectContext) async throws -> [UUID] {
+//        var ids = [UUID]()
+//        for object in objects {
+//            ids.append(contentsOf: try await object.getNotExportedCount(in: context))
+//        }
+//        
+//        return ids
+//    }
 }
