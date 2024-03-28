@@ -128,7 +128,6 @@ public extension ConnectUser {
         }
     }
     
-    
     var notExportedCount: Int {
         get {
             value(for: "not_exported_count") as? Int ?? 0
@@ -137,8 +136,6 @@ public extension ConnectUser {
             setValue(newValue, for: "not_exported_count")
         }
     }
-    
-    
 }
 
 private extension ConnectUser {

@@ -12,6 +12,8 @@ public protocol AtlasModifiable: AtlasSyncable, Modifiable {
     static var isEditable: Bool { get }
     static var isTrackable: Bool { get }
     
+    static var isEditingStarted: Bool { get set }
+    
     var viewRepresentable: AtlasModifiable? { get }
 }
 
