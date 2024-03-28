@@ -115,7 +115,7 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
     public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print(error.localizedDescription)
     }
-
+    
     public func setDeviceOrientation(_ orientation: UIDeviceOrientation) {
         switch orientation {
         case .portrait:
