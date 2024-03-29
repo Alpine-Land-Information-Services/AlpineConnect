@@ -102,7 +102,7 @@ public extension ConnectUser {
     
     var databaseType: DatabaseType {
         get {
-            let db = value(for: "database") as? String ?? DatabaseType.sandbox.rawValue // CHANGED TO SANDBOX FOR TESTING
+            let db = value(for: "database") as? String ?? DatabaseType.production.rawValue // CHANGED TO SANDBOX FOR TESTING
             return DatabaseType(rawValue: db) ?? .production
         }
         set {
