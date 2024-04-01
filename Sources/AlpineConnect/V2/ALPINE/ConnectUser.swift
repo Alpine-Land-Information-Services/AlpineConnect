@@ -21,8 +21,14 @@ public class ConnectUser {
     public var email: String
     
     internal init(for serverUser: ServerUserResponse) { // user is created on login and should not be initialized elsewhere.
-        self.email = serverUser.email
         data = Dictionary.getFromDefaults(key: serverUser.email) ?? Self.makeUser(for: serverUser)
+        self.email = serverUser.email
+        
+        data["email"] = serverUser.email
+        data["first_name"] = serverUser.firstName
+        data["last_name"] = serverUser.lastName
+        data["is_admin"] = serverUser.isAdmin
+        
     }
     
     internal init?(for email: String) {
@@ -58,7 +64,7 @@ public extension ConnectUser {
     }
     
     var guid: UUID {
-        let id = data["guid"] as? String ?? "00000000-0000-0000-0000-000000000000"
+        let id = data["guid"] as? String ?? UUID().uuidString
         return UUID(uuidString: id)!
     }
     
