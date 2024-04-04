@@ -16,7 +16,7 @@ public protocol AtlasSyncable: AtlasObject, Importable {
     static var syncFields: [AtlasSyncField] { get }
     
     static func performAtlasSynchronization(with data: [AtlasFeatureData]) async throws
-    static func createLayer() async throws
+    static func reloadOrCreateLayer() async throws
     
     static func clearCache() throws
     static func deleteLayer() throws

@@ -21,7 +21,7 @@ public class AtlasSynchronizer {
     }
     
     public func synchronize(in context: NSManagedObjectContext) async throws {
-        try await objectType.createLayer()
+        try await objectType.reloadOrCreateLayer()
         
         guard objectType.cleanPredicate != nil else { 
             syncManager?.tracker.makeRecord(name: objectType.displayName, type: .atlasSync, recordCount: 0)
