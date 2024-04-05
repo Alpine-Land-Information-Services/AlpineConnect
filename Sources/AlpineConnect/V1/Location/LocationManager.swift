@@ -138,9 +138,9 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
         case .portraitUpsideDown:
             manager.headingOrientation = CLDeviceOrientation.portraitUpsideDown
         case .landscapeLeft:
-            manager.headingOrientation = CLDeviceOrientation.landscapeLeft
-        case .landscapeRight:
             manager.headingOrientation = CLDeviceOrientation.landscapeRight
+        case .landscapeRight:
+            manager.headingOrientation = CLDeviceOrientation.landscapeLeft
         default:
             break
         }
