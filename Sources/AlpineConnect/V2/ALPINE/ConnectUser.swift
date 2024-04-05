@@ -55,6 +55,10 @@ public class ConnectUser {
 
 public extension ConnectUser {
     
+    var isSandbox: Bool {
+        databaseType == .sandbox
+    }
+    
     var isAdmin: Bool {
         data["is_admin"] as? Bool ?? false
     }
