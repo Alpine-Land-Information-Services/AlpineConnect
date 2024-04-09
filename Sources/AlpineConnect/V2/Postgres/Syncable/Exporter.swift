@@ -37,6 +37,8 @@ class Exporter {
             return
         }
 
+        defer { syncManager.currentQuery = "" }
+
         let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.exportPredicate, sortDescriptors: nil, with: objectType.exportBatchSize, isModifying: true)
         var objects: [any Exportable]? = []
 
@@ -52,8 +54,6 @@ class Exporter {
                 }
             }
         } while objects != nil
-
-        defer { syncManager.currentQuery = "" }
 
         objectType.additionalActionsAfterExport()
         syncManager.tracker.endRecordSync()
