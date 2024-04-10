@@ -64,8 +64,10 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
         manager.pausesLocationUpdatesAutomatically = false
         manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         manager.activityType = .otherNavigation
-        manager.startUpdatingLocation()
         
+        manager.startUpdatingLocation()
+        manager.requestLocation()
+
         manager.headingFilter = 5
         manager.startUpdatingHeading()
     }
