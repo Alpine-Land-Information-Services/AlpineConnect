@@ -8,6 +8,8 @@
 import SwiftUI
 import Network
 
+import AlpineCore
+
 public class SwiftUIUpdater: ObservableObject {
     
     @Environment(\.openURL) var openURL
@@ -98,20 +100,22 @@ public class SwiftUIUpdater: ObservableObject {
     }
     
     func newAlert() {
-        var alert = AppAlert(title: "No Updates", message: "You are already on the latest version.")
+        var alert = CoreAlert(title: "No Updates", message: "You are already on the latest version.", buttons: [.ok])
+        let updateButton = CoreAlertButton(title: "Update Now", action: callUpdate)
         switch updater.updateStatus {
         case .updateRequired:
-            alert = AppAlert(title: "Update Required", message: "Your application version is no longer supported. \n\nPlease update to continue.", dismiss: AlertAction(text: "Update Now", action: callUpdate))
+            alert = CoreAlert(title: "Update Required", message: "Your application version is no longer supported. \n\nPlease update to continue.", buttons: [updateButton])
         case .updatedAvailble:
-            alert = AppAlert(title: "New Version Avalible", message: "Update to the latest version for best functionality.", dismiss: AlertAction(text: "Not Now", role: .destructive), actions: [AlertAction(text: "Update", action: callUpdate)])
+            alert = CoreAlert(title: "New Version Avalible", message: "Update to the latest version for best functionality.", buttons: [.notNow, updateButton])
         case .latestVersion:
             break
         case .error:
-            alert = AppAlert(title: "Something Went Wrong", message: "Please try again later")
+            alert = CoreAlert(title: "Something Went Wrong", message: "Please try again later.", buttons: [.ok])
         case .notConnected:
-            alert = AppAlert(title: "No Connection", message: "Network connection required to check for updates.")
+            alert = CoreAlert(title: "No Connection", message: "Network connection required to check for updates.", buttons: [.ok])
         }
         
-        AppControlOld.makeAlert(alert: alert)
+        showAlert = false
+        Core.makeAlert(alert)
     }
 }

@@ -346,9 +346,13 @@ private extension SyncManager { //MARK: Import
         }
         
         syncErrorsResolver = SyncErrorsResolver()
+        let syncRecordBackups = tracker.syncRecords
+
         repeat {
             await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
-        } while tracker.status == .error && syncErrorsResolver.shouldRepeat()
+        } while tracker.status == .error && syncErrorsResolver.shouldRepeat(onRepeat: {
+            self.tracker.syncRecords = syncRecordBackups
+        })
         
         guard tracker.status == .importDone else {
             return
@@ -465,11 +469,15 @@ private extension SyncManager { //MARK: Export
             tracker.updateStatus(.exportDone)
             return
         }
-
+        
+        let syncRecordBackups = tracker.syncRecords
         syncErrorsResolver = SyncErrorsResolver()
+        
         repeat {
             await doExport(in: context, objects: exportable, helpers: container.exportHelperObjects)
-        } while tracker.status == .error && syncErrorsResolver.shouldRepeat()
+        } while tracker.status == .error && syncErrorsResolver.shouldRepeat(onRepeat: {
+            tracker.syncRecords = syncRecordBackups
+        })
         
         guard tracker.status == .exportDone else {
             return
@@ -503,9 +511,6 @@ private extension SyncManager { //MARK: Export
             
             ConnectManager.shared.postgres?.pool?.withConnection { result in
                 do {
-//                    if self.syncErrorsResolver.repeatAttempts == 2 {
-//                        throw AlpineError("connectionClosed", file: "", function: "", line: 0)
-//                    }
                     let connection = try result.get()
                     self.activeConnection = connection
                     defer { connection.close() }

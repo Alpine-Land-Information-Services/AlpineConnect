@@ -28,8 +28,14 @@ class SyncErrorsResolver {
         return isForeground
     }
     
-    func shouldRepeat() -> Bool {
+    func shouldRepeat(onRepeat: () -> Void) -> Bool {
         repeatAttempts -= 1
-        return repeatAttempts > 0
+        
+        if repeatAttempts > 0 {
+            onRepeat()
+            return true
+        }
+        
+        return false
     }
 }
