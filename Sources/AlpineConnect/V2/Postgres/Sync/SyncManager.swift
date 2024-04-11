@@ -41,6 +41,8 @@ public class SyncManager {
     
     var timer: Timer?
     
+    var syncErrorsResolver = SyncErrorsResolver()
+    
     public init(for container: ObjectContainer, database: any Database, context: NSManagedObjectContext) {
         self.container = container
         tracker = SyncTracker()
@@ -343,7 +345,10 @@ private extension SyncManager { //MARK: Import
             return
         }
         
-        await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
+        syncErrorsResolver = SyncErrorsResolver()
+        repeat {
+            await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
+        } while tracker.status == .error && syncErrorsResolver.shouldRepeat()
         
         guard tracker.status == .importDone else {
             return
@@ -372,7 +377,7 @@ private extension SyncManager { //MARK: Import
         
         await withCheckedContinuation({ continuation in
             ConnectManager.shared.postgres?.pool?.withConnection { con_from_pool in
-                do {
+                do {//throw AlpineError("connectionClosed", file: "", function: "", line: 0)
                     try context.performAndWait {
                         let connection = try con_from_pool.get()
                         self.activeConnection = connection
@@ -404,9 +409,11 @@ private extension SyncManager { //MARK: Import
                     }
                 }
                 catch {
+                    self.syncErrorsResolver.error = error 
                     self.nonCancelAction {
                         self.tracker.updateStatus(.error)
-                        Core.makeError(error: error, additionalInfo: self.currentQuery, showToUser: self.isForeground)
+                        Core.makeError(error: error, additionalInfo: self.currentQuery,
+                                       showToUser: self.syncErrorsResolver.shouldShowToUser(self.isForeground))
                     }
                     continuation.resume()
                 }
@@ -459,8 +466,11 @@ private extension SyncManager { //MARK: Export
             return
         }
 
-        await doExport(in: context, objects: exportable, helpers: container.exportHelperObjects)
-
+        syncErrorsResolver = SyncErrorsResolver()
+        repeat {
+            await doExport(in: context, objects: exportable, helpers: container.exportHelperObjects)
+        } while tracker.status == .error && syncErrorsResolver.shouldRepeat()
+        
         guard tracker.status == .exportDone else {
             return
         }
@@ -486,13 +496,16 @@ private extension SyncManager { //MARK: Export
         tracker.updateStatus(.exporting, message: "Exporting")
         
         await withCheckedContinuation { continuation in
-            guard ConnectManager.shared.postgres?.pool !=  nil else {
+            guard ConnectManager.shared.postgres?.pool != nil else {
                 continuation.resume()
                 return
             }
             
             ConnectManager.shared.postgres?.pool?.withConnection { result in
                 do {
+//                    if self.syncErrorsResolver.repeatAttempts == 2 {
+//                        throw AlpineError("connectionClosed", file: "", function: "", line: 0)
+//                    }
                     let connection = try result.get()
                     self.activeConnection = connection
                     defer { connection.close() }
@@ -519,9 +532,11 @@ private extension SyncManager { //MARK: Export
                     continuation.resume()
                 }
                 catch {
+                    self.syncErrorsResolver.error = error 
                     self.nonCancelAction {
                         self.tracker.updateStatus(.error)
-                        Core.makeError(error: error, additionalInfo: self.currentQuery, showToUser: self.isForeground)
+                        Core.makeError(error: error, additionalInfo: self.currentQuery, 
+                                       showToUser: self.syncErrorsResolver.shouldShowToUser(self.isForeground))
                     }
                     context.performAndWait {
                         context.rollback()
