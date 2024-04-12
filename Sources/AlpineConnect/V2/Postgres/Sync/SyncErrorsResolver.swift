@@ -16,15 +16,17 @@ class SyncErrorsResolver {
         self.repeatAttempts = repeatAttempts
     }
     
-    func shouldShowToUser(_ isForeground: Bool) -> Bool{
-        if let error, 
-            (error.localizedDescription.contains("socketError(cause:") 
-             || error.localizedDescription.contains("connectionClosed")
-//             || (error as? AlpineError)?.message == "connectionClosed"
-            ) 
-        {
+    func shouldShowToUser(_ isForeground: Bool) -> Bool {
+        guard let error, repeatAttempts > 0 else { return isForeground }
+        let description = error.localizedDescription
+        
+        if description.contains("socketError") {
             return false
         }
+        else if description.contains("connectionClosed") {
+            return false
+        }
+        
         return isForeground
     }
     
