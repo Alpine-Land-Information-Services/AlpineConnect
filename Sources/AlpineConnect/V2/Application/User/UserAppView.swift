@@ -33,6 +33,7 @@ struct UserAppView<App: View>: View {
                 .scaleEffect(2)
                 .onAppear {
                     CoreAppControl.shared.user = users.first ?? assingUser(id: userID)
+                    Core.makeEvent("Sign in successful", type: .system)
                 }
         }
         else {
