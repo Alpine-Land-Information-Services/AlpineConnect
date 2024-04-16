@@ -24,22 +24,24 @@ struct UserAppView<App: View>: View {
         self.userID = userID
         self.app = app()
         _users = Query(filter: #Predicate<CoreUser> { $0.id == userID })
-
     }
-    
+
     var body: some View {
         if CoreAppControl.shared.user == nil {
             ProgressView()
                 .scaleEffect(2)
                 .onAppear {
-                    CoreAppControl.shared.user = users.first ?? assingUser(id: userID)
-                    Core.makeEvent("Sign in successful", type: .system)
+                    CoreAppControl.shared.assignUser(users.first ?? assingUser(id: userID))
+                    Core.makeEvent("sign in successful", type: .system)
                 }
         }
         else {
             app
                 .environment(CoreAppControl.shared)
                 .locationToggler
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification), perform: { _ in
+                    
+                })
         }
     }
     
