@@ -23,7 +23,7 @@ public class Tracker {
         }
     }
     
-    public static func appRleaseNotesURL() -> URL {
+    public static func appReleaseNotesURL() -> URL {
         let releases = URL(string: "https://alpinesupport.azurewebsites.net/Releases")!
         var appVersion = appVersion()
         guard appVersion != "Unknown" else { return releases }
