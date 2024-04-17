@@ -23,8 +23,8 @@ public class Tracker {
         }
     }
     
-    public static func appReleaseNotesURL() -> URL {
-        let releases = URL(string: "https://alpinesupport.azurewebsites.net/Releases")!
+    public static func appReleaseNotesURL(preview: Bool = false) -> URL {
+        let releases = preview ? URL(string: "https://alpinesupport-preview.azurewebsites.net/Releases")! : URL(string: "https://alpinesupport.azurewebsites.net/Releases")!
         var appVersion = appVersion()
         guard appVersion != "Unknown" else { return releases }
         appVersion = appVersion.replacingOccurrences(of: ".", with: "_")
@@ -32,6 +32,7 @@ public class Tracker {
         
         return releases.appending(path: appName).appending(path: appVersion)
     }
+    
     
     public static func appVersion() -> String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"

@@ -8,11 +8,15 @@
 import Foundation
 import Network
 import SwiftUI
+
+
 import AlpineUI
+import AlpineCore
 
 @Observable
 public class NetworkMonitor {
     
+    @available(*, deprecated, message: "Use AlpineCore NetworkTracker")
     static public let shared = NetworkMonitor()
     
     public enum ConnectionType: String {
@@ -22,6 +26,7 @@ public class NetworkMonitor {
     }
     
     public var connectionType = ConnectionType.offline
+    
     public var connected = false
     
     public static var serverURL = "https://alpinebackyard20220722084741.azurewebsites.net/"
@@ -120,5 +125,17 @@ public class NetworkMonitor {
                 continuation.resume(returning: connection)
             }
         }
+    }
+}
+
+public extension NetworkMonitor {
+    
+    func connectedAction(action: () -> Void) {
+        guard connected else {
+            Core.makeSimpleAlert(title: "Offline", message: "Network connection is required for this action.")
+            return
+        }
+        
+        action()
     }
 }

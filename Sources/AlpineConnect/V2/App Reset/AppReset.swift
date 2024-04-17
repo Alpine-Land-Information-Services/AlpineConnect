@@ -72,7 +72,7 @@ private extension AppReset {
             
             core.defaults.resetWithCode(currectAppResetCode)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                exit(0)
+                Core.quit()
             }
         })])
         Core.makeAlert(alert)

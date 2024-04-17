@@ -56,35 +56,20 @@ struct AppChangeLogView: View {
     var body: some View {
         GeometryReader { geometry in
             NavigationStack {
-                List {
+                VStack(spacing: 0) {
                     HStack {
                         Text(previousFullVersion)
                         Image(systemName: "arrow.forward")
                         Text(currentVersion)
                     }
                     .frame(maxWidth: .infinity)
-                    .font(.headline)
-                    .padding()
-
-                    Section {
-                        ListPickerBlock(style: .segmented, value: $changesSelection) {
-                            Text(appName + " Changelog")
-                                .tag("app")
-                            Text("Atlas Changelog")
-                                .tag("atlas")
-                        }
-                    }
-                    
-                    Section {
-                        if changesSelection == "app" {
-                            WebView(url: .constant(appChangelogURL))
-                                .frame(height: geometry.size.width > geometry.size.height ? 340 : 640)
-                        }
-                        else {
-                            WebView(url: .constant(URL(string: "https://raw.githubusercontent.com/Alpine-Land-Information-Services/iOS-Docs/main/atlas-changelog.md")!))
-                                .frame(height: geometry.size.width > geometry.size.height ? 340 : 640)
-                        }
-                    }
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .padding(.bottom)
+                    .background()
+                    .backgroundStyle(.ultraThickMaterial)
+                    Divider()
+                    WebView(url: .constant(appChangelogURL))
                 }
                 .navigationTitle(appName + " Has Been Updated")
                 .toolbar {
@@ -96,6 +81,7 @@ struct AppChangeLogView: View {
                 }
             }
         }
+        .preferredColorScheme(.dark)
     }
 }
 
@@ -107,7 +93,7 @@ fileprivate struct ChangelogModifier: ViewModifier {
         CoreAppControl.shared
     }
     
-    var appURL: String
+    var appURL: URL
     var includeAtlas: Bool
     
     func body(content: Content) -> some View {
@@ -118,7 +104,7 @@ fileprivate struct ChangelogModifier: ViewModifier {
                 }
             }
             .sheet(isPresented: $isChangelogPresented, content: {
-                AppChangeLogView(appChangelogURL: URL(string: appURL)!, showAtlas: includeAtlas)
+                AppChangeLogView(appChangelogURL: appURL, showAtlas: includeAtlas)
             })
     }
     
@@ -128,25 +114,21 @@ fileprivate struct ChangelogModifier: ViewModifier {
                 isChangelogPresented.toggle()
             }
         }
-        else {
-            core.defaults.appBuild = Tracker.appBuild()
-            core.defaults.appVersion = Tracker.appVersion()
-        }
     }
 }
 
 public extension View {
     
-    func changelog(appURL: String, includeAtlas: Bool) -> some View {
+    func changelog(appURL: URL, includeAtlas: Bool) -> some View {
         modifier(ChangelogModifier(appURL: appURL, includeAtlas: includeAtlas))
     }
 }
 
-//#Preview {
-//    VStack {
-//        
-//    }
-//    .sheet(isPresented: .constant(true), content: {
-//        AppChangeLogView()
-//    })
-//}
+#Preview {
+    VStack {
+        
+    }
+    .sheet(isPresented: .constant(true), content: {
+        AppChangeLogView(appChangelogURL: URL(string: "https://alpinesupport-preview.azurewebsites.net/Releases/Wildlife/3_0_1/webview")!, showAtlas: false)
+    })
+}

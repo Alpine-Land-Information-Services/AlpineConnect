@@ -7,6 +7,7 @@
 
 import CoreData
 import AlpineUI
+import AlpineCore
 import Zip
 import PostgresClientKit
 import UIKit
@@ -20,7 +21,7 @@ public class DBRescue {
     static var restartAlert: AppAlert {
         return AppAlert(title: "Reset Successful", message: "Application must be restarted.",
                         dismiss: AlertAction(text: "Quit App", role: .regular, action: {
-                exit(0)
+            Core.quit()
             }))
     }
     

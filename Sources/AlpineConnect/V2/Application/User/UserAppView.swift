@@ -39,9 +39,7 @@ struct UserAppView<App: View>: View {
             app
                 .environment(CoreAppControl.shared)
                 .locationToggler
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification), perform: { _ in
-                    
-                })
+                .networkTracker
         }
     }
     
