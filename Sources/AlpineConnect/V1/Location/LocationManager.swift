@@ -57,7 +57,6 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
         isActive = true
 
         manager.delegate = self
-        manager.requestLocation()
         manager.allowsBackgroundLocationUpdates = true
         manager.distanceFilter = 5
         manager.showsBackgroundLocationIndicator = true
@@ -65,8 +64,8 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
         manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         manager.activityType = .otherNavigation
         
-        manager.startUpdatingLocation()
         manager.requestLocation()
+        manager.startUpdatingLocation()
 
         manager.headingFilter = 5
         manager.startUpdatingHeading()
