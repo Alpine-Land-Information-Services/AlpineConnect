@@ -18,7 +18,7 @@ public class ConnectManager: ObservableObject {
     }
     
     var isConnected: Bool {
-        NetworkMonitor.shared.connected
+        NetworkTracker.shared.isConnected
     }
         
     @Published public var user: ConnectUser!    
