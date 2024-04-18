@@ -42,45 +42,36 @@ public extension Importable {
 
 public extension Importable {
     
-    static func sync(with connection: Connection, in context: NSManagedObjectContext) -> Bool {
+    static func sync(with connection: Connection, in context: NSManagedObjectContext) throws {
         guard Self.needUpdate(in: context) else {
             syncManager.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: 0)
-            return true
+            return
         }
 
         let text = Self.selectQuery
-        var result = false
         
         defer { syncManager.currentQuery = "" }
-        do {
-            syncManager.currentQuery = text
-            if shallCountRecords {
-                let recCount = try getRecordsCount(query: text, connection: connection)
-                syncManager.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: recCount)
-//                print(text)
-                guard recCount != 0 else { return true }
-            }
-            else {
-                print("-- import  >>>  \(Self.entityName)")
-            }
-                        
-            let statement = try connection.prepareStatement(text: text)
-            defer { statement.close() }
-            let cursor = try statement.execute()
-            defer { cursor.close() }
-            
-            try Self.processPGResult(cursor: cursor, in: context)
-            try context.persistentSave()
-            
-            syncManager.tracker.endRecordSync()
-            result = true
-            
-        } catch {
-            syncManager.nonCancelAction {
-                Core.makeError(error: error, additionalInfo: "\(Self.entityName) Import:\n" + (syncManager.currentQuery ?? ""))
-            }
+        
+        syncManager.currentQuery = text
+        if shallCountRecords {
+            let recCount = try getRecordsCount(query: text, connection: connection)
+            syncManager.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: recCount)
+//            print(text)
+            guard recCount != 0 else { return }
         }
-        return result
+        else {
+            print("-- import  >>>  \(Self.entityName)")
+        }
+        
+        let statement = try connection.prepareStatement(text: text)
+        defer { statement.close() }
+        let cursor = try statement.execute()
+        defer { cursor.close() }
+        
+        try Self.processPGResult(cursor: cursor, in: context)
+        try context.persistentSave()
+        
+        syncManager.tracker.endRecordSync()
     }
     
     static func getRecordsCount(query: String, connection: Connection) throws -> Int {

@@ -351,7 +351,9 @@ private extension SyncManager { //MARK: Import
         repeat {
             await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
         } while tracker.status == .error && syncErrorsResolver.shouldRepeat(onRepeat: {
-            self.tracker.syncRecords = syncRecordBackups
+            DispatchQueue.main.async {
+                self.tracker.syncRecords = syncRecordBackups
+            }
         })
         
         guard tracker.status == .importDone else {
@@ -380,10 +382,15 @@ private extension SyncManager { //MARK: Import
         tracker.updateStatus(.importing, message: "Importing")
         
         await withCheckedContinuation({ continuation in
-            ConnectManager.shared.postgres?.pool?.withConnection { con_from_pool in
-                do {//throw AlpineError("connectionClosed", file: "", function: "", line: 0)
+            guard ConnectManager.shared.postgres?.pool != nil else {
+                continuation.resume()
+                return
+            }
+            ConnectManager.shared.postgres?.pool?.withConnection { connnection_from_pool in
+                do {
+//                    throw AlpineError("_test_connectionClosed_", file: "", function: "", line: 0)
                     try context.performAndWait {
-                        let connection = try con_from_pool.get()
+                        let connection = try connnection_from_pool.get()
                         self.activeConnection = connection
                         defer { connection.close() }
                         
@@ -400,14 +407,9 @@ private extension SyncManager { //MARK: Import
                                 continuation.resume()
                                 return
                             }
-                            guard object.sync(with: connection, in: context) else {
-                                self.nonCancelAction {
-                                    self.tracker.updateStatus(.error)
-                                }
-                                continuation.resume()
-                                return
-                            }
+                            try object.sync(with: connection, in: context)
                         }
+                        
                         self.tracker.updateStatus(.importDone)
                         continuation.resume()
                     }
@@ -476,7 +478,9 @@ private extension SyncManager { //MARK: Export
         repeat {
             await doExport(in: context, objects: exportable, helpers: container.exportHelperObjects)
         } while tracker.status == .error && syncErrorsResolver.shouldRepeat(onRepeat: {
-            tracker.syncRecords = syncRecordBackups
+            DispatchQueue.main.async {
+                self.tracker.syncRecords = syncRecordBackups
+            }
         })
         
         guard tracker.status == .exportDone else {
@@ -508,10 +512,12 @@ private extension SyncManager { //MARK: Export
                 continuation.resume()
                 return
             }
-            
-            ConnectManager.shared.postgres?.pool?.withConnection { result in
+            ConnectManager.shared.postgres?.pool?.withConnection { connnection_from_pool in
                 do {
-                    let connection = try result.get()
+//                    if self.syncErrorsResolver.repeatAttempts == 2 {
+//                        throw AlpineError("_test_connectionClosed_", file: "", function: "", line: 0)
+//                    }
+                    let connection = try connnection_from_pool.get()
                     self.activeConnection = connection
                     defer { connection.close() }
                     
@@ -535,8 +541,7 @@ private extension SyncManager { //MARK: Export
                     
                     self.tracker.updateStatus(.exportDone)
                     continuation.resume()
-                }
-                catch {
+                } catch {
                     self.syncErrorsResolver.error = error 
                     self.nonCancelAction {
                         self.tracker.updateStatus(.error)

@@ -1,6 +1,6 @@
 //
 //  SyncErrorsResolver.swift
-//  
+//  AlpineConnect
 //
 //  Created by mkv on 4/11/24.
 //
@@ -17,13 +17,11 @@ class SyncErrorsResolver {
     }
     
     func shouldShowToUser(_ isForeground: Bool) -> Bool {
-        guard let error, repeatAttempts > 0 else { return isForeground }
+        guard let error, repeatAttempts > 1 else { return isForeground }
         let description = error.localizedDescription
-        
-        if description.contains("socketError") {
-            return false
-        }
-        else if description.contains("connectionClosed") {
+        if description.contains("socketError") || description.contains("connectionClosed")
+//            || (error as? AlpineError)?.message == "_test_connectionClosed_"
+        {
             return false
         }
         
@@ -31,13 +29,16 @@ class SyncErrorsResolver {
     }
     
     func shouldRepeat(onRepeat: () -> Void) -> Bool {
-        repeatAttempts -= 1
-        
-        if repeatAttempts > 0 {
-            onRepeat()
-            return true
+        if let error,
+           error.localizedDescription.contains("socketError") || error.localizedDescription.contains("connectionClosed")
+//            || (error as? AlpineError)?.message == "_test_connectionClosed_"
+        {
+            repeatAttempts -= 1
+            if repeatAttempts > 0 {
+                onRepeat()
+                return true
+            }
         }
-        
         return false
     }
 }

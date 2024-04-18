@@ -33,9 +33,7 @@ class Exporter {
         }
         syncManager.tracker.makeRecord(name: objectType.displayName, type: .export, recordCount: totalObjectsCount)
 
-        guard totalObjectsCount > 0 else {
-            return
-        }
+        guard totalObjectsCount > 0 else { return }
 
         defer { syncManager.currentQuery = "" }
 
@@ -66,7 +64,6 @@ private extension Exporter {
         for query in objectType.getInsertQueries(for: objects) {
             try execute(query, with: connection)
         }
-
         objectType.modifyAfterExport(objects)
         syncManager.tracker.progressUpdate(adding: Double(objects.count))
     }
