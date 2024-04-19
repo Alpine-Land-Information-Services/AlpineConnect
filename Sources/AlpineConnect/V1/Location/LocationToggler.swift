@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AlpineCore
 
 struct LocationToggler: ViewModifier {
     
@@ -17,8 +18,12 @@ struct LocationToggler: ViewModifier {
                 switch newValue {
                 case .active:
                     LocationManager.shared.resume()
+                    Core.shared.defaults.isAppActive = true
+                    Core.makeEvent("application in foreground", type: .userAction)
                 default:
                     LocationManager.shared.stopIfNoUsers()
+                    Core.shared.defaults.isAppActive = false
+                    Core.makeEvent("application in background", type: .userAction)
                 }
             }
     }

@@ -264,6 +264,7 @@ public extension ConnectManager {
     }
     
     func signout() {
+        Core.makeEvent("signing out", type: .userAction)
         isSignedIn = false
         core.defaults.backyardToken = nil
     }

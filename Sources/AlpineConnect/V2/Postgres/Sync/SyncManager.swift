@@ -73,7 +73,7 @@ public class SyncManager {
             Core.makeSimpleAlert(title: "Already Syncing", message: "Please wait for the current sync to complete.")
             return
         }
-        Core.makeEvent("syncing started", type: .sync)
+        Core.makeEvent("initializing sync", type: .sync)
         DispatchQueue.main.async {
             self.tracker.isDoingSomeSync = true
         }
