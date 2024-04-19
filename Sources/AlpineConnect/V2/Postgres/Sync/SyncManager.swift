@@ -73,7 +73,7 @@ public class SyncManager {
             Core.makeSimpleAlert(title: "Already Syncing", message: "Please wait for the current sync to complete.")
             return
         }
-        
+        Core.makeEvent("syncing started", type: .sync)
         DispatchQueue.main.async {
             self.tracker.isDoingSomeSync = true
         }
@@ -111,9 +111,10 @@ public class SyncManager {
                 self.tracker.updateType(.none)
                 self.clear()
             }
+            Core.makeEvent("syncing finished", type: .sync)
         }
         
-        guard await NetworkMonitor.shared.canConnectToServer() else {
+        guard await NetworkTracker.shared.canConnectToServer() else {
             if isForeground {
                 Core.makeSimpleAlert(title: "Connection Timeout", message: "Cannot connect to server in reasonable time, please try again later.")
             }
@@ -407,6 +408,7 @@ private extension SyncManager { //MARK: Import
                                 continuation.resume()
                                 return
                             }
+// MARK: main func is HERE:
                             try object.sync(with: connection, in: context)
                         }
                         
@@ -536,6 +538,7 @@ private extension SyncManager { //MARK: Export
                             continuation.resume()
                             return
                         }
+// MARK: main func is HERE:
                         try Exporter(for: object, using: self).export(with: connection, in: context)
                     }
                     

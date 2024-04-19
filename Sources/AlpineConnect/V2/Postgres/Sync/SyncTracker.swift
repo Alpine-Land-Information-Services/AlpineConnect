@@ -32,7 +32,6 @@ public class SyncTracker: ObservableObject {
         case none
     }
     
-    
     struct SyncableRecord: Identifiable {
         
         enum RecordType: String {
@@ -101,6 +100,7 @@ extension SyncTracker {
     }
     
     func makeRecord(name: String, type: SyncTracker.SyncableRecord.RecordType, recordCount: Int) {
+        Core.makeEvent("\(type): \(recordCount) \(name)", type: .sync)
         print(code: type == .import ? .yellow : type == .export ? .orange : .blue, "\(type)\t\(recordCount)\t\(name)")
         DispatchQueue.main.async { [self] in
             currentRecordProgress = 0
@@ -152,7 +152,7 @@ public extension SyncTracker {
     
     func updateStatus(_ status: SyncStatus, message: String? = nil) {
         internalStatus = status
-
+        Core.makeEvent("sync status: \(status)", type: .sync)
         DispatchQueue.main.async {
             withAnimation {
                 self.slowStatus = status
