@@ -14,4 +14,8 @@ public extension ConnectManager {
     static var user: ConnectUser {
         ConnectManager.shared.user
     }
+    
+    static var hasUser: Bool {
+        ConnectManager.shared.user != nil
+    }
 }
