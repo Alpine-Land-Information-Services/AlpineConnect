@@ -24,7 +24,7 @@ public class ConnectManager: ObservableObject {
     @Published public var user: ConnectUser!    
     public var token: Token?
     
-    @Published var isSignedIn = false
+    @Published public var isSignedIn = false
     @Published public var inOfflineMode = false
 
     @Published public var id = UUID()
