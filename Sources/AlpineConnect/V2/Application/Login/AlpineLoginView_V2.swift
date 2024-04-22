@@ -13,7 +13,10 @@ import AlpineCore
 struct AlpineLoginView_V2: View {
     
     @EnvironmentObject var manager: ConnectManager
-    var networkMonitor = NetworkMonitor.shared
+    
+    var network: NetworkTracker {
+        NetworkTracker.shared
+    }
     
     @State private var email = ""
     @State private var password = ""
@@ -121,7 +124,7 @@ struct AlpineLoginView_V2: View {
             .padding(.bottom, 8)
             .font(.caption)
             .frame(maxWidth: .infinity, alignment: .center)
-            .disabled(!networkMonitor.connected)
+            .disabled(!network.isConnected)
         }
         .padding([.leading, .top, .trailing])
         .background(Color.black.opacity(0.75)).cornerRadius(20)

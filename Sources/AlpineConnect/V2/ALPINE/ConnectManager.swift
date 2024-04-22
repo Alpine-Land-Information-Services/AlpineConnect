@@ -81,7 +81,7 @@ extension ConnectManager {
         var response: ConnectionResponse
         
         if isConnected && !offline {
-            guard await NetworkMonitor.shared.canConnectToServer() else {
+            guard await NetworkTracker.shared.canConnectToServer() else {
                 return ConnectionResponse(result: .moreDetail, detail: .timeout)
             }
             

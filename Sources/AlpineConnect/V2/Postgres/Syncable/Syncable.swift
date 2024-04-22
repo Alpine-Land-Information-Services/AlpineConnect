@@ -39,3 +39,10 @@ public extension Syncable {
         value(forKey: "a_syncDate") == nil
     }
 }
+
+public extension Syncable {
+    
+    static var syncUser: ConnectUser {
+        Connect.shared.user
+    }
+}
