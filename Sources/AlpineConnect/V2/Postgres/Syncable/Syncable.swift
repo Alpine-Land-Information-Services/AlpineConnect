@@ -41,8 +41,8 @@ public extension Syncable {
 }
 
 public extension Syncable {
-    
+    //we should check "Connect.user != nil" before sync starts
     static var syncUser: ConnectUser {
-        Connect.shared.user
+        Connect.user!
     }
 }

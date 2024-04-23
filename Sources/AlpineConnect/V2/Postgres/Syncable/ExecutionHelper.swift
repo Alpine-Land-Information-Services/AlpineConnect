@@ -15,3 +15,9 @@ public protocol ExecutionHelper {
     static func performWork(with connection: Connection, in context: NSManagedObjectContext) throws
 }
 
+public extension ExecutionHelper {
+    
+    static var syncUser: ConnectUser {
+        Connect.user!
+    }
+}

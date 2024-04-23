@@ -74,6 +74,6 @@ class SyncViewModel: ObservableObject {
     }
     
     var greeting: String {
-        greetingText + ", " + (Connect.hasUser ? Connect.user.firstName.capitalized : "_USER_NOT_SET_")
+        greetingText + ", " + (Connect.hasUser ? Connect.user!.firstName.capitalized : "_USER_NOT_SET_")
     }
 }

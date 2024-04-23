@@ -153,6 +153,7 @@ extension AppControlOld { //MARK: Alerts
     }
     
     private func errorAlert(title: String, error: Error, customDescription: String?) {
+        guard let user = Connect.user else { return }
         if error.log().contains("socketError(cause:")
             || error.log().contains("connectionClosed")
         {
@@ -164,7 +165,7 @@ extension AppControlOld { //MARK: Alerts
         let alert = AppAlert(title: "\(title) Error", message: "\(error.localizedDescription) \n-----\n Check error logs for detailed description.", dismiss: AlertAction(text: "Okay"), actions: [AlertAction(text: "Report", role: .alert, action: {
             AppControlOld.showSheet(view: {
                 NavigationView {
-                    ReportIssueView(userName: Connect.user.fullName, email: Connect.user.email, title: title, text: error.log() + "\n" + (customDescription ?? "No additional information."))
+                    ReportIssueView(userName: user.fullName, email: user.email, title: title, text: error.log() + "\n" + (customDescription ?? "No additional information."))
                 }
                 .navigationViewStyle(.stack)
             }())

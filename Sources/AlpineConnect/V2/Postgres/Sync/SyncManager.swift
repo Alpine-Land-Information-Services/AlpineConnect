@@ -83,7 +83,7 @@ public class SyncManager {
         
         tracker.currentSyncStartTime = Date()
         print(code: .red, "start time: \(tracker.currentSyncStartTime)")
-        print(code: .red, "last  sync: \(String(describing: Connect.user.lastSync))")
+        print(code: .red, "last  sync: \(String(describing: Connect.user?.lastSync))")
         tracker.totalRecordsToSync = getRecordCount(for: type, importable: importable, exportable: exportable) + container.atlasObjects.count
 
 //        scheduleTimer() // Sync timeout functionality
@@ -102,7 +102,7 @@ public class SyncManager {
                 self.tracker.updateType(.none)
             }
             else if tracker.status != .error {
-                Connect.user.lastSync = tracker.currentSyncStartTime
+                Connect.user?.lastSync = tracker.currentSyncStartTime
                 self.tracker.updateStatus(.none)
                 self.tracker.updateType(.none)
             }
@@ -261,9 +261,10 @@ extension SyncManager { //MARK: Cancel
     }
     
     func scheduleTimer() {
+        guard let user = Connect.user else { return }
         if CurrentDBUser.syncTimeout != 0 {
             DispatchQueue.main.async { [self] in
-                timer = Timer.scheduledTimer(timeInterval: TimeInterval(Connect.user.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+                timer = Timer.scheduledTimer(timeInterval: TimeInterval(user.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
             }
         }
     }
@@ -335,7 +336,7 @@ private extension SyncManager { //MARK: Import
         
         if tracker.status == .exportDone {
             DispatchQueue.main.async {
-                Connect.user.requiresSync = false
+                Connect.user?.requiresSync = false
             }
         }
     }
@@ -464,7 +465,7 @@ private extension SyncManager { //MARK: Export
         await exectuteImport(importable: importable)
         
         if tracker.status == .importDone {
-            Connect.user.requiresSync = false
+            Connect.user?.requiresSync = false
         }
     }
     

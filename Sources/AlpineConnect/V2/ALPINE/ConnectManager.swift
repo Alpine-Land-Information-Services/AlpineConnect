@@ -21,7 +21,7 @@ public class ConnectManager: ObservableObject {
         NetworkTracker.shared.isConnected
     }
         
-    @Published public var user: ConnectUser!    
+    @Published public var user: ConnectUser?   
     public var token: Token?
     
     @Published public var isSignedIn = false
@@ -43,12 +43,12 @@ public class ConnectManager: ObservableObject {
     public var postgres: PostgresManager?
     
     public var userID: String {
-        user.databaseType == .production ?
-        loginData.email : "\(loginData.email)-Sandbox"
+        guard let user else { return "_USER_NOT_SET_" }
+        return user.databaseType == .production ? loginData.email : "\(loginData.email)-Sandbox"
     }
     
     init() {
-        NetworkMonitor.shared.start()
+        NetworkTracker.shared.start()
     }
     
     static func reset() {
@@ -117,9 +117,9 @@ extension ConnectManager {
             return try await processBackyardData(data)
         }
         
-        self.postgresInfo!.databaseType = user.databaseType
+        self.postgresInfo?.databaseType = try unwrap(user?.databaseType)
         
-        let postgresResponse = try await attemptPostgresLogin(with: self.postgresInfo!)
+        let postgresResponse = try await attemptPostgresLogin(with: try unwrap(self.postgresInfo))
         guard postgresResponse.result == .success else {
             return postgresResponse
         }
@@ -133,7 +133,7 @@ extension ConnectManager {
     }
     
     private func processBackyardData(_ data: BackyardLogin.Response) async throws -> ConnectionResponse {
-        createToken(from: data.sessionToken)
+        _ = createToken(from: data.sessionToken)
         
         if let lastLogin = Connect.lastSavedLogin {
             if lastLogin != loginData.email {
@@ -177,7 +177,7 @@ public extension ConnectManager {
             Core.makeSimpleAlert(title: "Offline", message: "Cannot attempt online connection, you are offline.")
             return
         }
-        guard await NetworkMonitor.shared.canConnectToServer() else {
+        guard await NetworkTracker.shared.canConnectToServer() else {
             Core.makeSimpleAlert(title: "Server Connection Failed", message: "Could not establish connection with server, you might be in an area with poor connection.")
             return
         }
@@ -220,7 +220,7 @@ extension ConnectManager {
     
     func requestNewToken(with info: LoginConnectionInfo, and credentials: CredentialsData) async throws -> (response: TokenResponse, token: Token?) {
         guard credentialsExist else { return (TokenResponse.noStoredCredentials, nil) }
-        guard isConnected, await NetworkMonitor.shared.canConnectToServer() else { return (TokenResponse.notConnected, nil) }
+        guard await NetworkTracker.shared.canConnectToServer() else { return (TokenResponse.notConnected, nil) }
         
         let response = try await BackyardLogin(info, data: credentials).attemptLogin()
         if let data = response.backyardData {
@@ -276,7 +276,7 @@ public extension ConnectManager {
     
     static func getValidToken(with info: LoginConnectionInfo) async throws -> (TokenResponse, Token?) {
         if let token = ConnectManager.shared.token ?? ConnectManager.shared.getStoredToken() {
-            if NetworkMonitor.shared.connected, await NetworkMonitor.shared.canConnectToServer() {
+            if NetworkTracker.shared.isConnected, await NetworkTracker.shared.canConnectToServer() {
                 if token.expirationDate.add(.hour, value: -1) > Date() {
                     return (TokenResponse.success, token)
                 }
