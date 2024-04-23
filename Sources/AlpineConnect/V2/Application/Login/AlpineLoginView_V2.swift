@@ -57,6 +57,7 @@ struct AlpineLoginView_V2: View {
         .connectAlert(currentAlert, isPresented: $isAlertPresented)
         .onAppear {
             fieldsFillCheck()
+            NetworkMonitor.shared.start()
         }
         .onDisappear {
             clear()
