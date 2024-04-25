@@ -265,13 +265,14 @@ public extension ConnectManager {
     
     func signout() {
         Core.makeEvent("signing out", type: .userAction)
+        core.defaults.isAppActive = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
             isSignedIn = false
             core.defaults.backyardToken = nil
         }
     }
     
-    static func signout() {
+    static func signoutReset() {
         ConnectManager.reset()
         CoreAppControl.reset()
     }

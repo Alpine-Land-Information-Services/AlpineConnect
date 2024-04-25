@@ -49,10 +49,7 @@ struct AppChangeLogView: View {
     }
         
     var appChangelogURL: URL
-    var showAtlas: Bool
-    
-    @State private var changesSelection = "app"
-    
+        
     var body: some View {
         GeometryReader { geometry in
             NavigationStack {
@@ -94,7 +91,7 @@ fileprivate struct ChangelogModifier: ViewModifier {
     }
     
     var appURL: URL
-    var includeAtlas: Bool
+    var onVersionChange: () -> Void
     
     func body(content: Content) -> some View {
         content
@@ -104,7 +101,7 @@ fileprivate struct ChangelogModifier: ViewModifier {
                 }
             }
             .sheet(isPresented: $isChangelogPresented, content: {
-                AppChangeLogView(appChangelogURL: appURL, showAtlas: includeAtlas)
+                AppChangeLogView(appChangelogURL: appURL)
             })
     }
     
@@ -112,6 +109,7 @@ fileprivate struct ChangelogModifier: ViewModifier {
         if let lastBuild = core.defaults.appBuild {
             if lastBuild != Tracker.appBuild() {
                 isChangelogPresented.toggle()
+                onVersionChange()
             }
         }
     }
@@ -119,8 +117,8 @@ fileprivate struct ChangelogModifier: ViewModifier {
 
 public extension View {
     
-    func changelog(appURL: URL, includeAtlas: Bool) -> some View {
-        modifier(ChangelogModifier(appURL: appURL, includeAtlas: includeAtlas))
+    func changelog(appURL: URL, onVersionChange: @escaping () -> Void) -> some View {
+        modifier(ChangelogModifier(appURL: appURL, onVersionChange: onVersionChange))
     }
 }
 
@@ -129,6 +127,6 @@ public extension View {
         
     }
     .sheet(isPresented: .constant(true), content: {
-        AppChangeLogView(appChangelogURL: URL(string: "https://alpinesupport-preview.azurewebsites.net/Releases/Wildlife/3_0_1/webview")!, showAtlas: false)
+        AppChangeLogView(appChangelogURL: URL(string: "https://alpinesupport-preview.azurewebsites.net/Releases/Wildlife/3_0_1/webview")!)
     })
 }
