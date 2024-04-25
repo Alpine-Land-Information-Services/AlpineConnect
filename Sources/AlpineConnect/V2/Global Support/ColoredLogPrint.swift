@@ -28,6 +28,7 @@ public enum LogColorCode: String {
     case circleY = "🟡"
     case circleG = "🟢"
     case circleB = "🔵"
+    case question = "❓"
 }
 
 public func print(code: LogColorCode, _ message: Any) {
