@@ -84,10 +84,8 @@ extension ConnectManager {
             guard await NetworkTracker.shared.canConnectToServer() else {
                 return ConnectionResponse(result: .moreDetail, detail: .timeout)
             }
-            
             response = try await attemptOnlineLogin()
-        }
-        else {
+        } else {
             response = await attemptOfflineLogin()
         }
         

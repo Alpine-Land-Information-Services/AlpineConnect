@@ -71,9 +71,7 @@ private extension AppReset {
                               buttons: [CoreAlertButton(title: "Quit App", action: {
             
             core.defaults.resetWithCode(currectAppResetCode)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                Core.quit()
-            }
+            Core.quit()
         })])
         Core.makeAlert(alert)
     }
