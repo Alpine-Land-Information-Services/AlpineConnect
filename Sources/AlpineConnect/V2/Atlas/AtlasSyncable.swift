@@ -14,6 +14,7 @@ public protocol AtlasSyncable: AtlasObject, Importable {
     static var cleanPredicate: NSPredicate? { get set }
     
     static var syncFields: [AtlasSyncField] { get }
+    var relationshipSyncFields: [AtlasFieldData]? { get }
     
     static func performAtlasSynchronization(with data: [AtlasFeatureData]) async throws
     static func reloadOrCreateLayer() async throws
@@ -39,6 +40,10 @@ public extension AtlasSyncable {
                 self.setValue(newValue, forKey: "a_geometry")
             }
         }
+    }
+    
+    var relationshipSyncFields: [AtlasFieldData]? {
+        nil
     }
     
     func getGeometry(in context: NSManagedObjectContext) -> String? {
@@ -91,10 +96,13 @@ public struct AtlasSyncField {
     public var objectFieldName: String
     public var fieldType: Any.Type
     
-    public init(layerFieldName: String, objectFieldName: String, fieldType: Any.Type) {
+    public var isReference: Bool
+        
+    public init(layerFieldName: String, objectFieldName: String, fieldType: Any.Type, isReference: Bool = false) {
         self.layerFieldName = layerFieldName
         self.objectFieldName = objectFieldName
         self.fieldType = fieldType
+        self.isReference = isReference
     }
     
     public func convertToLayerType() -> Any.Type {

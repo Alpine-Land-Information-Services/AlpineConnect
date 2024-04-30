@@ -72,8 +72,11 @@ public class AtlasSynchronizer {
             var fields = [AtlasFieldData(name: "UNIQ_ID", value: object.guid.uuidString),
                           AtlasFieldData(name: "OBJECT_TYPE", value: objectType.entityName)]
             
-            for field in type(of: object).syncFields {
+            for field in type(of: object).syncFields.filter({ $0.isReference == false }) {
                 fields.append(AtlasFieldData(name: field.layerFieldName, value: object.value(forKey: field.objectFieldName) ?? "")) //"_INVALID_FIELD_NAME_"
+            }
+            if let relationshipSyncFields = object.relationshipSyncFields {
+                fields.append(contentsOf: relationshipSyncFields)
             }
             let featureData = AtlasFeatureData(wkt: geometry, fields: fields)
             data.append(featureData)
