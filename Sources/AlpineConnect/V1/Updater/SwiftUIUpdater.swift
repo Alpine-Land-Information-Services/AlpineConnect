@@ -25,7 +25,8 @@ public class SwiftUIUpdater: ObservableObject {
     public func checkForUpdate(automatic: Bool, onComplete: @escaping () -> Void) {
         let monitor = NWPathMonitor()
         monitor.start(queue: DispatchQueue(label: "UpdaterMonitor"))
-        monitor.pathUpdateHandler = { path in
+        monitor.pathUpdateHandler = { [weak self] path in
+            guard let self else { return }
             if path.status == .satisfied && (!automatic || !path.isExpensive) {
                 self.updater.checkVersion(name: Tracker.appName(), automatic: automatic, showMessage: { result, updateRequired in
                     if result || updateRequired {

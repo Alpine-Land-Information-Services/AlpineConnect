@@ -133,10 +133,10 @@ extension ConnectManager {
     private func processBackyardData(_ data: BackyardLogin.Response) async throws -> ConnectionResponse {
         _ = createToken(from: data.sessionToken)
         
-        if let lastLogin = Connect.lastSavedLogin {
-            if lastLogin != loginData.email {
-                return ConnectionResponse(result: .moreDetail, detail: .overrideKeychain)
-            }
+        if let lastLogin = Connect.lastSavedLogin,
+           lastLogin != loginData.email
+        {
+            return ConnectionResponse(result: .moreDetail, detail: .overrideKeychain)
         }
         
         return authManager.saveUser(with: loginData) //MARK: Connect user is init here
@@ -159,9 +159,9 @@ extension ConnectManager {
             return ConnectionResponse(result: .fail, problem: ConnectionProblem(customAlert: ConnectAlert(title: "User Record Not Found", message: "Could not find existing record for \(lastLogin)")))
         }
         
-        DispatchQueue.main.sync {
-            self.user = user
-            inOfflineMode = true
+        DispatchQueue.main.sync { [weak self] in
+            self?.user = user
+            self?.inOfflineMode = true
         }
 
         return ConnectionResponse(result: .success)
@@ -195,8 +195,7 @@ public extension ConnectManager {
                     Core.makeSimpleAlert(title: "Connection Problem", message: message)
                 }
             }
-        }
-        catch {
+        } catch {
             Core.shared.makeError(error: error)
         }
     }
@@ -235,9 +234,9 @@ extension ConnectManager {
     func createToken(from value: String) -> Token {
         let expDate = Calendar.current.date(byAdding: .hour, value: 8, to: Date())!
         let token = Token(rawValue: value, expirationDate: expDate)
-        DispatchQueue.main.async { [self] in
-            self.token = token
-            core.defaults.backyardToken = token.encoded
+        DispatchQueue.main.async { [weak self] in
+            self?.token = token
+            self?.core.defaults.backyardToken = token.encoded
         }
         return token
     }
@@ -264,9 +263,9 @@ public extension ConnectManager {
     func signout() {
         Core.makeEvent("signing out", type: .userAction)
         core.defaults.isAppActive = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [self] in
-            isSignedIn = false
-            core.defaults.backyardToken = nil
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [weak self] in
+            self?.isSignedIn = false
+            self?.core.defaults.backyardToken = nil
         }
     }
     
