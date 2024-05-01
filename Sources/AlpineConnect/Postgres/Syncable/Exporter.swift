@@ -24,6 +24,7 @@ class Exporter {
     }
 
     func export(with connection: Connection, in context: NSManagedObjectContext) throws {
+        /*
         let context = objectType.isSavedIndependently ? syncManager.database.container.newBackgroundContext() : context
         
         var totalObjectsCount = 0
@@ -56,7 +57,9 @@ class Exporter {
 
         objectType.additionalActionsAfterExport()
         syncManager.tracker.endRecordSync()
+         */
     }
+         
 }
 
 private extension Exporter {

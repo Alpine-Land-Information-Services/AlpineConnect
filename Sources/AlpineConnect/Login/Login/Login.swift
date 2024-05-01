@@ -95,7 +95,7 @@ public class Login {
         /// </summary>
         let status: Int?
         /// <summary>
-        /// Gets or sets a detailed description of the problem.
+        /// Gets or sets a detailed description of the problem.go
         /// </summary>
         let detail: String?
         /// <summary>
