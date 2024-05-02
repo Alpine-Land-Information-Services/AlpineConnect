@@ -13,8 +13,8 @@ let package = Package(
             targets: ["AlpineConnect"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/jenyalebid/AlpineCore.git", .branch("main")),
-        .package(url: "https://github.com/jenyalebid/AlpineUI.git", .branch("main")),
+        .package(url: "https://github.com/jenyalebid/AlpineCore.git", .branch("_mapkit_1.0")),
+        .package(url: "https://github.com/jenyalebid/AlpineUI.git", .branch("SeedTree")),
         .package(url: "https://github.com/codewinsdotcom/PostgresClientKit.git", from: "1.4.3"),
         .package(url: "https://github.com/marmelroy/Zip.git", from: "2.1.2")
     ],
