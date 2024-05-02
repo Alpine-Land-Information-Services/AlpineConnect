@@ -102,7 +102,8 @@ extension SyncTracker {
     func makeRecord(name: String, type: SyncTracker.SyncableRecord.RecordType, recordCount: Int) {
         Core.makeEvent("\(type): \(recordCount) \(name)", type: .sync)
         print(code: type == .import ? .yellow : type == .export ? .orange : .blue, "\(type)\t\(recordCount)\t\(name)")
-        DispatchQueue.main.async { [self] in
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             currentRecordProgress = 0
             currentRecord = SyncableRecord(name: name, type: type, recordsCount: Double(recordCount))
             if recordCount == 0 {

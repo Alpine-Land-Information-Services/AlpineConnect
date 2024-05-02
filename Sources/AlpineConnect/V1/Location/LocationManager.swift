@@ -105,7 +105,8 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
     }
     
     public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        DispatchQueue.main.async { [self] in
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             if let heading = manager.heading {
                 lastHeading = heading
                 degrees = -1 * heading.magneticHeading

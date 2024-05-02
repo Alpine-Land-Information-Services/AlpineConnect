@@ -161,9 +161,9 @@ public class SyncManager {
 private extension SyncManager {
     
     func mergeBackgroundChangesToMainContext() {
-        DispatchQueue.main.async { [self] in
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             let changes = context.insertedObjects.union(context.updatedObjects).union(context.deletedObjects)
-            
             for obj in changes {
                 let mainContextObject = database.container.viewContext.object(with: obj.objectID)
                 database.container.viewContext.refresh(mainContextObject, mergeChanges: true)
@@ -263,7 +263,8 @@ extension SyncManager { //MARK: Cancel
     func scheduleTimer() {
         guard let user = Connect.user else { return }
         if CurrentDBUser.syncTimeout != 0 {
-            DispatchQueue.main.async { [self] in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
                 timer = Timer.scheduledTimer(timeInterval: TimeInterval(user.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
             }
         }

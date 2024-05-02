@@ -17,7 +17,8 @@ public final class StorageDirectoryConnection: StorageConnection {
             return try await fetchItems(in: directory)
         }
         catch {
-            DispatchQueue.main.async { [self] in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
                 if let error = error as? ConnectError {
                     alert = ConnectAlert(title: "\(error.type.rawValue.capitalized) Error", message: error.message)
                     status = .issue(error.message)

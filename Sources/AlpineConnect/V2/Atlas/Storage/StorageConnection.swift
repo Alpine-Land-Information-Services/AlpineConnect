@@ -60,7 +60,8 @@ public class StorageConnection {
     }
     
     func presentAlert(from problem: ConnectionProblem) {
-        DispatchQueue.main.async { [self] in
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             lastUpdate = Date()
             status = .issue(problem.alertDetail)
             alert = problem.alert
@@ -69,7 +70,8 @@ public class StorageConnection {
     }
     
    public func presentTimeoutAlert() {
-        DispatchQueue.main.async { [self] in
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             let issue = ConnectionProblem(title: "Connection Timeout", detail: "Could not establish connection with Cloud in reasonable time.", customAlert: nil)
             status = .offline
             alert = issue.alert
