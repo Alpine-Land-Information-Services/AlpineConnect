@@ -9,10 +9,10 @@ import AlpineCore
 
 class SyncErrorsResolver {
     
-    var repeatAttempts = 2
+    var repeatAttempts: Int
     var error: Error?
     
-    init(repeatAttempts: Int = 2) {
+    init(repeatAttempts: Int = 3) {
         self.repeatAttempts = repeatAttempts
     }
     

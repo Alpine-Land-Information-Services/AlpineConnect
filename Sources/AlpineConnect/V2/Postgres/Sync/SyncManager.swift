@@ -389,43 +389,51 @@ private extension SyncManager { //MARK: Import
                 continuation.resume()
                 return
             }
-            ConnectManager.shared.postgres?.pool?.withConnection { connnection_from_pool in
-                do {
-//                    throw AlpineError("_test_connectionClosed_", file: "", function: "", line: 0)
-                    try context.performAndWait {
-                        let connection = try connnection_from_pool.get()
+            ConnectManager.shared.postgres?.pool?.withConnection { [weak self] response in
+                guard let self else { return }
+                switch response {
+                case .failure(let error):
+                    syncErrorsResolver.error = error
+                    Core.makeError(error: error, 
+                                   additionalInfo: currentQuery,
+                                   showToUser: syncErrorsResolver.shouldShowToUser(isForeground))
+                case .success(let connection):
+                    do {
+//                        throw AlpineError("_test_connectionClosed_", file: "", function: "", line: 0)
                         self.activeConnection = connection
                         defer { connection.close() }
-                        
-                        for helper in helpers {
-                            guard !self.isSyncCanceled else {
-                                continuation.resume()
-                                return
+                        try context.performAndWait {
+                            for helper in helpers {
+                                guard !self.isSyncCanceled else {
+                                    continuation.resume()
+                                    return
+                                }
+                                try helper.performWork(with: connection, in: context)
                             }
-                            try helper.performWork(with: connection, in: context)
-                        }
-                        
-                        for object in objects {
-                            guard !self.isSyncCanceled else {
-                                continuation.resume()
-                                return
+                            
+                            for object in objects {
+                                guard !self.isSyncCanceled else {
+                                    continuation.resume()
+                                    return
+                                }
+                                // MARK: main func is HERE:
+                                try object.sync(with: connection, in: context)
                             }
-// MARK: main func is HERE:
-                            try object.sync(with: connection, in: context)
+                            
+                            self.tracker.updateStatus(.importDone)
+                            continuation.resume()
                         }
-                        
-                        self.tracker.updateStatus(.importDone)
+                    }
+                    catch {
+                        self.syncErrorsResolver.error = error 
+                        self.nonCancelAction {
+                            self.tracker.updateStatus(.error)
+                            Core.makeError(error: error, 
+                                           additionalInfo: self.currentQuery,
+                                           showToUser: self.syncErrorsResolver.shouldShowToUser(self.isForeground))
+                        }
                         continuation.resume()
                     }
-                }
-                catch {
-                    self.syncErrorsResolver.error = error 
-                    self.nonCancelAction {
-                        self.tracker.updateStatus(.error)
-                        Core.makeError(error: error, additionalInfo: self.currentQuery,
-                                       showToUser: self.syncErrorsResolver.shouldShowToUser(self.isForeground))
-                    }
-                    continuation.resume()
                 }
             }
         })
@@ -516,47 +524,56 @@ private extension SyncManager { //MARK: Export
                 continuation.resume()
                 return
             }
-            ConnectManager.shared.postgres?.pool?.withConnection { connnection_from_pool in
-                do {
+            ConnectManager.shared.postgres?.pool?.withConnection { [weak self] response in
+                guard let self else { return }
+                switch response {
+                case .failure(let error):
+                    syncErrorsResolver.error = error 
+                    Core.makeError(error: error, 
+                                   additionalInfo: currentQuery, 
+                                   showToUser: syncErrorsResolver.shouldShowToUser(isForeground))
+                case .success(let connection):
+                    do {
 //                    if self.syncErrorsResolver.repeatAttempts == 2 {
 //                        throw AlpineError("_test_connectionClosed_", file: "", function: "", line: 0)
 //                    }
-                    let connection = try connnection_from_pool.get()
-                    self.activeConnection = connection
-                    defer { connection.close() }
-                    
-                    try context.performAndWait {
-                        for helper in helpers {
+                        self.activeConnection = connection
+                        defer { connection.close() }
+                        
+                        try context.performAndWait {
+                            for helper in helpers {
+                                guard !self.isSyncCanceled else {
+                                    continuation.resume()
+                                    return
+                                }
+                                try helper.performWork(with: connection, in: context)
+                            }
+                        }
+                        
+                        for object in objects {
                             guard !self.isSyncCanceled else {
                                 continuation.resume()
                                 return
                             }
-                            try helper.performWork(with: connection, in: context)
+                            // MARK: main func is HERE:
+                            try Exporter(for: object, using: self).export(with: connection, in: context)
                         }
-                    }
-                    
-                    for object in objects {
-                        guard !self.isSyncCanceled else {
-                            continuation.resume()
-                            return
+                        
+                        self.tracker.updateStatus(.exportDone)
+                        continuation.resume()
+                    } catch {
+                        self.syncErrorsResolver.error = error 
+                        self.nonCancelAction {
+                            self.tracker.updateStatus(.error)
+                            Core.makeError(error: error,
+                                           additionalInfo: self.currentQuery, 
+                                           showToUser: self.syncErrorsResolver.shouldShowToUser(self.isForeground))
                         }
-// MARK: main func is HERE:
-                        try Exporter(for: object, using: self).export(with: connection, in: context)
+                        context.performAndWait {
+                            context.rollback()
+                        }
+                        continuation.resume()
                     }
-                    
-                    self.tracker.updateStatus(.exportDone)
-                    continuation.resume()
-                } catch {
-                    self.syncErrorsResolver.error = error 
-                    self.nonCancelAction {
-                        self.tracker.updateStatus(.error)
-                        Core.makeError(error: error, additionalInfo: self.currentQuery, 
-                                       showToUser: self.syncErrorsResolver.shouldShowToUser(self.isForeground))
-                    }
-                    context.performAndWait {
-                        context.rollback()
-                    }
-                    continuation.resume()
                 }
             }
         }
