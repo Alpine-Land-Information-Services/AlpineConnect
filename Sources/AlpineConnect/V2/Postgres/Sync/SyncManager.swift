@@ -260,16 +260,16 @@ extension SyncManager { //MARK: Cancel
         tracker.status == .canceled
     }
     
-    func scheduleTimer() {
-        guard let user = Connect.user else { return }
-        //TODO: using of obsolete CurrentDBUser !!!
-        if CurrentDBUser.syncTimeout != 0 {
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                timer = Timer.scheduledTimer(timeInterval: TimeInterval(user.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
-            }
-        }
-    }
+//    func scheduleTimer() {
+//        guard let user = Connect.user else { return }
+//        //TODO: using of obsolete CurrentDBUser !!!
+//        if CurrentDBUser.syncTimeout != 0 {
+//            DispatchQueue.main.async { [weak self] in
+//                guard let self else { return }
+//                timer = Timer.scheduledTimer(timeInterval: TimeInterval(user.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+//            }
+//        }
+//    }
     
     func cancelSync() {
         guard let activeConnection else {
