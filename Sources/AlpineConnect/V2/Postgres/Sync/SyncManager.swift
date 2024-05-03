@@ -262,6 +262,7 @@ extension SyncManager { //MARK: Cancel
     
     func scheduleTimer() {
         guard let user = Connect.user else { return }
+        //TODO: using of obsolete CurrentDBUser !!!
         if CurrentDBUser.syncTimeout != 0 {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
