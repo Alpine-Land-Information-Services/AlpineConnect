@@ -59,8 +59,8 @@ public class SyncManager {
     
     @objc
     func contextDidSave(notification: Notification) {
-        DispatchQueue.main.async {
-            self.database.type.main.mergeChanges(fromContextDidSave: notification)
+        DispatchQueue.main.async { [weak self] in
+            self?.database.type.main.mergeChanges(fromContextDidSave: notification)
         }
     }
     
@@ -74,8 +74,8 @@ public class SyncManager {
             return
         }
         Core.makeEvent("initializing sync", type: .sync)
-        DispatchQueue.main.async {
-            self.tracker.isDoingSomeSync = true
+        DispatchQueue.main.async { [weak self] in
+            self?.tracker.isDoingSomeSync = true
         }
         isForeground = !isBackground
         tracker.updateType(type)
@@ -95,8 +95,8 @@ public class SyncManager {
             currentQuery = ""
             timer?.invalidate()
             activeConnection = nil
-            DispatchQueue.main.async {
-                self.tracker.isDoingSomeSync = false
+            DispatchQueue.main.async { [weak self] in
+                self?.tracker.isDoingSomeSync = false
             }
             if tracker.status == .canceled {
                 self.tracker.updateType(.none)
@@ -355,8 +355,8 @@ private extension SyncManager { //MARK: Import
         repeat {
             await doImport(in: context, objects: importable, helpers: container.importHelperObjects)
         } while tracker.status == .error && syncErrorsResolver.shouldRepeat(onRepeat: {
-            DispatchQueue.main.async {
-                self.tracker.syncRecords = syncRecordBackups
+            DispatchQueue.main.async { [weak self] in
+                self?.tracker.syncRecords = syncRecordBackups
             }
         })
         
@@ -491,8 +491,8 @@ private extension SyncManager { //MARK: Export
         repeat {
             await doExport(in: context, objects: exportable, helpers: container.exportHelperObjects)
         } while tracker.status == .error && syncErrorsResolver.shouldRepeat(onRepeat: {
-            DispatchQueue.main.async {
-                self.tracker.syncRecords = syncRecordBackups
+            DispatchQueue.main.async { [weak self] in
+                self?.tracker.syncRecords = syncRecordBackups
             }
         })
         

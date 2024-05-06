@@ -94,8 +94,8 @@ public class SyncTracker: ObservableObject {
 extension SyncTracker {
     
     func progressUpdate(adding number: Double = 1) {
-        DispatchQueue.main.async {
-            self.currentRecordProgress += number
+        DispatchQueue.main.async { [weak self] in
+            self?.currentRecordProgress += number
         }
     }
     
@@ -114,8 +114,8 @@ extension SyncTracker {
     
     func endRecordSync() {
         if let currentRecord {
-            DispatchQueue.main.async {
-                self.syncRecords.insert(currentRecord, at: 0)
+            DispatchQueue.main.async { [weak self] in
+                self?.syncRecords.insert(currentRecord, at: 0)
             }
         }
     }
@@ -133,9 +133,9 @@ extension SyncTracker {
     }
     
     func toggleSyncWindow(to value: Bool) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
             withAnimation {
-                self.showSync = value
+                self?.showSync = value
             }
         }
     }
@@ -154,28 +154,28 @@ public extension SyncTracker {
     func updateStatus(_ status: SyncStatus, message: String? = nil) {
         internalStatus = status
         Core.makeEvent("sync status: \(status)", type: .sync)
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
             withAnimation {
-                self.slowStatus = status
+                self?.slowStatus = status
             }
             if let message {
-                self.statusMessage = message
+                self?.statusMessage = message
             }
         }
     }
     
     func updateType(_ type: SyncManager.SyncType) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
             withAnimation {
                 print("updated type to \(type)")
-                self.syncType = type
+                self?.syncType = type
             }
         }
     }
     
     func statusMessage(_ message: String) {
-        DispatchQueue.main.async {
-            self.statusMessage = message
+        DispatchQueue.main.async { [weak self] in
+            self?.statusMessage = message
         }
     }
 }
@@ -183,14 +183,14 @@ public extension SyncTracker {
 extension SyncTracker {
     
     public func addToNotExported(_ guid: UUID) {
-        DispatchQueue.main.async {
-            self.notExported.appendIfNotExists(guid)
+        DispatchQueue.main.async { [weak self] in
+            self?.notExported.appendIfNotExists(guid)
         }
     }
 
     public func removeFromNotExported(_ guid: UUID) {
-        DispatchQueue.main.async {
-            self.notExported.removeIfExists(guid)
+        DispatchQueue.main.async { [weak self] in
+            self?.notExported.removeIfExists(guid)
         }
     }
     

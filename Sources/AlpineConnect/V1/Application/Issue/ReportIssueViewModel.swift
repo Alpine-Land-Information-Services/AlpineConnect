@@ -51,15 +51,15 @@ public class ReportIssueViewModel: ObservableObject {
             switch result {
             case .success(let data):
                 self.resultText = "Report sent.\nIssue #\(data["number"] as? Int ?? 0) created."
-                DispatchQueue.main.async {
-                    self.clear()
+                DispatchQueue.main.async { [weak self] in
+                    self?.clear()
                 }
             case .failure(let error):
                 self.resultText = "Error sending report.\n\(error.message)"
             }
-            DispatchQueue.main.async {
-                AppControlOld.makeSimpleAlert(title: "Report Status", message: self.resultText)
-                self.spinner = false
+            DispatchQueue.main.async { [weak self] in
+                AppControlOld.makeSimpleAlert(title: "Report Status", message: self?.resultText ?? "")
+                self?.spinner = false
             }
         }
     }

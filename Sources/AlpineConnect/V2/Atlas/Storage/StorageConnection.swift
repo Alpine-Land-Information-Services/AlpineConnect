@@ -54,8 +54,8 @@ public class StorageConnection {
     }
     
     public func refresh() {
-        DispatchQueue.main.async {
-            self.refreshID = UUID()
+        DispatchQueue.main.async { [weak self] in
+            self?.refreshID = UUID()
         }
     }
     
