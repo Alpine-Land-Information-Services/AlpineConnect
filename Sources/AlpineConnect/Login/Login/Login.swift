@@ -160,7 +160,13 @@ public class Login {
                 print(jsonString ?? "")
                 let userResponce = try decoder.decode(ProblemDetails.self, from: data)
                 print(userResponce)
-                completionHandler(.wrongPassword)
+                
+                if let detail = userResponce.detail, detail.contains("access") {
+                    Login.loginResponse = detail
+                    completionHandler(.noAccess)
+                } else {
+                    completionHandler(.wrongPassword)
+                }
             }
             else {
                 Login.loginResponse = httpResponse.debugDescription

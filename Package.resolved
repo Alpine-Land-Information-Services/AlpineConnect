@@ -5,8 +5,8 @@
         "package": "AlpineCore",
         "repositoryURL": "https://github.com/jenyalebid/AlpineCore.git",
         "state": {
-          "branch": "main",
-          "revision": "1001e68384e295abcf57dcd6f83dea24544ca529",
+          "branch": "_mapkit_1.0",
+          "revision": "1e5aedcd15e1c7a7130ebfd38700adfe03aaa090",
           "version": null
         }
       },
@@ -14,8 +14,8 @@
         "package": "AlpineUI",
         "repositoryURL": "https://github.com/jenyalebid/AlpineUI.git",
         "state": {
-          "branch": "main",
-          "revision": "f5193a55fc5fad25637434fa557e4d64f9348ab8",
+          "branch": "SeedTree",
+          "revision": "ecbdc2a6dbcf21e7a316ec6fe0a796a88824659e",
           "version": null
         }
       },
