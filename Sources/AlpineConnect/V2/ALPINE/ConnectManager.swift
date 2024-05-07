@@ -262,7 +262,7 @@ public extension ConnectManager {
     
     func signout() {
         Core.makeEvent("signing out", type: .userAction)
-        core.defaults.isAppActive = false
+        core.markInactive()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [weak self] in
             self?.isSignedIn = false
             self?.core.defaults.backyardToken = nil
