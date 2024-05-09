@@ -387,6 +387,8 @@ private extension SyncManager { //MARK: Import
         
         await withCheckedContinuation({ continuation in
             guard ConnectManager.shared.postgres?.pool != nil else {
+                Core.makeEvent("postgres.pool == nil", type: .sync)
+                self.tracker.updateStatus(.error)
                 continuation.resume()
                 return
             }
@@ -394,10 +396,14 @@ private extension SyncManager { //MARK: Import
                 guard let self else { return }
                 switch response {
                 case .failure(let error):
+                    Core.makeEvent("pool.withConnection: .failure", type: .sync)
                     syncErrorsResolver.error = error
-                    Core.makeError(error: error, 
+                    self.tracker.updateStatus(.error)
+                    Core.makeError(error: error,
                                    additionalInfo: currentQuery,
                                    showToUser: syncErrorsResolver.shouldShowToUser(isForeground))
+                    continuation.resume()
+                    return
                 case .success(let connection):
                     do {
 //                        throw AlpineError("_test_connectionClosed_", file: "", function: "", line: 0)
@@ -522,6 +528,8 @@ private extension SyncManager { //MARK: Export
         
         await withCheckedContinuation { continuation in
             guard ConnectManager.shared.postgres?.pool != nil else {
+                Core.makeEvent("postgres.pool == nil", type: .sync)
+                self.tracker.updateStatus(.error)
                 continuation.resume()
                 return
             }
@@ -529,10 +537,14 @@ private extension SyncManager { //MARK: Export
                 guard let self else { return }
                 switch response {
                 case .failure(let error):
-                    syncErrorsResolver.error = error 
-                    Core.makeError(error: error, 
-                                   additionalInfo: currentQuery, 
+                    Core.makeEvent("pool.withConnection: .failure", type: .sync)
+                    syncErrorsResolver.error = error
+                    self.tracker.updateStatus(.error)
+                    Core.makeError(error: error,
+                                   additionalInfo: currentQuery,
                                    showToUser: syncErrorsResolver.shouldShowToUser(isForeground))
+                    continuation.resume()
+                    return
                 case .success(let connection):
                     do {
 //                    if self.syncErrorsResolver.repeatAttempts == 2 {

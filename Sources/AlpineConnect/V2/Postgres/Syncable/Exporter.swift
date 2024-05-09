@@ -35,7 +35,7 @@ class Exporter {
 
         guard totalObjectsCount > 0 else { return }
 
-        defer { syncManager.currentQuery = "" }
+//        defer { syncManager.currentQuery = "" }
 
         let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.exportPredicate, sortDescriptors: nil, with: objectType.exportBatchSize, isModifying: true)
         var objects: [any Exportable]? = []

@@ -50,7 +50,7 @@ public extension Importable {
 
         let text = Self.selectQuery
         
-        defer { syncManager.currentQuery = "" }
+//        defer { syncManager.currentQuery = "" }
         
         syncManager.currentQuery = text
         if shallCountRecords {
