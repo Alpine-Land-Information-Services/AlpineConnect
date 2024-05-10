@@ -23,6 +23,11 @@ class TokenManager {
         }
     }
     
+    static func setMapKitToken(_ token: String) {
+        let token = UserManager.LoginToken(token)
+        UserManager.shared.mapKitToken = token
+    }
+    
     static func checkToken() {
         guard NetworkMonitor.shared.connected else {
             return

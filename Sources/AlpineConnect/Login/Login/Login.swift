@@ -145,6 +145,8 @@ public class Login {
                     print(userResponce)
                     TokenManager.saveLoginToken(userResponce.sessionToken)
                     CurrentUser.makeUserData(email: userResponce.user.email, name: "\(userResponce.user.firstName) \(userResponce.user.lastName)", id: UUID())
+                    
+                    Task {  await  updateUserLogin(info: info) }
                     completionHandler(.successfulLogin)
                 } catch {
                     Login.loginResponse = error.localizedDescription
@@ -178,6 +180,54 @@ public class Login {
             completionHandler(.unknownError)
         }
     }
+    
+    static func updateUserLogin(info: UserLoginUpdate) async -> LoginResponse {
+        var info = info
+        info.appName = "FMS_iOS"
+        
+         var newServerURL: String {
+            switch serverMode {
+            case "test":
+                return "https://alpinebackyard20220722084741-testing.azurewebsites.net/"
+            default:
+                return "https://alpinebackyard20220722084741.azurewebsites.net/"
+            }
+        }
+        
+        guard let url = URL(string: "\(newServerURL)user/credentials") else {
+            AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot make URL to get user info.")
+            return .unknownError
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            let data = try JSONEncoder().encode(info)
+            let (body, response) = try await URLSession.shared.upload(for: request, from: data)
+                        
+            guard let httpResponse = response as? HTTPURLResponse else {
+                AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot get HHTP response.")
+                loginResponse = "Cannot get HHTP response."
+                return .unknownError
+            }
+
+            TokenManager.setMapKitToken(try JSONDecoder().decode(String.self, from: body))
+            
+            switch httpResponse.statusCode {
+            case 200:
+                  return .successfulLogin
+            default:
+                return .unknownError
+            }
+        }
+        catch {
+            AppControl.makeError(onAction: "Getting Server User", error: error, showToUser: false)
+            return Check.checkPostgresError(error)
+        }
+    }
+    
     /*
      guard let url = URL(string: "\(serverURL)login") else {
      AppControl.makeError(onAction: "Login", error: AlpineError.unknown, customDescription: "Cannot make URL to get user info.")
