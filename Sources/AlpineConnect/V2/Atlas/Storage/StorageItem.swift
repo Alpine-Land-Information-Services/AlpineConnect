@@ -20,14 +20,16 @@ public struct StorageItem: Codable, Hashable, Equatable, Identifiable {
     public var hash: String
     public var path: String
     public var contentType: String
-    
+        
     public var relativePath: String?
 
     public var created: Date
     public var lastModified: Date
+    
+    public var isShortcut: Bool?
         
     public static var demo: StorageItem {
-        StorageItem(name: "county.fgb", type: "File", size: 52087, hash: "23423424", path: "234", contentType: "", created: Date(), lastModified: Date())
+        StorageItem(name: "county.fgb", type: "File", size: 52087, hash: "23423424", path: "234", contentType: "", created: Date(), lastModified: Date(), isShortcut: false)
     }
     
     public var isPack: Bool {

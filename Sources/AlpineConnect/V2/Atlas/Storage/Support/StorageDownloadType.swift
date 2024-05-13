@@ -22,6 +22,19 @@ public enum ReferenceLocation: String {
         }
     }
     
+    public var stackName: String {
+        switch self {
+        case .myFolder:
+            "My Folder"
+        case .cloud:
+            "Alpine Cloud"
+        case .shared:
+            "Shared With Me"
+        case .project:
+            "Project"
+        }
+    }
+    
     static var groupURL: URL {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas")!
     }
