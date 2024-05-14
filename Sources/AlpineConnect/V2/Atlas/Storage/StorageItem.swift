@@ -42,4 +42,8 @@ public struct StorageItem: Codable, Hashable, Equatable, Identifiable {
         }
         return false
     }
+    
+    public var fileName: String {
+        name.components(separatedBy: ".").first ?? name
+    }
 }
