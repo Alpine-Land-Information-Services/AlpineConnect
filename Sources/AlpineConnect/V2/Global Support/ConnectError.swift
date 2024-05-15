@@ -25,4 +25,5 @@ public class ConnectError: AlpineError {
 public enum ConnectErrorType: String {
     case login = "Login Error"
     case storage = "Storage Error"
+    case upload = "Upload Error"
 }
