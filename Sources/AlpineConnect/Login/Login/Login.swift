@@ -10,11 +10,90 @@ import PostgresClientKit
 
 public class Login {
     
+    enum ConnectionDetail {
+        case timeout
+        case overrideKeychain
+        case keychainSaveFail
+        case biometrics
+    }
+
+    enum ConnectionResult {
+        case success
+        case fail
+        case moreDetail
+    }
+    
+    public struct Response: Decodable {
+        let sessionToken: String
+        let user: ServerUserResponse
+    }
+    
+    public struct BackendUser: Codable {
+        public var id: UUID
+        public var email: String
+        public var firstName: String
+        public var lastName: String
+        var isActive: Bool
+        var forceChangePassword: Bool
+    }
+    
+    struct UserLoginUpdate: Codable {
+        var email: String
+        var password: String
+        var appName: String
+        var appVersion: String
+        var machineName: String
+        var lat: Double?
+        var lng: Double?
+        var info: String
+    }
+
+    struct ConnectionResponse {
+        public init(result: ConnectionResult, detail: ConnectionDetail? = nil, data: Login.Response? = nil,problem: ConnectionProblem? = nil) {
+            self.result = result
+            self.backyardData = data
+            self.problem = problem
+        }
+        
+        public var result: ConnectionResult
+        public var backyardData: Login.Response?
+        public var problem: ConnectionProblem?
+        
+        var detail: ConnectionDetail?
+    }
+
+    struct ServerUserResponse: Codable {
+        public let email: String
+        public let firstName: String
+        public let lastName: String
+        public let isAdmin: Bool
+    }
+
+    struct ConnectionProblem: Decodable {
+        enum CodingKeys: CodingKey {
+            case type
+            case title
+            case status
+            case detail
+        }
+        
+        public let type: String?
+        public let title: String?
+        public let status: Int?
+        public let detail: String?
+        
+        public init(type: String? = nil, title: String? = nil, status: Int? = nil, detail: String? = nil) {
+            self.type = type
+            self.title = title
+            self.status = status
+            self.detail = detail
+        }
+    }
+    
     public static var loginResponse = ""
     public static var responseBody: String?
     
     static private let serverMode = "default" // "default" - use regular url, "test" - use testing url
-    
     static var serverURL: String {
         switch serverMode {
         case "test":
@@ -23,41 +102,88 @@ public class Login {
             return "https://alpinebackyard20220722084741.azurewebsites.net/"
         }
     }
-    
-    public struct BackendUser: Codable {
-        public var id: UUID
-        public var email: String
-        public var firstName: String
-        public var lastName: String
-        
-        var isActive: Bool
-        var forceChangePassword: Bool
-    }
-    
-    struct UserLoginUpdate: Codable {
-        var email: String
-        var password: String
-        
-        var appName: String
-        var appVersion: String
-        var machineName: String
-        
-        var lat: Double?
-        var lng: Double?
 
-        var info: String
-    }
-    
     public static var user: BackendUser!
     
-    static func loginUser(info: UserLoginUpdate, completionHandler: @escaping (LoginResponse) -> ()) {
-        NetworkMonitor.shared.canConnectToServer { connection in
-            switch connection {
-            case true:
-               loginUserOnline(info: info, completionHandler: completionHandler)
-            case false:
+    static var decoder: JSONDecoder {
+        let decoder = JSONDecoder()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
+        
+        return decoder
+    }
+    
+    static func loginUser(info: UserLoginUpdate, completionHandler: @escaping (LoginResponse) -> Void) {
+        Task {
+            guard await NetworkMonitor.shared.canConnectToServer() else {
                 completionHandler(.timeout)
+                return
             }
+
+            guard let response = await loginUserOnlineNew(info: info) else {
+                completionHandler(.unknownError)
+                return
+            }
+
+            if response.result != .success {
+                completionHandler(.customError(title: response.problem?.title ?? "Unknown Error", detail: response.problem?.detail ?? "No further information available"))
+            } else {
+                completionHandler(.successfulLogin)
+            }
+        }
+    }
+    
+    static private func loginUserOnlineNew(info: UserLoginUpdate) async -> ConnectionResponse? {
+        let appURL = "https://alpine-legacy.azurewebsites.net/login"
+        let dataRequest = "\(info.email):\(info.password)".data(using: .utf8)!.base64EncodedString()
+        let appToken = "FHUb7mT6yLP4QVb0Gra8hBNe37EcaIHBaEHxsGnyCRU2FgkQUFAPRQRDJbY80hxd?c=2024-05-16T14:39:26?e=2024-11-12T14:39:26"
+        
+        guard let url = URL(string: appURL) else {
+            print("Could not create application URL.")
+            return nil
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("Basic \(dataRequest)", forHTTPHeaderField: "Authorization")
+        request.addValue(appToken, forHTTPHeaderField: "ApiKey")
+        
+        do {
+            let (data, response) = try await URLSession.shared.upload(for: request, from: Data())
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("Could not get HTTP response.")
+                return nil
+            }
+            
+            if (200...299).contains(httpResponse.statusCode) {
+                return await decodeSuccessfulResponse(from: data)
+            } else {
+                return await decodeErrorResponse(from: data)
+            }
+        } catch {
+            print("Network request failed: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    static private func decodeSuccessfulResponse(from data: Data) async -> ConnectionResponse? {
+        do {
+            let response = try decoder.decode(Response.self, from: data)
+            return ConnectionResponse(result: .success, data: response, problem: nil)
+        } catch {
+            print("Failed to decode a successful response: \(error)")
+            return nil
+        }
+    }
+
+    static private func decodeErrorResponse(from data: Data) async -> ConnectionResponse? {
+        do {
+            let problem = try decoder.decode(ConnectionProblem.self, from: data)
+            return ConnectionResponse(result: .fail, data: nil, problem: problem)
+        } catch {
+            print("Failed to decode an error response: \(error)")
+            return nil
         }
     }
     

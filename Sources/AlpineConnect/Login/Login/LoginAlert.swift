@@ -173,6 +173,10 @@ class LoginAlert: ObservableObject {
                 UserDefaults().setValue(true, forKey: "debugPasswordSave")
                 self.continueWithLogin()}),
                          secondaryButton: .cancel(Text("Not Now"), action: self.continueWithLogin))
+        case .customError(let title, let detail):
+            return Alert(title: Text(title),
+                         message: Text(detail),
+                         dismissButton: .default(Text("OK"), action: {}))
         default:
             return Alert(title: Text("Something Went Wrong"), message: Text("Please try again. \n\n Error: \n\(Login.responseBody ?? "") \n \(Login.loginResponse)"))
 

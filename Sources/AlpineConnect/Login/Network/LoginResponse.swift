@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum LoginResponse {
+public enum LoginResponse: Hashable {
 
     case successfulLogin
     case invalidCredentials
@@ -39,6 +39,8 @@ public enum LoginResponse {
     case bioNotSet
     case bioNotAvailable
     case unknownBioError
+    
+    case customError(title: String, detail: String)
 }
 
 extension LoginResponse: RawRepresentable {
