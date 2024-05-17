@@ -13,5 +13,6 @@ public struct StorageDirectory: Codable {
     public var path: String
     public var relativePath: String?
     public var isShortcut: Bool?
+    public var isShared: Bool?
     public var contents: [StorageItemKind]
 }

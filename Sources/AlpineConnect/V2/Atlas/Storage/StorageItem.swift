@@ -27,6 +27,7 @@ public struct StorageItem: Codable, Hashable, Equatable, Identifiable {
     public var lastModified: Date
     
     public var isShortcut: Bool?
+    public var isShared: Bool?
         
     public static var demo: StorageItem {
         StorageItem(name: "county.fgb", type: "File", size: 52087, hash: "23423424", path: "234", contentType: "", created: Date(), lastModified: Date(), isShortcut: false)
