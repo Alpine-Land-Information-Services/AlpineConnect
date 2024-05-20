@@ -29,7 +29,7 @@ public struct AlpineLoginView: View {
                 .sheet(isPresented: $loginAlert.showSheet) {
                     switch loginAlert.activeAlert {
                     case .registrationRequired:
-                        RegisterView(open: $loginAlert.showSheet)
+                        RegisterWebView(showAlert: $loginAlert.showAlert)
                     case .passwordChangeRequired:
                         PasswordChangeView(required: true)
                     default:
@@ -47,7 +47,7 @@ public struct AlpineLoginView: View {
                     Text(loginAlert.newAlert().message)
                 }
                 .sheet(isPresented: $viewModel.register) {
-                    RegisterView(open: $viewModel.register)
+                    RegisterWebView(showAlert: $loginAlert.showNewAlert)
                 }
             Spacer()
         }
@@ -68,7 +68,7 @@ public struct AlpineLoginView: View {
             .ignoresSafeArea(.keyboard, edges: .all)
         }
         .resizableSheet(isPresented: $viewModel.showResetPassword) {
-            PasswordResetView(open: $viewModel.showResetPassword)
+            PasswordResetWebView(showAlert: $loginAlert.showAlert)
         }
         .onChange(of: loginAlert.showAlert) { show in
             if show {

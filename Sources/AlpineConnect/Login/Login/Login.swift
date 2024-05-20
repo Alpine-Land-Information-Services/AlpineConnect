@@ -129,6 +129,10 @@ public class Login {
             if response.result != .success {
                 completionHandler(.customError(title: response.problem?.title ?? "Unknown Error", detail: response.problem?.detail ?? "No further information available"))
             } else {
+                if let backyardData = response.backyardData {
+                    UserManager.shared.userName = backyardData.user.email
+                    UserManager.shared.fullName = "\(backyardData.user.firstName) \(backyardData.user.lastName )"
+                }
                 completionHandler(.successfulLogin)
             }
         }
