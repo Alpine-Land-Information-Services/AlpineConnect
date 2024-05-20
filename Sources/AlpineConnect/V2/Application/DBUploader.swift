@@ -14,6 +14,11 @@ import AlpineUI
 @Observable
 public class DBUploader {
     
+    public enum ContainerType {
+        case filesystem
+        case appData
+    }
+    
     public enum Status: String {
         case none = ""
         case packing = "Packing..."
@@ -30,15 +35,14 @@ public class DBUploader {
     }
     
     
-    public func upload(containerPath: String) async {
+    public func upload(containerPath: String, containerType: ContainerType) async {
         do {
-            let path = containerPath.appending(".sqlite")
-            let containerURL = FS.appSupportURL.appending(path: path)
+            let containerURL = getURL(path: containerPath, in: containerType)
             guard FS.fileExists(at: containerURL) else {
                 throw ConnectError("Container does not exist at specified path: \(containerURL)", type: .upload)
             }
             setStatus(to: .packing)
-            let zipURL = try Zip.quickZipFiles([containerURL], fileName: path)
+            let zipURL = try Zip.quickZipFiles([containerURL], fileName: containerPath)
             try await doUpload(from: zipURL, to: containerPath)
             try FileManager.default.removeItem(at: zipURL)
             resetStatus()
@@ -47,6 +51,15 @@ public class DBUploader {
             setStatus(to: .error)
             Core.makeError(error: error)
             resetStatus()
+        }
+    }
+    
+    private func getURL(path: String, in container: ContainerType) -> URL {
+        switch container {
+        case .filesystem:
+            return FS.atlasGroupURL.appending(component: "Library").appending(component: "Application Support").appending(component: path)
+        case .appData:
+            return FS.appSupportURL.appending(path: path)
         }
     }
     
@@ -105,13 +118,20 @@ public extension DBUploader {
         @State private var uploader: DBUploader
         var containerPath: String
         
-        public init(containerPath: String, token: String) {
+        var icon: String
+        var title: String
+        var containerType: ContainerType
+        
+        public init(containerPath: String, token: String, icon: String, title: String, containerType: ContainerType) {
             self.containerPath = containerPath
+            self.icon = icon
+            self.title = title
+            self.containerType = containerType
             _uploader = State(wrappedValue: DBUploader(token: token))
         }
         
         public var body: some View {
-            SettingBlock(image: "square.and.arrow.up.on.square", color: .orange, title: "Upload Local Database", displayContent: {
+            SettingBlock(image: icon, color: .orange, title: title, displayContent: {
                 switch uploader.status {
                 case .packing, .uploading:
                     HStack {
@@ -126,10 +146,10 @@ public extension DBUploader {
                 guard uploader.status == .none else { return }
                 let proceedButton = CoreAlertButton(title: "Proceed", style: .destructive) {
                     Task {
-                        await uploader.upload(containerPath: containerPath)
+                        await uploader.upload(containerPath: containerPath, containerType: containerType)
                     }
                 }
-                let alert = CoreAlert(title: "Upload Database?", message: "This will upload a copy of your local database for debugging.\n\nPlease only do so if requested.\n\nThe process may take a while, do not leave this page while upload is in process.", buttons: [.cancel,  proceedButton])
+                let alert = CoreAlert(title: "Upload Container?", message: "This will upload a copy of this container for debugging.\n\nPlease only do so if requested.\n\nThe process may take a while, do not leave this page while upload is in process.", buttons: [.cancel,  proceedButton])
     
                 Core.makeAlert(alert)
             })
