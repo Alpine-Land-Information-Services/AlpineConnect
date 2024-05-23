@@ -91,6 +91,6 @@ public struct AppInfo {
     }
     
     var url: String
-    var token: String
+    public var token: String
     var userTableConnect: () async -> ConnectionResponse
 }

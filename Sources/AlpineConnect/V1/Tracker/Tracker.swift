@@ -23,12 +23,12 @@ public class Tracker {
         }
     }
     
-    public static func appReleaseNotesURL(preview: Bool = false) -> URL {
+    public static func appReleaseNotesURL(preview: Bool = false, name: String? = nil) -> URL {
         let releases = preview ? URL(string: "https://alpinesupport-preview.azurewebsites.net/Releases")! : URL(string: "https://alpinesupport.azurewebsites.net/Releases")!
         var appVersion = appVersion()
         guard appVersion != "Unknown" else { return releases }
         appVersion = appVersion.replacingOccurrences(of: ".", with: "_")
-        let appName = appName().components(separatedBy: " ").first ?? appName()
+        let appName = name ?? appName().components(separatedBy: " ").first ?? appName()
         
         return releases.appending(path: appName).appending(path: appVersion)
     }
