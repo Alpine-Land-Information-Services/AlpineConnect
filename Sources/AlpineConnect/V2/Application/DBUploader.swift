@@ -122,12 +122,12 @@ public extension DBUploader {
         var title: String
         var containerType: ContainerType
         
-        public init(containerPath: String, token: String, icon: String, title: String, containerType: ContainerType) {
+        public init(containerPath: String, storageToken: String, icon: String, title: String, containerType: ContainerType) {
             self.containerPath = containerPath
             self.icon = icon
             self.title = title
             self.containerType = containerType
-            _uploader = State(wrappedValue: DBUploader(token: token))
+            _uploader = State(wrappedValue: DBUploader(token: storageToken))
         }
         
         public var body: some View {

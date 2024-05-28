@@ -84,13 +84,15 @@ public struct TrackingInfo {
 
 public struct AppInfo {
     
-    public init(url: String, token: String, userTableConnect: @escaping () async -> ConnectionResponse) {
+    public init(url: String, token: String, storageToken: String? = nil, userTableConnect: @escaping () async -> ConnectionResponse) {
         self.url = url
         self.token = token
         self.userTableConnect = userTableConnect
+        self.storageToken = storageToken
     }
     
+    public var storageToken: String?
     var url: String
-    public var token: String
+    var token: String
     var userTableConnect: () async -> ConnectionResponse
 }
