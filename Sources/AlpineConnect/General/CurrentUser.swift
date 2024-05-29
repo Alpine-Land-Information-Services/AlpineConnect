@@ -126,7 +126,7 @@ public extension CurrentUser {
     }
     
     static var email: String {
-        data["email"] as! String
+        data["email"] as? String ?? ""
     }
     
     static var fullName: String {

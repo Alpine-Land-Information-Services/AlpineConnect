@@ -26,7 +26,7 @@ public class UserManager: ObservableObject {
     public static let shared = UserManager()
     
     public var token: LoginToken?
-    
+    public var mapKitToken: LoginToken?
     
     var storedPassword: String? = nil
     var storedUserName: String? = nil

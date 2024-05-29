@@ -50,7 +50,7 @@ class LoginViewModel: ObservableObject {
         }
         authenthication.handleBiometricAuthorization { result in
             if result {
-                self.doLogin()
+              self.doLogin()
             }
         }
     }

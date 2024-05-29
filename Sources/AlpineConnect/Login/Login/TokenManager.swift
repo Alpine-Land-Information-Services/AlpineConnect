@@ -23,6 +23,11 @@ class TokenManager {
         }
     }
     
+    static func setMapKitToken(_ token: String) {
+        let token = UserManager.LoginToken(token)
+        UserManager.shared.mapKitToken = token
+    }
+    
     static func checkToken() {
         guard NetworkMonitor.shared.connected else {
             return
@@ -37,6 +42,7 @@ class TokenManager {
     }
     
     static func getNewToken() {
+        /*
         guard let loginUpdate = UserManager.shared.loginUpdate else {
             return
         }
@@ -48,6 +54,7 @@ class TokenManager {
                 noTokenAlert()
             }
         }
+         */
     }
     
     static func noTokenAlert() {
