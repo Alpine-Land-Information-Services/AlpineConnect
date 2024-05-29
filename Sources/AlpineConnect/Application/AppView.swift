@@ -12,6 +12,8 @@ public struct AppView<App: View>: View {
     
     @ObservedObject var control = AppControl.shared
     
+    @Environment(\.horizontalSizeClass) var hSizeClass
+    
     var app: App
     
     public init(@ViewBuilder app: () -> App) {
@@ -46,6 +48,20 @@ public struct AppView<App: View>: View {
                     }
                     .appAlert(isPresented: $control.showSheetAlert, alert: control.currentAlert)
             }
+            .fullScreenCover(isPresented: $control.showCover, content: {
+                control.currentCover
+                    .overlay {
+                        if control.sheetDimView {
+                            Color(uiColor: .black)
+                                .opacity(0.4)
+                                .ignoresSafeArea()
+                        }
+                    }
+                    .popup(isPresented: $control.showSecondaryPopup, alignment: .bottom, direction: .bottomTrailing) {
+                        control.currentSecondaryPopup.content
+                    }
+                    .appAlert(isPresented: $control.showSheetAlert, alert: control.currentAlert)
+            })
             .ignoresSafeArea()
     }
     

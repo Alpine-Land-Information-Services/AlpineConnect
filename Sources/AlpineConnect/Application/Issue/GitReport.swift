@@ -70,9 +70,10 @@ class GitReport {
     }
     
     func getAppVersion() -> String? {
-        guard let filePath = Bundle.main.path(forResource: "Info", ofType: "plist") else { return nil }
-        let plist = NSDictionary(contentsOfFile: filePath)
-        guard let value = plist?.object(forKey: "CFBundleShortVersionString") as? String else { return nil }
-        return value
+        return Tracker.appFullVersion()
+//        guard let filePath = Bundle.main.path(forResource: "Info", ofType: "plist") else { return nil }
+//        let plist = NSDictionary(contentsOfFile: filePath)
+//        guard let value = plist?.object(forKey: "CFBundleShortVersionString") as? String else { return nil }
+//        return value
     }
 }

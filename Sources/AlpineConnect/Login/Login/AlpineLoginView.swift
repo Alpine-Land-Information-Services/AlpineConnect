@@ -23,19 +23,17 @@ public struct AlpineLoginView: View {
     }
     
     public var body: some View {
-        GeometryReader { geometry in
-            VStack {
-                logo
-                    .modifier(UpdateCheckModifier(automatic: true, dismissAction: viewModel.bioAuthentication, DBPassword: viewModel.info.connectDBPassword))
-                    .sheet(isPresented: $loginAlert.showSheet) {
-                        switch loginAlert.activeAlert {
-                        case .registrationRequired:
-                            RegisterView(open: $loginAlert.showSheet)
-                        case .passwordChangeRequired:
-                            PasswordChangeView(required: true)
-                        default:
-                            EmptyView()
-                        }
+        VStack {
+            logo
+                .modifier(UpdateCheckModifier(automatic: true, dismissAction: viewModel.bioAuthentication, DBPassword: viewModel.info.connectDBPassword))
+                .sheet(isPresented: $loginAlert.showSheet) {
+                    switch loginAlert.activeAlert {
+                    case .registrationRequired:
+                        RegisterWebView(showAlert: $loginAlert.showAlert)
+                    case .passwordChangeRequired:
+                        PasswordChangeView(required: true)
+                    default:
+                        EmptyView()
                     }
                 
                 login
@@ -76,14 +74,22 @@ public struct AlpineLoginView: View {
                 if show {
                     viewModel.spinner = false
                 }
-            }
-            .onChange(of: loginAlert.showNewAlert) { show in
-                if show {
-                    viewModel.spinner = false
+                .sheet(isPresented: $viewModel.register) {
+                    RegisterWebView(showAlert: $loginAlert.showNewAlert)
                 }
             }
-            .onReceive(updateStatus) { _ in
-                viewModel.bioAuthentication()
+            .font(.caption)
+            .foregroundColor(Color.gray)
+            .padding(6)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            .ignoresSafeArea(.keyboard, edges: .all)
+        }
+        .resizableSheet(isPresented: $viewModel.showResetPassword) {
+            PasswordResetWebView(showAlert: $loginAlert.showAlert)
+        }
+        .onChange(of: loginAlert.showAlert) { show in
+            if show {
+                viewModel.spinner = false
             }
             .onDisappear {
                 viewModel.userManager.inputPassword = ""

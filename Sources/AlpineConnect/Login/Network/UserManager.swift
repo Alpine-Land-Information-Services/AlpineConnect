@@ -31,11 +31,11 @@ public class UserManager: ObservableObject {
     var storedPassword: String? = nil
     var storedUserName: String? = nil
     var password: String = ""
-    
     var loginUpdate: Login.UserLoginUpdate?
     
     @Published public var userName: String = ""
-    @Published var inputPassword: String = ""
-    
+    @Published public var fullName: String = ""
     @Published public var userLoggedIn: Bool = false
+    
+    @Published var inputPassword: String = ""
 }

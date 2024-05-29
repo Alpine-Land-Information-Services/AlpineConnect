@@ -13,6 +13,7 @@ public class SyncTracker: ObservableObject {
     
     public enum SyncStatus {
         case exportReady
+        case exportPreparing
         case exporting
         case exportDone
         
@@ -22,10 +23,13 @@ public class SyncTracker: ObservableObject {
         case importDone
         
         case actions
+        case saving
         
         case error
+        case canceled
         case none
     }
+    
     
     struct SyncableRecord: Identifiable {
         
@@ -43,8 +47,30 @@ public class SyncTracker: ObservableObject {
     public var currentSyncStartDate = Date()
     
     @Published public var showSync = false
+    @Published public var syncType = SyncManager.SyncType.none {
+        didSet {
+            withAnimation {
+                isSyncing = checkIfSyncing(type: syncType)
+            }
+        }
+    }
     
-    @Published public var slowStatus = SyncStatus.none
+    @Published public var isDoingSomeSync = false
+    @Published var showingUI = false
+    
+    @Published public var isSyncing = false {
+        didSet {
+            NotificationCenter.default.post(Notification(name: Notification.Name("AC_SyncChange"), object: isSyncing))
+        }
+    }
+        
+    @Published public var slowStatus = SyncStatus.none {
+        didSet {
+            if internalStatus == .error || internalStatus == .canceled {
+                NotificationCenter.default.post(Notification(name: Notification.Name("AC_SyncChange"), object: false))
+            }
+        }
+    }
     var internalStatus = SyncStatus.none
     
     @Published public var statusMessage = ""
@@ -92,6 +118,15 @@ extension SyncTracker {
 
 extension SyncTracker {
     
+    func checkIfSyncing(type: SyncManager.SyncType) -> Bool {
+        switch type {
+        case .exportFirst, .importFirst, .exportFirstNoUI, .importFirstNoUI:
+            return true
+        default:
+            return false
+        }
+    }
+    
     func toggleSyncWindow(to value: Bool) {
         DispatchQueue.main.async {
             withAnimation {
@@ -114,7 +149,18 @@ public extension SyncTracker {
     func updateStatus(_ status: SyncStatus) {
         internalStatus = status
         DispatchQueue.main.async {
-            self.slowStatus = status
+            withAnimation {
+                self.slowStatus = status
+            }
+        }
+    }
+    
+    func updateType(_ type: SyncManager.SyncType) {
+        DispatchQueue.main.async {
+            withAnimation {
+                print("updated type to\(type)")
+                self.syncType = type
+            }
         }
     }
     

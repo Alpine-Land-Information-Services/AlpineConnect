@@ -21,6 +21,7 @@ public struct UpdateButton: View {
             viewModel.checkForUpdate(automatic: false)
         } label: {
             Text("Check for Update")
+                .foregroundColor(.accentColor)
         }
         .onChange(of: viewModel.showAlert) { show in
             if show {

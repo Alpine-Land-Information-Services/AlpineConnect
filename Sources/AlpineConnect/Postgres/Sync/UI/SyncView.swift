@@ -33,17 +33,33 @@ public struct SyncView: View {
                 syncedRecords
             }
             .background(Color(uiColor: .systemGray6))
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Menu {
+                        Button(role: .destructive) {
+                            tracker.manager.userSyncCancelAlert()
+                        } label: {
+                            Label("Cancel Sync", systemImage: "exclamationmark.octagon")
+                        }
+                    } label: {
+                        Label("Options", systemImage: "ellipsis.circle")
+                    }
+                }
+            }
         }
-        .interactiveDismissDisabled(tracker.status != .none)
+        .interactiveDismissDisabled(tracker.status != .none && tracker.status != .canceled)
         .onChange(of: tracker.status) { newValue in
-            if newValue == .none {
+            if newValue == .none || newValue == .canceled {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                     dismiss()
                 }
             }
         }
+        .onAppear {
+            tracker.showingUI = true
+        }
         .onDisappear {
-            viewModel.sync.clear()
+            tracker.manager.clear()
         }
     }
     
@@ -61,7 +77,7 @@ public struct SyncView: View {
     
     var syncMessage: some View {
         HStack {
-            if tracker.status != .none && tracker.status != .error {
+            if tracker.status != .none && tracker.status != .error && tracker.status != .canceled {
                 ProgressView()
                     .progressViewStyle(.circular)
                     .padding(.horizontal, 6)

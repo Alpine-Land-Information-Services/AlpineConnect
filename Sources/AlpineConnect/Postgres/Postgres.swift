@@ -15,6 +15,20 @@ public extension Optional where Wrapped == UUID {
     }
 }
 
+//public extension Optional where Wrapped == Int {
+//
+//    func toPostgres() -> String {
+//        return self != nil ? "\(self!)" : "NULL"
+//    }
+//}
+//
+//public extension Optional where Wrapped == Int32 {
+//
+//    func toPostgres() -> String {
+//        return self != nil ? "\(self!)" : "NULL"
+//    }
+//}
+
 public extension Optional where Wrapped == String {
     
     func geometryToPostgres() -> String {
@@ -23,7 +37,7 @@ public extension Optional where Wrapped == String {
     }
     
     func toPostgres() -> String {
-        self != nil && self != "" ? "'\(self!)'" : "NULL"
+        self != nil && self != "" ? "'\(self!.postgresEscaped)'" : "NULL"
     }
 }
 

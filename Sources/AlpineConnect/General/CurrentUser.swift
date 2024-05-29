@@ -47,6 +47,10 @@ public extension CurrentUser {
         UUID(uuidString: data["guid"] as! String)!
     }
     
+    static var applicationUserGuid: UUID {
+        UUID(uuidString: data["applicationUserGuid"] as! String)!
+    }
+    
     static var isAdmin: Bool {
         data["isAdmin"] as? Bool ?? false
     }
@@ -60,12 +64,73 @@ public extension CurrentUser {
         }
     }
     
+    static var autoSync: Bool {
+        get {
+            data["autoSync"] as? Bool ?? true
+        }
+        set {
+            data["autoSync"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
+    
+    static var syncTimeout: Int {
+        get {
+            data["syncTimeout"] as? Int ?? 60
+        }
+        set {
+            data["syncTimeout"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
+    static var syncWithCellular: Bool {
+        get {
+            data["syncWithCellular"] as? Bool ?? true
+        }
+        set {
+            data["syncWithCellular"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
+    static var syncPauseEndDate: Date? {
+        get {
+            data["syncPauseEndDate"] as? Date
+        }
+        set {
+            data["syncPauseEndDate"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
+    static var requiresSync: Bool {
+        get {
+            data["requiresSync"] as? Bool ?? false
+        }
+        set {
+            data["requiresSync"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
+    static var didBackgroundSync: Bool {
+        get {
+            data["didBackgroundSync"] as? Bool ?? false
+        }
+        set {
+            data["didBackgroundSync"] = newValue
+            data.saveToDefaults(key: userKey)
+        }
+    }
+    
     static var email: String {
         data["email"] as? String ?? ""
     }
     
     static var fullName: String {
-        data["name"] as? String ?? ""
+        data["name"] as? String ?? "Noname" //TODO: for some reasore there is no name on the first app run
     }
     
     static var firstName: String {
@@ -74,6 +139,10 @@ public extension CurrentUser {
     
     static var lastName: String {
         fullName.components(separatedBy: .whitespaces)[1]
+    }
+    
+    static var defaultsGroup: Int {
+        data["defaultsGroup"] as? Int ?? 0
     }
     
     static var database: Database {
@@ -93,6 +162,9 @@ public extension CurrentUser {
         case .sandbox:
             data["lastSyncSandbox"] = date
         }
+        if date == nil {
+            data["requiresSync"] = false
+        }
         data.saveToDefaults(key: userKey)
     }
     
@@ -103,6 +175,17 @@ public extension CurrentUser {
     
     static func setAdmin(to value: Bool) {
         data["isAdmin"] = value
+    }
+    
+    static func setDefaultsGroup(to value: Int) {
+        data["defaultsGroup"] = value
+    }
+    
+    static func setApplicationUserGuid(to value: UUID) {
+        data["applicationUserGuid"] = value.uuidString
+    }
+    
+    static func saveDefaults() {
         data.saveToDefaults(key: userKey)
     }
 }

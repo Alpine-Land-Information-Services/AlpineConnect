@@ -21,6 +21,8 @@ class SyncViewModel: ObservableObject {
         switch sync.tracker.status {
         case .error:
             return .red
+        case .canceled:
+            return .orange
         case .none:
             return .green
         default:
@@ -32,6 +34,8 @@ class SyncViewModel: ObservableObject {
         switch sync.tracker.status {
         case .error:
             return "Sync Error Accurred"
+        case .canceled:
+            return "Process Canceled"
         case .none:
             return "Process Complete"
         default:

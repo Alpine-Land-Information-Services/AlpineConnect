@@ -17,15 +17,13 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
     
     var headingOrientation: CLDeviceOrientation {
         get { manager.headingOrientation }
-        set { manager.headingOrientation = newValue}
+        set { manager.headingOrientation = newValue }
     }
     
     var isWorking = false
     
-    @Published public var lastLocation: CLLocation?                 // in degrees, 4326
+    @Published public var lastLocation: CLLocation? // in degrees, 4326
     @Published public var lastHeading: CLHeading?
-    //TODO: is this needed?
-    @Published public var centerCoordinate: CLLocationCoordinate2D? // in projection, 26710
     
     public var locationUsers = [UUID: String]()
     
@@ -35,9 +33,21 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         }
     }
     
+    public func isEnabled() async -> Bool {
+        switch manager.authorizationStatus {
+            case .notDetermined, .restricted, .denied:
+                return false
+            case .authorizedAlways, .authorizedWhenInUse:
+                return true
+            @unknown default:
+                return true
+        }
+    }
+    
     public func start() {
-        if isWorking { return }
+        guard !isWorking else { return }
         isWorking = true
+
         manager.requestWhenInUseAuthorization()
         manager.delegate = self
         manager.requestLocation()
@@ -57,9 +67,9 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         guard !isWorking else {
             return
         }
-        isWorking = true
         manager.startUpdatingLocation()
         manager.startUpdatingHeading()
+        isWorking = true
     }
 
     func stop() {

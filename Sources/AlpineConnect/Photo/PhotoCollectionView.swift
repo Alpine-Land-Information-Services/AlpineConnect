@@ -213,12 +213,14 @@ public struct PhotoCollectionButton: View {
 public struct PhotoCollectionBlock<Label: View>: View {
     
     @StateObject var viewModel: PhotoViewModel
-    
+    @Binding var changed: Bool
+
     var required: Bool
     var label: Label
 
-    public init(object: PhotoObject, required: Bool = false, @ViewBuilder label: () -> Label) {
+    public init(object: PhotoObject, changed: Binding<Bool>, required: Bool = false, @ViewBuilder label: () -> Label) {
         self._viewModel = StateObject(wrappedValue: PhotoViewModel(object: object))
+        self._changed = changed
         self.required = required
         self.label = label()
     }
@@ -235,6 +237,11 @@ public struct PhotoCollectionBlock<Label: View>: View {
                             .foregroundColor(.red)
                     }
                 }
+        }
+        .onChange(of: viewModel.takingPhoto) { taking in
+            if !taking {
+                changed.toggle()
+            }
         }
     }
 }
