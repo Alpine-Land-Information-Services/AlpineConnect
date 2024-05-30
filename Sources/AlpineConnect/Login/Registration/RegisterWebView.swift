@@ -17,8 +17,6 @@ struct RegisterWebView: View {
     
     @Environment(\.presentationMode) var presentationMode
     
-    @Binding var showAlert: Bool
-    
     @State private var isLoading = false
     @State private var registrationURL = URL(string: "https://alpinesupport-preview.azurewebsites.net/Account/Register/Webview")!
 
@@ -50,9 +48,7 @@ struct RegisterWebView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: registrationURL) { newValue in
                 loginAlert.updateAlertType(.customError(title: "Registration Successful", detail:  "You will receive an email shortly to confirm. \n\nNote:\nYou can only login after confirmation."))
-                showAlert = true
                 presentationMode.wrappedValue.dismiss()
-            
         }
     }
 }

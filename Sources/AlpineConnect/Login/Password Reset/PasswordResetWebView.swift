@@ -9,9 +9,7 @@ import SwiftUI
 
 struct PasswordResetWebView: View {
     @Environment(\.presentationMode) var presentationMode
-    
-    @Binding var showAlert: Bool
-    
+
     @State private var isLoading = false
     @State private var resetURL = URL(string: "https://alpinesupport-preview.azurewebsites.net/account/forgotpassword/webview")!
 
@@ -43,7 +41,6 @@ struct PasswordResetWebView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: resetURL) { newValue in
                 loginAlert.updateAlertType(.customError(title: "Reset Request Sent", detail:  "You will recieve an email shortly to confirm."))
-                showAlert = true
                 presentationMode.wrappedValue.dismiss()
         }
     }
