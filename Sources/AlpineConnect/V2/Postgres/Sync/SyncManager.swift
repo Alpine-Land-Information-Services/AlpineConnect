@@ -143,6 +143,10 @@ public class SyncManager {
             return
         }
         
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(Notification(name: .AC_SyncComplete, object: nil, userInfo: ["success": true]))
+        }
+        
         if let doAfter {
             doAfter()
         }

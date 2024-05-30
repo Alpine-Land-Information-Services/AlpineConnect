@@ -106,7 +106,7 @@ fileprivate struct ChangelogModifier: ViewModifier {
     }
     
     func checkIfToPresent() {
-        if let lastBuild = core.defaults.appBuild {
+        if let lastBuild = core.defaults.appBuild, core.isInitialized(sandbox: Connect.user?.isSandbox ?? false) {
             if lastBuild != Tracker.appBuild() {
                 isChangelogPresented.toggle()
                 onVersionChange()
