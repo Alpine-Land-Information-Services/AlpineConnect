@@ -12,21 +12,21 @@ public struct UpdateCheckModifier: ViewModifier {
     @StateObject var viewModel = SwiftUIUpdater()
     
     var automatic: Bool
-    var dissmissAction: () -> ()
+    var dismissAction: () -> ()
     
     public init(automatic: Bool, dismissAction: @escaping () -> (), DBPassword: String) {
         self.automatic = automatic
-        self.dissmissAction = dismissAction
+        self.dismissAction = dismissAction
         TrackerConnectionInfo.shared.password = DBPassword
     }
     
     public func body(content: Content) -> some View {
         content
             .task {
-                viewModel.checkForUpdate(automatic: automatic, onComplete: dissmissAction)
+                viewModel.checkForUpdate(automatic: automatic, onComplete: dismissAction)
             }
             .alert(isPresented: $viewModel.showAlert) {
-                viewModel.alert(dismissAction: dissmissAction)
+                viewModel.alert(dismissAction: dismissAction)
             }
     }
 }
