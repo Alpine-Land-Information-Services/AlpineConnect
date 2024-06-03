@@ -130,9 +130,9 @@ open class Location: NSObject, CLLocationManagerDelegate, ObservableObject {
         case .portraitUpsideDown:
             manager.headingOrientation = CLDeviceOrientation.portraitUpsideDown
         case .landscapeLeft:
-            manager.headingOrientation = CLDeviceOrientation.landscapeLeft
-        case .landscapeRight:
             manager.headingOrientation = CLDeviceOrientation.landscapeRight
+        case .landscapeRight:
+            manager.headingOrientation = CLDeviceOrientation.landscapeLeft
         default:
             break
         }
