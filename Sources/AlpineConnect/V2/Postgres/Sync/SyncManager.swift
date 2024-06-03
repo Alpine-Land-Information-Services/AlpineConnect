@@ -40,14 +40,16 @@ public class SyncManager {
     var isForeground = true
     
     var timer: Timer?
+    var doAtlasSync: Bool
     
     var syncErrorsResolver = SyncErrorsResolver()
     
-    public init(for container: ObjectContainer, database: any Database, context: NSManagedObjectContext) {
+    public init(for container: ObjectContainer, database: any Database, doAtlasSync: Bool = true, context: NSManagedObjectContext) {
         self.container = container
         tracker = SyncTracker()
         self.context = context
         context.mergePolicy = SelectiveMergePolicy()
+        self.doAtlasSync = doAtlasSync
         tracker.manager = self
         self.database = database
 //        DispatchQueue.global(qos: .background).async {
@@ -381,7 +383,9 @@ private extension SyncManager { //MARK: Import
         }
         
         await doClean(in: context, objects: importable)
-        await atlasSync(for: container.atlasObjects)
+        if doAtlasSync {
+            await atlasSync(for: container.atlasObjects)
+        }
 
         try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
     }
