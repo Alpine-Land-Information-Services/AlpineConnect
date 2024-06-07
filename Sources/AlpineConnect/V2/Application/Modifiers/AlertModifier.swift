@@ -15,6 +15,9 @@ struct AlertModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .alert(alert.title, isPresented: $isPresented, actions: {
+                if let textFieldBinding = alert.textFieldBinding {
+                    TextField(alert.textFieldPlaceholder ?? "", text: textFieldBinding)
+                }
                 if let buttons = alert.buttons {
                     ForEach(buttons, id: \.label) { button in
                         Button(role: button.role) {
@@ -30,8 +33,7 @@ struct AlertModifier: ViewModifier {
                     } label: {
                         Text(button.label)
                     }
-                }
-                else {
+                } else {
                     Button(role: .cancel) {
                         
                     } label: {
@@ -52,3 +54,5 @@ public extension View {
         modifier(AlertModifier(alert: alert, isPresented: isPresented))
     }
 }
+
+

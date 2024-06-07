@@ -13,23 +13,23 @@ import AlpineCore
 struct AlpineLoginView_V2: View {
     
     @EnvironmentObject var manager: ConnectManager
-    
-    var network: NetworkTracker {
-        NetworkTracker.shared
-    }
-    
+
     @State private var email = ""
     @State private var password = ""
-    
     @State private var isAlertPresented = false
     @State private var attemptingLogin = false
-    
     @State private var isRegistrationPresented = false
     @State private var isPasswordResetPresented = false
-
+    @State private var isSettingsPresented = false
     @State private var currentAlert = ConnectAlert.empty
     
     var info: LoginConnectionInfo
+    var network: NetworkTracker {
+        NetworkTracker.shared
+    }
+    var fieldsEmpty: Bool {
+        email.isEmpty || password.isEmpty
+    }
     
     public var body: some View {
         VStack {
@@ -40,7 +40,7 @@ struct AlpineLoginView_V2: View {
         .padding()
         .frame(maxWidth: .infinity)
         .background(Image("Login-BG").resizable().blur(radius: 50, opaque: true).ignoresSafeArea())
-        .overlay {
+        .overlay(alignment: .bottomTrailing) {
             HStack {
                 Text("Version: \(Tracker.appVersion())")
                     .fontWeight(.medium)
@@ -50,9 +50,22 @@ struct AlpineLoginView_V2: View {
             .font(.caption)
             .foregroundColor(Color.gray)
             .padding(6)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             .ignoresSafeArea(.keyboard, edges: .all)
             .updateChecker(DBPassword: info.trackingInfo.password, onDismiss: promptBioLogin)
+        }
+        .overlay(alignment: .bottomLeading) {
+            Button {
+                self.isSettingsPresented.toggle()
+            } label: {
+                Image(systemName: "gear")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .foregroundColor(Color.gray)
+            }
+            .frame(width: 34, height: 34)
+            .padding(.bottom, 6)
+            .padding(.horizontal)
+            .ignoresSafeArea(.keyboard, edges: .all)
         }
         .connectAlert(currentAlert, isPresented: $isAlertPresented)
         .onAppear {
@@ -68,6 +81,9 @@ struct AlpineLoginView_V2: View {
         .sheet(isPresented: $isPasswordResetPresented) {
             PasswordResetView()
         }
+        .sheet(isPresented: $isSettingsPresented, content: {
+            LaunchSettings()
+        })
     }
     
     var logo: some View {
@@ -140,16 +156,12 @@ struct AlpineLoginView_V2: View {
 
 extension AlpineLoginView_V2 {
     
-    var fieldsEmpty: Bool {
-        email.isEmpty || password.isEmpty
-    }
-    
-    func clear() {
+    private func clear() {
         email = ""
         password = ""
     }
     
-    func loginPress(offline: Bool = false) {
+    private func loginPress(offline: Bool = false) {
         attemptingLogin = true
         
         guard !fieldsEmpty else {
@@ -172,7 +184,7 @@ extension AlpineLoginView_V2 {
         }
     }
     
-    func responseFailAlert(for error: Error) {
+    private func responseFailAlert(for error: Error) {
         var errorDescription = "\(error)"
         if let connectError = error as? ConnectError {
             errorDescription = connectError.message
@@ -183,27 +195,27 @@ extension AlpineLoginView_V2 {
         isAlertPresented.toggle()
     }
     
-    fileprivate func triggerAlert(with type: LoginAlertType) {
-        attemptingLogin = false
-        
-        switch type {
-        case .empty:
-            currentAlert = ConnectAlert.emptyFields
-        }
-        
-        isAlertPresented.toggle()
-    }
-    
     private func doSignIn() {
         withAnimation {
             manager.isSignedIn = true
         }
     }
+    
+    fileprivate func triggerAlert(with type: LoginAlertType) {
+        attemptingLogin = false
+        
+        switch type {
+        case .empty:
+            currentAlert = ConnectAlert(title: "Empty Fields", message: "Both email and password must be filled to continue.")
+        }
+        
+        isAlertPresented.toggle()
+    }
 }
 
 private extension AlpineLoginView_V2 {
     
-    func promptBioLogin() {
+    private func promptBioLogin() {
         guard manager.authManager.biometricsAuthorized else { return }
         manager.authManager.runBioAuth { success in
             if success {
@@ -214,7 +226,7 @@ private extension AlpineLoginView_V2 {
         
     }
     
-    func fillPassword() {
+    private func fillPassword() {
         guard let email = manager.core.defaults.lastUser,
               let password = AuthManager.retrieveFromKeychain(account: email)
         else { return }
@@ -223,7 +235,7 @@ private extension AlpineLoginView_V2 {
     }
     
     
-    func fieldsFillCheck() {
+    private func fieldsFillCheck() {
         if let email = manager.core.defaults.lastUser {
             self.email = email
         }
@@ -236,7 +248,7 @@ private extension AlpineLoginView_V2 {
 
 private extension AlpineLoginView_V2 {
     
-    func processLoginResponse(_ response: ConnectionResponse) {
+    private func processLoginResponse(_ response: ConnectionResponse) {
         switch response.result {
         case .success:
             doSignIn()
@@ -247,7 +259,7 @@ private extension AlpineLoginView_V2 {
         }
     }
     
-    func makeFailAlert(from response: ConnectionResponse) {
+    private func makeFailAlert(from response: ConnectionResponse) {
         if let problem = response.problem {
             currentAlert = problem.alert
         }
@@ -259,7 +271,7 @@ private extension AlpineLoginView_V2 {
     }
     
     
-    func processDetailResponse(_ detail: ConnectionDetail?) {
+    private func processDetailResponse(_ detail: ConnectionDetail?) {
         guard let detail else {
             currentAlert = ConnectAlert(title: "Sign In Error", message: "Detail response returned no detail. \n\nContact support if the issue persists.")
             isAlertPresented.toggle()
@@ -280,7 +292,7 @@ private extension AlpineLoginView_V2 {
         isAlertPresented.toggle()
     }
     
-    func timeoutAlert() {
+    private func timeoutAlert() {
         let offlineButton = ConnectAlertButton(label: "Sign In Offline") {
             loginPress(offline: true)
         }
@@ -288,7 +300,7 @@ private extension AlpineLoginView_V2 {
         currentAlert = ConnectAlert(title: "Sign In Timeout", message: "Could not reach network in reasonable time.", buttons: [offlineButton], dismissButton: dismissButton)
     }
     
-    func overrideKeychainAlert() {
+    private func overrideKeychainAlert() {
         let proceedButton = ConnectAlertButton(label: "Override") {
             processLoginResponse(manager.overrideCredentials())
         }
@@ -297,13 +309,13 @@ private extension AlpineLoginView_V2 {
         currentAlert = ConnectAlert(title: "New Sign In", message: "Your sign in will override previous stored credentials. \n\nGoing forward, any future attempts to sign in while offline will only work for this account unless a new sign in is performed while online.", buttons: [proceedButton], dismissButton: proceedNoOverride)
     }
     
-    func keychainSaveFailAlert() {
+    private func keychainSaveFailAlert() {
         let continueButton = ConnectAlertButton(label: "Proceed Anyway", role: .destructive, action: doSignIn)
         let cancel = ConnectAlertButton(label: "Cancel", role: .cancel, action: {})
         currentAlert = ConnectAlert(title: "Could Not Save Credentials", message: "There was an issue attempting to save sign in information. \n\nOffline Sign In will be availible until saved. \n\nIf the Issue persists, contact support.", buttons: [continueButton], dismissButton: cancel)
     }
     
-    func biometricsAlert() {
+    private func biometricsAlert() {
         let setUp = ConnectAlertButton(label: "Enable", action: {
             manager.authManager.authorizeBiometrics()
             doSignIn()
@@ -318,13 +330,6 @@ private extension AlpineLoginView_V2 {
         let alert = ConnectAlert(title: "Enable \(manager.authManager.bioType)", message: "To skip entering password each time, allow for \(manager.authManager.bioType) sign in?", buttons: [setUp, remindLater], dismissButton: continueButton)
         
         currentAlert = alert
-    }
-}
-
-private extension ConnectAlert {
-    
-    static var emptyFields: ConnectAlert {
-        ConnectAlert(title: "Empty Fields", message: "Both email and password must be filled to continue.")
     }
 }
 
