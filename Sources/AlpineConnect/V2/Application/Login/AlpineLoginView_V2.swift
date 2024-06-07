@@ -1,6 +1,6 @@
 //
 //  AlpineLoginView_V2.swift
-//  
+//
 //
 //  Created by Jenya Lebid on 12/6/23.
 //
@@ -13,7 +13,7 @@ import AlpineCore
 struct AlpineLoginView_V2: View {
     
     @EnvironmentObject var manager: ConnectManager
-
+    
     @State private var email = ""
     @State private var password = ""
     @State private var isAlertPresented = false
@@ -85,7 +85,7 @@ struct AlpineLoginView_V2: View {
             LaunchSettings()
         })
     }
-    
+
     var logo: some View {
         VStack {
             Image(info.loginPageInfo.logoImageName).resizable()
@@ -240,9 +240,9 @@ private extension AlpineLoginView_V2 {
             self.email = email
         }
         
-        #if DEBUG
+#if DEBUG
         fillPassword()
-        #endif
+#endif
     }
 }
 
@@ -324,7 +324,7 @@ private extension AlpineLoginView_V2 {
             manager.authManager.setRemindLaterForBiometrics()
             doSignIn()
         })
-
+        
         let continueButton = ConnectAlertButton(label: "Not Now", action: doSignIn)
         
         let alert = ConnectAlert(title: "Enable \(manager.authManager.bioType)", message: "To skip entering password each time, allow for \(manager.authManager.bioType) sign in?", buttons: [setUp, remindLater], dismissButton: continueButton)
