@@ -38,6 +38,10 @@ public extension CGSize {
     func proportion() -> Double {
         width != 0 ? height / width : 0        
     }
+    
+    func isCorrect() -> Bool {
+        self.width > 0 && self.height > 0 && self.width.isFinite && self.height.isFinite
+    }
 }
 
 
