@@ -50,9 +50,9 @@ struct AlpineLoginView_V2: View {
             .font(.caption)
             .foregroundColor(Color.gray)
             .padding(6)
-            .ignoresSafeArea(.keyboard, edges: .all)
             .updateChecker(DBPassword: info.trackingInfo.password, onDismiss: promptBioLogin)
         }
+        .ignoresSafeArea(.keyboard, edges: .all)
         .overlay(alignment: .bottomLeading) {
             Button {
                 self.isSettingsPresented.toggle()
@@ -65,8 +65,8 @@ struct AlpineLoginView_V2: View {
             .frame(width: 34, height: 34)
             .padding(.bottom, 6)
             .padding(.horizontal)
-            .ignoresSafeArea(.keyboard, edges: .all)
         }
+        .ignoresSafeArea(.keyboard, edges: .all)
         .connectAlert(currentAlert, isPresented: $isAlertPresented)
         .onAppear {
             fieldsFillCheck()
