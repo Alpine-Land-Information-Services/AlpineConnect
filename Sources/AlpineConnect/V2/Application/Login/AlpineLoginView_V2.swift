@@ -40,33 +40,31 @@ struct AlpineLoginView_V2: View {
         .padding()
         .frame(maxWidth: .infinity)
         .background(Image("Login-BG").resizable().blur(radius: 50, opaque: true).ignoresSafeArea())
-        .overlay(alignment: .bottomTrailing) {
+        .overlay(alignment: .bottom) {
             HStack {
+                Button {
+                    self.isSettingsPresented.toggle()
+                } label: {
+                    Image(systemName: "gear")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundColor(Color.gray)
+                }
+                .frame(width: 34, height: 34)
+                .padding(.bottom, 6)
+                .padding(.horizontal)
+                Spacer()
                 Text("Version: \(Tracker.appVersion())")
                     .fontWeight(.medium)
                 Text("Build: \(Tracker.appBuild())")
                     .fontWeight(.medium)
             }
+            .ignoresSafeArea(.keyboard)
             .font(.caption)
             .foregroundColor(Color.gray)
             .padding(6)
             .updateChecker(DBPassword: info.trackingInfo.password, onDismiss: promptBioLogin)
         }
-        .ignoresSafeArea(.keyboard, edges: .all)
-        .overlay(alignment: .bottomLeading) {
-            Button {
-                self.isSettingsPresented.toggle()
-            } label: {
-                Image(systemName: "gear")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .foregroundColor(Color.gray)
-            }
-            .frame(width: 34, height: 34)
-            .padding(.bottom, 6)
-            .padding(.horizontal)
-        }
-        .ignoresSafeArea(.keyboard, edges: .all)
         .connectAlert(currentAlert, isPresented: $isAlertPresented)
         .onAppear {
             fieldsFillCheck()
