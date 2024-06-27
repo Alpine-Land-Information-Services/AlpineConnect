@@ -146,6 +146,15 @@ public extension ConnectUser {
             setValue(newValue, for: "not_exported_count")
         }
     }
+    
+    var toolbarButtonMigrationVersion: Int  {
+        get {
+            value(for: "toolbar_button_migration_version") as? Int ?? 0
+        }
+        set {
+            setValue(newValue, for: "toolbar_button_migration_version")
+        }
+    }
 }
 
 private extension ConnectUser {
