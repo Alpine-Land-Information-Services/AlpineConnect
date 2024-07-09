@@ -15,8 +15,10 @@ public class ObjectContainer {
     public var nonClearableObjects = [CDObject.Type]()
     public var importHelperObjects = [ExecutionHelper.Type]()
     public var exportHelperObjects = [ExecutionHelper.Type]()
-    
     public var atlasObjects = [AtlasObject.Type]()
+    public var atlasSyncableObjects: [AtlasSyncable.Type] {
+        objects.filter({ $0 is AtlasSyncable.Type}) as! [AtlasSyncable.Type]
+    }
     
     public init(objects: [CDObject.Type], nonClearables: [CDObject.Type] = [], importHelpers: [ExecutionHelper.Type] = [], exportHelpers: [ExecutionHelper.Type] = [], atlasObjects: [AtlasSyncable.Type] = []) {
         self.objects = objects
@@ -38,7 +40,6 @@ public class CDObjects {
                 }
                 
                 try context.persistentSave()
-//                context.reset()
             }
             catch {
                 return .failure(error)
@@ -47,10 +48,6 @@ public class CDObjects {
             if let doAfter {
                 doAfter()
             }
-            
-//            DispatchQueue.main.async {
-//                NotificationCenter.default.post(.viewUpdate(with: "reloadSidebar"))
-//            }
             return .success(())
         }
     }
@@ -70,14 +67,7 @@ public class CDObjects {
             catch {
                 Core.makeError(error: error, additionalInfo: "Could not find selected feature.")
             }
-            
             return result
         }
-    }
-}
-
-extension ObjectContainer {
-    public var atlasSyncableObjects: [AtlasSyncable.Type] {
-        objects.filter({ $0 is AtlasSyncable.Type}) as! [AtlasSyncable.Type]
     }
 }
