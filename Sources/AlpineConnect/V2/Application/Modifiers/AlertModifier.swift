@@ -47,12 +47,3 @@ struct AlertModifier: ViewModifier {
             })
     }
 }
-
-public extension View {
-    
-    func connectAlert(_ alert: ConnectAlert, isPresented: Binding<Bool>) -> some View {
-        modifier(AlertModifier(alert: alert, isPresented: isPresented))
-    }
-}
-
-

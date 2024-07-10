@@ -41,10 +41,3 @@ struct ResetModifier: ViewModifier {
         AppReset.checkToReset(code: currentCode)
     }
 }
-
-public extension View {
-    
-    func appResetCheck(code: String) -> some View {
-        modifier(ResetModifier(currentCode: code))
-    }
-}

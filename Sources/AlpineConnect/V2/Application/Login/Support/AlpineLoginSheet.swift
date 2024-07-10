@@ -38,9 +38,3 @@ struct AlpineLoginSheet: ViewModifier {
             }
     }
 }
-
-public extension View {
-    func alpineLoginSheet(info: LoginConnectionInfo, isPresented: Binding<Bool>, afterSignInAction: @escaping () async -> Void) -> some View {
-        modifier(AlpineLoginSheet(info: info, isPresented: isPresented, afterSignInAction: afterSignInAction))
-    }
-}

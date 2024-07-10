@@ -76,10 +76,3 @@ struct LocationRequirementModifier: ViewModifier {
         UIApplication.shared.open(settingsUrl)
     }
 }
-
-public extension View {
-    
-    var locationRequirementTracker: some View {
-        modifier(LocationRequirementModifier())
-    }
-}

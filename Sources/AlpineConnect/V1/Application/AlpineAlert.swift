@@ -8,6 +8,7 @@
 import SwiftUI
 import AlpineUI
 
+@available(*, deprecated, message: "AlpineAlert v1 is deprecated.")
 public struct AlpineAlert: View {
     
     @Binding var isPresented: Bool
@@ -86,6 +87,27 @@ public struct AlpineAlert: View {
     }
 }
 
+@available(*, deprecated, message: "AlertTest v1 is deprecated.")
+struct AlertTest: View {
+    
+    @State var showAlert = true
+    
+    var alert = AppAlert(title: "Hello", message: "This is a better alert becuase the defualt ones are not very good.", dismiss: AlertAction(text: "Okay"), actions: [AlertAction(text: "Do It", role: .regular, action: {})])
+    
+    var body: some View {
+        
+        Button("Show Alert") {
+            withAnimation {
+                showAlert.toggle()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .appAlert(isPresented: $showAlert, alert: alert)
+    }
+    
+}
+
+@available(*, deprecated, message: "AlpineAlertViewModifier v1 is deprecated.")
 struct AlpineAlertViewModifier: ViewModifier {
     
     @Binding var isPresented: Bool
@@ -107,25 +129,6 @@ extension View {
     public func appAlert(isPresented: Binding<Bool>, alert: AppAlert) -> some View {
         return modifier(AlpineAlertViewModifier(isPresented: isPresented, alert: alert))
     }
-}
-
-struct AlertTest: View {
-    
-    @State var showAlert = true
-    
-    var alert = AppAlert(title: "Hello", message: "This is a better alert becuase the defualt ones are not very good.", dismiss: AlertAction(text: "Okay"), actions: [AlertAction(text: "Do It", role: .regular, action: {})])
-    
-    var body: some View {
-        
-        Button("Show Alert") {
-            withAnimation {
-                showAlert.toggle()
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .appAlert(isPresented: $showAlert, alert: alert)
-    }
-    
 }
 
 struct AlpineAlert_Previews: PreviewProvider {

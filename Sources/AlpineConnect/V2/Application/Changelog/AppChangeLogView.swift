@@ -11,19 +11,19 @@ import AlpineCore
 
 struct AppChangeLogView: View {
     
-    var appName: String {
+    private var appName: String {
         Tracker.appName()
     }
     
-    var version: String {
+    private var version: String {
         Tracker.appVersion()
     }
     
-    var build: String {
+    private var build: String {
         Tracker.appBuild()
     }
     
-    var core: CoreAppControl {
+    private var core: CoreAppControl {
         CoreAppControl.shared
     }
     
@@ -35,16 +35,15 @@ struct AppChangeLogView: View {
         core.defaults.appVersion
     }
     
-    var previousFullVersion: String {
+    private var previousFullVersion: String {
         if let previousVersion, let previousBuild {
             return previousVersion + " " + previousBuild
-        }
-        else {
+        } else {
             return "Not Recorded"
         }
     }
     
-    var currentVersion: String {
+    private var currentVersion: String {
         version + " " + build
     }
         
@@ -79,46 +78,6 @@ struct AppChangeLogView: View {
             }
         }
         .preferredColorScheme(.dark)
-    }
-}
-
-fileprivate struct ChangelogModifier: ViewModifier {
-    
-    @State private var isChangelogPresented = false
-    
-    var core: CoreAppControl {
-        CoreAppControl.shared
-    }
-    
-    var appURL: URL
-    var onVersionChange: () -> Void
-    
-    func body(content: Content) -> some View {
-        content
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    checkIfToPresent()
-                }
-            }
-            .sheet(isPresented: $isChangelogPresented, content: {
-                AppChangeLogView(appChangelogURL: appURL)
-            })
-    }
-    
-    func checkIfToPresent() {
-        if let lastBuild = core.defaults.appBuild, core.isInitialized(sandbox: Connect.user?.isSandbox ?? false) {
-            if lastBuild != Tracker.appBuild() {
-                isChangelogPresented.toggle()
-                onVersionChange()
-            }
-        }
-    }
-}
-
-public extension View {
-    
-    func changelog(appURL: URL, onVersionChange: @escaping () -> Void) -> some View {
-        modifier(ChangelogModifier(appURL: appURL, onVersionChange: onVersionChange))
     }
 }
 

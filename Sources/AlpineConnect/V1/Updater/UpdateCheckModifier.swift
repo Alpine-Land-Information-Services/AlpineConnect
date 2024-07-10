@@ -30,10 +30,3 @@ public struct UpdateCheckModifier: ViewModifier {
             }
     }
 }
-
-extension View {
-    
-    func updateChecker(DBPassword: String, onDismiss: @escaping () -> Void) -> some View {
-        modifier(UpdateCheckModifier(automatic: true, dismissAction: onDismiss, DBPassword: DBPassword))
-    }
-}
