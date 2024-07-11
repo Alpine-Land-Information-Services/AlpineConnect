@@ -7,6 +7,7 @@
 
 import Foundation
 import PostgresClientKit
+import AlpineCore
 
 public extension Optional where Wrapped == UUID {
     
@@ -14,20 +15,6 @@ public extension Optional where Wrapped == UUID {
         return self != nil ? "'\(self!.uuidString)'" : "NULL"
     }
 }
-
-//public extension Optional where Wrapped == Int {
-//
-//    func toPostgres() -> String {
-//        return self != nil ? "\(self!)" : "NULL"
-//    }
-//}
-//
-//public extension Optional where Wrapped == Int32 {
-//
-//    func toPostgres() -> String {
-//        return self != nil ? "\(self!)" : "NULL"
-//    }
-//}
 
 public extension Optional where Wrapped == String {
     
@@ -54,7 +41,6 @@ public extension Optional where Wrapped == NSNumber {
 }
 
 public extension Optional where Wrapped == Date {
-    
     func toPostgres() -> String {
         self != nil ? "'\(self!.toPostgresTimestamp())'" : "NULL"
     }
@@ -66,16 +52,17 @@ public extension Optional where Wrapped == Data {
     }
 }
 
-private extension Date {
-    
-    func toPostgresTimestamp() -> String {
-        toStringTimeZonePST(dateFormat: "yyyy-MM-dd HH:mm:ss")
-    }
-    
-    func toStringTimeZonePST(dateFormat format: String) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = format
-        dateFormatter.timeZone = TimeZone(identifier: "America/Los_Angeles")
-        return dateFormatter.string(from: self)
-    }
-}
+
+//public extension Optional where Wrapped == Int {
+//
+//    func toPostgres() -> String {
+//        return self != nil ? "\(self!)" : "NULL"
+//    }
+//}
+//
+//public extension Optional where Wrapped == Int32 {
+//
+//    func toPostgres() -> String {
+//        return self != nil ? "\(self!)" : "NULL"
+//    }
+//}
