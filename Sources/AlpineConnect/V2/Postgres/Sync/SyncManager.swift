@@ -104,7 +104,9 @@ public class SyncManager {
                 self.tracker.updateType(.none)
             }
             else if tracker.status != .error {
-                Connect.user?.lastSync = tracker.currentSyncStartTime
+                DispatchQueue.main.async {
+                    Connect.user?.lastSync = self.tracker.currentSyncStartTime
+                }
                 self.tracker.updateStatus(.none)
                 self.tracker.updateType(.none)
             }
