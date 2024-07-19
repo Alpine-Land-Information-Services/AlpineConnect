@@ -7,8 +7,6 @@
 
 import Foundation
 
-public typealias Connect = ConnectManager
-
 public extension ConnectManager {
     
     static var user: ConnectUser? {

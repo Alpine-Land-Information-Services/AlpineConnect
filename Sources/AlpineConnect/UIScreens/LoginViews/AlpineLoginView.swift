@@ -1,5 +1,5 @@
 //
-//  AlpineLoginView_V2.swift
+//  AlpineLoginView.swift
 //
 //
 //  Created by Jenya Lebid on 12/6/23.
@@ -10,7 +10,7 @@ import SwiftUI
 import AlpineUI
 import AlpineCore
 
-struct AlpineLoginView_V2: View {
+struct AlpineLoginView: View {
     
     @EnvironmentObject var manager: ConnectManager
     
@@ -68,19 +68,19 @@ struct AlpineLoginView_V2: View {
         .connectAlert(currentAlert, isPresented: $isAlertPresented)
         .onAppear {
             fieldsFillCheck()
-            NetworkMonitor.shared.start()
+            NetworkTracker.shared.start()
         }
         .onDisappear {
             clear()
         }
         .sheet(isPresented: $isRegistrationPresented) {
-            RegistationView()
+            RegistrationWebView()
         }
         .sheet(isPresented: $isPasswordResetPresented) {
             PasswordResetView()
         }
         .sheet(isPresented: $isSettingsPresented, content: {
-            LaunchSettings()
+            LaunchSettingsView()
         })
     }
 
@@ -152,7 +152,7 @@ struct AlpineLoginView_V2: View {
     }
 }
 
-extension AlpineLoginView_V2 {
+extension AlpineLoginView {
     
     private func clear() {
         email = ""
@@ -211,7 +211,7 @@ extension AlpineLoginView_V2 {
     }
 }
 
-private extension AlpineLoginView_V2 {
+private extension AlpineLoginView {
     
     private func promptBioLogin() {
         guard manager.authManager.biometricsAuthorized else { return }
@@ -244,7 +244,7 @@ private extension AlpineLoginView_V2 {
     }
 }
 
-private extension AlpineLoginView_V2 {
+private extension AlpineLoginView {
     
     private func processLoginResponse(_ response: ConnectionResponse) {
         switch response.result {

@@ -131,7 +131,9 @@ public class Tracker {
                 }
                 
                 connectionType = type
-                let data = TrackingData(deviceInfo: TrackingData.DeviceInfo(email: UserManager.shared.userName, deviceID: Tracker.deviceID(),
+               
+                let data = TrackingData(deviceInfo: TrackingData.DeviceInfo(email: Connect.user?.fullName ?? "" ,
+                                                                            deviceID: Tracker.deviceID(),
                                                                             deviceType: Tracker.deviceType(),
                                                                             deviceName: Tracker.deviceName(),
                                                                             deviceVersion: Tracker.deviceVersion(),

@@ -29,16 +29,3 @@ public struct ConnectAlert {
         self.textFieldPlaceholder = textFieldPlaceholder
     }
 }
-
-public struct ConnectAlertButton {
-    
-    var label: String
-    var role: ButtonRole?
-    var action: () -> Void
-    
-    public init(label: String, role: ButtonRole? = nil, action: @escaping () -> Void) {
-        self.label = label
-        self.role = role
-        self.action = action
-    }
-}

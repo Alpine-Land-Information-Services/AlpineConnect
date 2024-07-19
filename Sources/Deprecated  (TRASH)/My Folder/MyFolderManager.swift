@@ -9,8 +9,5 @@ import Foundation
 
 @Observable
 public class MyFolderManager {
-    
     public static var shared = MyFolderManager()
-    
-    
 }

@@ -9,10 +9,11 @@ import SwiftUI
 import AlpineUI
 import AlpineCore
 
-struct LaunchSettings: View {
-    @State private var showAlert = false
+struct LaunchSettingsView: View {
+    
+    @State private var showAlert: Bool = false
     @State private var currentAlert = ConnectAlert.empty
-    @State private var password = ""
+    @State private var password: String = ""
     
     var body: some View {
         NavigationStack {
@@ -65,5 +66,5 @@ struct LaunchSettings: View {
 }
 
 #Preview {
-    LaunchSettings()
+    LaunchSettingsView()
 }

@@ -393,19 +393,6 @@ private extension SyncManager { //MARK: Cancel
                                         AlertButton(title: "Cancel It", style: .destructive, action: { self.cancelSync() })])
         Core.makeAlert(alert)
     }
-    
-    /// Schedules a timer for the synchronization process.
-    @available(*, deprecated, message: "This function will be removed in a future release.")
-    func scheduleTimer() {
-        guard let user = Connect.user else { return }
-        //TODO: using of obsolete CurrentDBUser !!!
-        if CurrentDBUser.syncTimeout != 0 {
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                timer = Timer.scheduledTimer(timeInterval: TimeInterval(user.syncTimeout), target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
-            }
-        }
-    }
 }
 
 private extension SyncManager { //MARK: Import

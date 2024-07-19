@@ -1,19 +1,19 @@
 //
-//  RegistrationView.swift
+//  RegistrationWebView.swift
 //  AlpineConnect
 //
 //  Created by Jenya Lebid on 2/5/24.
 //
 
 import SwiftUI
-
 import AlpineUI
 import AlpineCore
 
-struct RegistationView: View {
+struct RegistrationWebView: View {
+    
+    @Environment(\.dismiss) var dismiss
     
     @State private var registrationURL = URL(string: "https://alpinesupport-preview.azurewebsites.net/Account/Register/Webview")!
-    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         NavigationStack {

@@ -13,28 +13,24 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
     
     public static let shared = LocationManager()
     
-    private let manager = CLLocationManager()
+    @Published public var lastLocation: CLLocation?
+    @Published public var lastHeading: CLHeading?
+    @Published public var autorizationStatus: CLAuthorizationStatus
     
-    var headingOrientation: CLDeviceOrientation {
+    private let manager = CLLocationManager()
+    private var isActive: Bool = false
+    private var headingOrientation: CLDeviceOrientation {
         get { manager.headingOrientation }
         set { manager.headingOrientation = newValue }
     }
     
-    var isActive = false
-    
-    @Published public var lastLocation: CLLocation? // in degrees, 4326
-    @Published public var lastHeading: CLHeading?
-    
-    @Published public var autorizationStatus: CLAuthorizationStatus
-    
     public var locationUsers = [UUID: String]()
-    
     public var degrees: Double = .zero {
         didSet {
             objectWillChange.send()
         }
     }
-    
+
     private override init() {
         autorizationStatus = manager.authorizationStatus
         
@@ -45,13 +41,7 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
     func requestAuthorization() {
         manager.requestWhenInUseAuthorization()
     }
-    
-    public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        withAnimation {
-            autorizationStatus = manager.authorizationStatus
-        }
-    }
-    
+
     func start() {
         guard !isActive else { return }
         isActive = true
@@ -69,6 +59,12 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
 
         manager.headingFilter = 5
         manager.startUpdatingHeading()
+    }
+    
+    public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        withAnimation {
+            autorizationStatus = manager.authorizationStatus
+        }
     }
     
     public func resume() {

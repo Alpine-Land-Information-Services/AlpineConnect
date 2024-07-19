@@ -12,7 +12,7 @@ import TipKit
 import PopupKit
 import AlpineCore
 
-public struct AppView_V2<App: View>: View {
+public struct AppView<App: View>: View {
     
     @ViewBuilder var app: (_ userID: String) -> App
     @ObservedObject var manager = ConnectManager.shared
@@ -53,7 +53,7 @@ public struct AppView_V2<App: View>: View {
             }
         }
         else {
-            AlpineLoginView_V2(info: info)
+            AlpineLoginView(info: info)
                 .transition(.move(edge: .bottom))
         }
     }

@@ -21,7 +21,7 @@ struct AlpineLoginSheet: ViewModifier {
         content
             .sheet(isPresented: $isPresented) {
                 NavigationStack {
-                    AlpineLoginView_V2(info: info)
+                    AlpineLoginView(info: info)
                         .toolbar {
                             DismissButton()
                         }

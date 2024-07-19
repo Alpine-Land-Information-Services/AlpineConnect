@@ -7,10 +7,6 @@
 
 import Foundation
 
-struct gitError: Error {
-    var message: String
-}
-
 class GitReport {
     private let apiEndpoint: String = "https://api.github.com"
     
@@ -22,12 +18,12 @@ class GitReport {
                     name: String,
                     email: String,
                     bug: Bool,
-                    completion: @escaping (Result<[String: AnyObject], gitError>) -> Void)
+                    completion: @escaping (Result<[String: AnyObject], GitError>) -> Void)
     {
         let accessToken = token.data(using: .utf8)!.base64EncodedString()
         let path = "repos/\(owner)/\(repository)/issues"
         let url = URL(string: path, relativeTo: URL(string: apiEndpoint)!)
-        guard url != nil else { return completion(.failure(gitError(message: "URL is not valid")))}
+        guard url != nil else { return completion(.failure(GitError(message: "URL is not valid")))}
         
         var request = URLRequest(url: url!)
         request.timeoutInterval = 30
@@ -42,15 +38,15 @@ class GitReport {
         do {
             data = try JSONSerialization.data(withJSONObject: params, options: JSONSerialization.WritingOptions())
         } catch {
-            return completion(.failure(gitError(message: error.localizedDescription)))
+            return completion(.failure(GitError(message: error.localizedDescription)))
         }
         
         let task = URLSession.shared.uploadTask(with: request, from: data) { data, response, error in
-            guard error == nil else { return completion(.failure(gitError(message: error!.localizedDescription))) }
-            guard data != nil else { return completion(.failure(gitError(message: "Data is empty"))) }
+            guard error == nil else { return completion(.failure(GitError(message: error!.localizedDescription))) }
+            guard data != nil else { return completion(.failure(GitError(message: "Data is empty"))) }
             
             if let error = error {
-                completion(.failure(gitError(message: error.localizedDescription)))
+                completion(.failure(GitError(message: error.localizedDescription)))
             } else {
                 if let data = data {
                     do {
@@ -58,10 +54,10 @@ class GitReport {
                         if json["number"] != nil {
                             completion(.success(json))
                         } else {
-                            completion(.failure(gitError(message: json["message"] as? String ?? "Unknown")))
+                            completion(.failure(GitError(message: json["message"] as? String ?? "Unknown")))
                         }
                     } catch {
-                        completion(.failure(gitError(message: error.localizedDescription)))
+                        completion(.failure(GitError(message: error.localizedDescription)))
                     }
                 }
             }
