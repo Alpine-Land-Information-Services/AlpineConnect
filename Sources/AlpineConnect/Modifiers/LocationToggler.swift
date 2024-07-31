@@ -18,11 +18,9 @@ struct LocationToggler: ViewModifier {
                 switch newValue {
                 case .active:
                     LocationManager.shared.resume()
-                    Core.shared.markActive()
                     Core.makeEvent("application in foreground", type: .userAction)
                 default:
                     LocationManager.shared.stopIfNoUsers()
-                    Core.shared.markInactive()
                     Core.makeEvent("application in background", type: .userAction)
                 }
             }
