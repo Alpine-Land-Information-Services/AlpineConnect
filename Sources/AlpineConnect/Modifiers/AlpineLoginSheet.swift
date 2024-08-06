@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AlpineUI
+import AlpineCore
 
 struct AlpineLoginSheet: ViewModifier {
     
@@ -23,7 +24,7 @@ struct AlpineLoginSheet: ViewModifier {
                 NavigationStack {
                     AlpineLoginView(info: info)
                         .toolbar {
-                            DismissButton()
+                           DismissButton(eventTracker: Core.eventTracker)
                         }
                 }
                 .environmentObject(manager)
