@@ -27,16 +27,6 @@ class AuthManager {
     var biometricsAuthorized: Bool {
         UserDefaults().bool(forKey: "AC_is_biometrics_authorized")
     }
-
-//    func attemptToSave(for serverUser: ServerUserResponse, with credentials: CredentialsData) -> ConnectionResponse {
-////        DispatchQueue.main.sync {
-////            ConnectManager.shared.user = ConnectUser(for: serverUser)
-////        }
-//        
-//
-//        
-//        return saveUser(with: credentials.email)
-//    }
     
     func saveUser(with credentials: CredentialsData) -> ConnectionResponse {
         

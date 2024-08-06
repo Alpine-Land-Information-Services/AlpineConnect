@@ -34,11 +34,16 @@ public class ConnectManager: ObservableObject {
     
     public var postgres: PostgresManager?
     public var token: Token?
+    public var jwtToken: Token?
     public var didSignInOnline: Bool = false
     
     private var loginData: CredentialsData!
     private var loginInfo: LoginConnectionInfo!
     private var postgresInfo: PostgresInfo?
+    
+    public var loginType: AppInfo.LoginType {
+        loginInfo.appInfo.loginType
+    }
 
     var authManager: AuthManager = AuthManager()
 
@@ -112,7 +117,7 @@ extension ConnectManager {
         guard hasValidLoginData() else {
             return .failDueToMissingInfo()
         }
-        return try await attemptOnlineLogin()
+        return try await attemptA3TOnlineLogin()
     }
     
     private func hasValidLoginData() -> Bool {
@@ -123,10 +128,34 @@ extension ConnectManager {
         guard await NetworkTracker.shared.canConnectToServer() else {
             return .timeout()
         }
-        return try await attemptOnlineLogin()
+        
+        switch loginType {
+        case .a3t:
+            return try await attemptA3TOnlineLogin()
+        case .api:
+            return try await attemptApiOnlineLogin()
+        }
     }
     
-    private func attemptOnlineLogin() async throws -> ConnectionResponse {
+    private func attemptApiOnlineLogin() async throws -> ConnectionResponse {
+        let response = try await ApiLogin(loginInfo, data: loginData).attemptLogin()
+        guard let data = response.apiResponse else {
+            return response
+        }
+        
+        return try await processApiData(data)
+    }
+    
+    private func processApiData(_ data: ApiLogin.Response) async throws -> ConnectionResponse {
+        _ = createJWTToken(from: data.sessionToken)
+        
+        if let lastLogin = Connect.lastSavedLogin, lastLogin != loginData.email {
+            return .overrideKeychain()
+        }
+        return authManager.saveUser(with: loginData)
+    }
+    
+    private func attemptA3TOnlineLogin() async throws -> ConnectionResponse {
         let response = try await BackyardLogin(loginInfo, data: loginData).attemptLogin()
         guard let data = response.backyardData else {
             return response
@@ -215,7 +244,7 @@ public extension ConnectManager {
         }
         
         do {
-            let response = try await attemptOnlineLogin()
+            let response = try await attemptA3TOnlineLogin()
             switch response.result {
             case .success:
                 Core.makeSimpleAlert(title: "Connection Successful", message: "You are now connected to Alpine Server.")
@@ -267,6 +296,16 @@ extension ConnectManager {
         DispatchQueue.main.async { [weak self] in
             self?.token = token
             self?.core.defaults.backyardToken = token.encoded
+        }
+        return token
+    }
+    
+    func createJWTToken(from value: String) -> Token {
+        let expDate = Calendar.current.date(byAdding: .hour, value: 8, to: Date())!
+        let token = Token(rawValue: value, expirationDate: expDate)
+        DispatchQueue.main.async { [weak self] in
+            self?.jwtToken = token
+            self?.core.defaults.jwtToken = token.encoded
         }
         return token
     }

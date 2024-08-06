@@ -19,6 +19,7 @@ public class ConnectUser {
     private var data: [String: Any]
     
     public var email: String
+    public var jwtToken: String?
     
     internal init(for serverUser: ServerUserResponse) { // user is created on login and should not be initialized elsewhere.
         data = Dictionary.getFromDefaults(key: serverUser.email) ?? Self.makeUser(for: serverUser)
@@ -29,6 +30,11 @@ public class ConnectUser {
         data["last_name"] = serverUser.lastName
         data["is_admin"] = serverUser.isAdmin
         
+    }
+    
+    internal init(for jwtToken: FMS_JWTData) {
+        data = Dictionary.getFromDefaults(key: jwtToken.Login) ?? Self.makeUser(for: jwtToken)
+        self.email = jwtToken.Login
     }
     
     internal init?(for email: String) {
@@ -167,6 +173,17 @@ private extension ConnectUser {
         data["is_admin"] = serverUser.isAdmin
         
         data.saveToDefaults(key: serverUser.email)
+        return data
+    }
+    
+    static func makeUser(for jwtToken: FMS_JWTData) -> [String: Any] {
+        var data = [String: Any]()
+        data["email"] = jwtToken.Login
+        data["first_name"] = jwtToken.FirstName
+        data["last_name"] = jwtToken.LastName
+//        data["is_admin"] = serverUser.isAdmin
+        
+        data.saveToDefaults(key: jwtToken.Login)
         return data
     }
 }

@@ -28,6 +28,8 @@ public struct ConnectionResponse {
     public var backyardData: BackyardLogin.Response?
     public var problem: ConnectionProblem?
     
+    public var apiResponse: ApiLogin.Response?
+    
     var detail: ConnectionDetail?
     
     public init(result: ConnectionResult) {
@@ -42,6 +44,12 @@ public struct ConnectionResponse {
     public init(result: ConnectionResult, detail: ConnectionDetail? = nil, data: BackyardLogin.Response? = nil, problem: ConnectionProblem? = nil) {
         self.result = result
         self.backyardData = data
+        self.problem = problem
+    }
+    
+    public init(result: ConnectionResult, data: ApiLogin.Response? = nil, problem: ConnectionProblem? = nil) {
+        self.result = result
+        self.apiResponse = data
         self.problem = problem
     }
 }
