@@ -29,7 +29,7 @@ public extension DBUploader {
         }
         
         public var body: some View {
-            SettingBlock(image: icon, color: .orange, title: title, displayContent: {
+            SettingBlock(image: icon, color: .orange, title: title, eventTracker: Core.eventTracker, displayContent: {
                 switch uploader.status {
                 case .packing, .uploading:
                     HStack {

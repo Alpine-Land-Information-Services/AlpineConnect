@@ -19,7 +19,7 @@ struct LaunchSettingsView: View {
         NavigationStack {
             List {
                 Section {
-                    SettingBlock(image: "trash", color: .red, title: "Delete User Container", action:  {
+                    SettingBlock(image: "trash", color: .red, title: "Delete User Container", eventTracker: Core.eventTracker, action:  {
                         self.questionAlert()
                         showAlert.toggle()
                     })

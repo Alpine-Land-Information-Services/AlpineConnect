@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AlpineUI
+import AlpineCore
 
 @available(*, deprecated, message: "AlpineAlert v1 is deprecated.")
 public struct AlpineAlert: View {
@@ -50,7 +51,7 @@ public struct AlpineAlert: View {
     }
     
     var dismiss: some View {
-        TextButtonBlock(text: alert.dismiss.text, width: 100, height: 50, background: color(alert.dismiss.role)) {
+        TextButtonBlock(text: alert.dismiss.text, width: 100, height: 50, background: color(alert.dismiss.role, eventTracker: Core.eventTracker)) {
             withAnimation {
                 isPresented.toggle()
                 alert.dismiss.action()
@@ -64,7 +65,7 @@ public struct AlpineAlert: View {
             Divider()
                 .frame(height: 20)
                 .padding()
-            TextButtonBlock(text: alert.actions[0].text, width: 100, height: 50, background: color(alert.actions[0].role)) {
+            TextButtonBlock(text: alert.actions[0].text, width: 100, height: 50, background: color(alert.actions[0].role, eventTracker: Core.eventTracker,)) {
                 withAnimation {
                     isPresented.toggle()
                     alert.actions[0].action()
