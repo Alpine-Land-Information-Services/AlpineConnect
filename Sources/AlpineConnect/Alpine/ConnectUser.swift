@@ -32,9 +32,10 @@ public class ConnectUser {
         
     }
     
-    internal init(for jwtToken: FMS_JWTData) {
-        data = Dictionary.getFromDefaults(key: jwtToken.Login) ?? Self.makeUser(for: jwtToken)
-        self.email = jwtToken.Login
+    internal init(for tokenData: FMS_JWTData, token: String) {
+        data = Dictionary.getFromDefaults(key: tokenData.Login) ?? Self.makeUser(for: tokenData)
+        self.email = tokenData.Login
+        self.jwtToken = token
     }
     
     internal init?(for email: String) {

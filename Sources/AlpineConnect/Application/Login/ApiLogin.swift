@@ -63,11 +63,11 @@ public final class ApiLogin {
     }
     
     func decodeToken(_ token: String) throws {
-        let data = try! decode(jwtToken: token)
+        let data = try decode(jwtToken: token)
         _ = ConnectManager.shared.createToken(from: data.SessionToken)
 
         DispatchQueue.main.sync {
-            ConnectManager.shared.user = ConnectUser(for: data)
+            ConnectManager.shared.user = ConnectUser(for: data, token: token)
             ConnectManager.shared.didSignInOnline = true
         }
     }
