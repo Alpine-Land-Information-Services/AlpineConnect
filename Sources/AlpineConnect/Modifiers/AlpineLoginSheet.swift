@@ -24,7 +24,9 @@ struct AlpineLoginSheet: ViewModifier {
                 NavigationStack {
                     AlpineLoginView(info: info)
                         .toolbar {
-                           DismissButton(eventTracker: Core.eventTracker)
+                            DismissButton(onEvent: { event, parameters in
+                                Core.logUIEvent(.dismissButton)
+                            })
                         }
                 }
                 .environmentObject(manager)

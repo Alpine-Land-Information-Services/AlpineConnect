@@ -49,9 +49,11 @@ public struct PhotoCollectionView: View {
                                 .environmentObject(viewModel)
                                 .disabled(viewModel.gettingPhotos)
                                 .padding(.trailing)
-                            DismissButton(environmentDismiss: false) {
+                            DismissButton(environmentDismiss: false, action: {
                                 dismiss()
-                            }
+                            }, onEvent:  { event, parameters in
+                                Core.logUIEvent(event, parameters: parameters)
+                            })
                         }
                     }
                 }

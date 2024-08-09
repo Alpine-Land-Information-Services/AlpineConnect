@@ -20,7 +20,9 @@ struct RegistrationWebView: View {
             WebView(url: $registrationURL)
                 .navigationTitle("Alpine Registration")
                 .toolbar {
-                   DismissButton(eventTracker: Core.eventTracker)
+                    DismissButton(onEvent: { event, parameters in
+                        Core.logUIEvent(event, parameters: parameters)
+                    })
                 }
         }
         .interactiveDismissDisabled()

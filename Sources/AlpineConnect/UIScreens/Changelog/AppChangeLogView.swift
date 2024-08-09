@@ -69,7 +69,9 @@ struct AppChangeLogView: View {
                 }
                 .navigationTitle(appName + " Has Been Updated")
                 .toolbar {
-                   DismissButton(eventTracker: Core.eventTracker)
+                    DismissButton(onEvent: { event, parameters in
+                        Core.logUIEvent(event, parameters: parameters)
+                    })
                 }
                 .onDisappear {
                     core.defaults.appBuild = build

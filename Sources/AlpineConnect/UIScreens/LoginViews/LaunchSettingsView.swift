@@ -29,7 +29,9 @@ struct LaunchSettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("Launch Settings")
             .toolbar {
-               DismissButton(eventTracker: Core.eventTracker)
+                DismissButton(onEvent: { event, parameters in
+                    Core.logUIEvent(event, parameters: parameters)
+                })
             }
         }
         .interactiveDismissDisabled()

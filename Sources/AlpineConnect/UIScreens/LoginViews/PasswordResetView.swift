@@ -20,7 +20,9 @@ struct PasswordResetView: View {
             WebView(url: $resetURL)
                 .navigationTitle("Password Reset")
                 .toolbar {
-                   DismissButton(eventTracker: Core.eventTracker)
+                    DismissButton(onEvent: { event, parameters in
+                        Core.logUIEvent(event, parameters: parameters)
+                    })
                 }
         }
         .interactiveDismissDisabled()
