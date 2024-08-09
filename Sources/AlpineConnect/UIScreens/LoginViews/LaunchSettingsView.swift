@@ -19,7 +19,9 @@ struct LaunchSettingsView: View {
         NavigationStack {
             List {
                 Section {
-                    SettingBlock(image: "trash", color: .red, title: "Delete User Container", eventTracker: Core.eventTracker, action:  {
+                    SettingBlock(image: "trash", color: .red, title: "Delete User Container", onEvent: { event, parameters in
+                        Core.logUIEvent(event, parameters: parameters)
+                    }, action:  {
                         self.questionAlert()
                         showAlert.toggle()
                     })

@@ -32,7 +32,9 @@ struct PasswordChangeView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding([.leading, .top, .trailing])
                     HStack {
-                        CheckmarkBlock(text: "Reveal Password", checked: $viewModel.showPassword, changed: .constant(false), eventTracker: Core.eventTracker)
+                        CheckmarkBlock(text: "Reveal Password", checked: $viewModel.showPassword, changed: .constant(false), onEvent: { event, parameters in
+                            Core.logUIEvent(event, parameters: parameters)
+                        })
                         Divider()
                         Text("Password must be at least medium strength.")
                             .font(.footnote)

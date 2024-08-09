@@ -86,7 +86,9 @@ public struct SyncView: View {
                         .font(.subheadline)
                         .foregroundColor(Color(uiColor: .systemGray))
                         .padding(10)
-                    TextButtonBlock(text: "Dismiss", font: .headline, eventTracker: Core.eventTracker, action: {
+                    TextButtonBlock(text: "Dismiss", font: .headline, onEvent: { event, parameters in
+                        Core.logUIEvent(event, parameters: parameters)
+                    }, action: {
                         dismiss()
                     })
                 }

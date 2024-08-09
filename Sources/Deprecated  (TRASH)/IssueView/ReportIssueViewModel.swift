@@ -7,7 +7,6 @@
 //
 //import Foundation
 //import AlpineCore
-//
 //public class ReportIssueViewModel: ObservableObject {
 //    
 //    public static var shared = ReportIssueViewModel()
@@ -22,7 +21,7 @@
 //    private var owner: String = ""
 //    private var repository: String = ""
 //    private var token: String = ""
-//
+//    
 //    var bug = false
 //    var resultText = ""
 //    

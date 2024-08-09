@@ -87,7 +87,9 @@ struct RegisterView: View {
         @Binding var answer: String
         
         var body: some View {
-            SingleDropdownBlock(title: "Security Question \(number)", values: values, selection: $selection, required: true, changed: .constant(false), eventTracker: Core.eventTracker)
+            SingleDropdownBlock(title: "Security Question \(number)", values: values, selection: $selection, required: true, changed: .constant(false), onEvent: { event, parameters in
+                Core.logUIEvent(event, parameters: parameters)
+            })
             TextFieldBlock(title: "Security Answer \(number)", value: $answer, required: true, changed: .constant(false))
         }
     }
