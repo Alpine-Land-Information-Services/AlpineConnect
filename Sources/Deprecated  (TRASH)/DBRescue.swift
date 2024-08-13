@@ -8,7 +8,7 @@
 import CoreData
 import AlpineUI
 import AlpineCore
-import Zip
+//import Zip
 import PostgresClientKit
 import UIKit
 

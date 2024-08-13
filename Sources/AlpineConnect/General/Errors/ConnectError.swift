@@ -12,9 +12,12 @@ public class ConnectError: AlpineError {
     
     var type: ConnectErrorType
     
-    public init(_ message: String, type: ConnectErrorType, file: String = #file, function: String = #function, line: Int = #line) {
+    public init(_ message: String,
+                type: ConnectErrorType,
+                includedFile: [ExportType] = [],
+                file: String = #file, function: String = #function, line: Int = #line) {
         self.type = type
-        super.init(message, file: file, function: function, line: line)
+        super.init(message, file: file, function: function, line: line, includedFile: includedFile)
     }
     
     public override func getType() -> String {

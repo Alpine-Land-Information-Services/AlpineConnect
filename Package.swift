@@ -16,13 +16,12 @@ let package = Package(
         .package(url: "https://github.com/jenyalebid/PopupKit.git", branch: "main"),
         .package(url: "https://github.com/jenyalebid/AlpineCore.git", branch: "main"),
         .package(url: "https://github.com/jenyalebid/AlpineUI.git", branch: "main"),
-        .package(url: "https://github.com/codewinsdotcom/PostgresClientKit.git", from: "1.4.3"),
-        .package(url: "https://github.com/marmelroy/Zip.git", from: "2.1.2")
+        .package(url: "https://github.com/codewinsdotcom/PostgresClientKit.git", from: "1.4.3")
     ],
     targets: [
         .target(
             name: "AlpineConnect",
-            dependencies: ["AlpineCore", "AlpineUI", "PopupKit", "PostgresClientKit", "Zip"],
+            dependencies: ["AlpineCore", "AlpineUI", "PopupKit", "PostgresClientKit"],
             resources: [.process("Resources")]),
         .testTarget(
             name: "AlpineConnectTests",

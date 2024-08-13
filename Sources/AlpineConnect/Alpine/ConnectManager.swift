@@ -259,7 +259,7 @@ public extension ConnectManager {
                 }
             }
         } catch {
-            Core.shared.makeError(error: error)
+            Core.makeError(error: error)
         }
     }
 }

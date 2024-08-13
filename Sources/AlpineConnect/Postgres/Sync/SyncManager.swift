@@ -220,7 +220,7 @@ private extension SyncManager {
             } catch {
                 tracker.statusMessage("Postgres connection failed.")
                 tracker.updateStatus(.error)
-                Core.shared.makeError(error: error)
+                Core.makeError(error: error)
             }
         } else {
             tracker.statusMessage("Already established connection to Postgres.")
@@ -732,7 +732,7 @@ extension SyncManager {
                     try await AtlasSynchronizer(for: object, syncManager: self).synchronize(in: context)
                 }
                 catch {
-                    Core.shared.makeError(error: error)
+                    Core.makeError(error: error)
                 }
             }
         }
