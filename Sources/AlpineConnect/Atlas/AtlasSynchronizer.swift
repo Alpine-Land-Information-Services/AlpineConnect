@@ -52,7 +52,7 @@ public class AtlasSynchronizer {
                 }
             }
             guard !featuresData.isEmpty else { break }
-            try await objectType.performAtlasSynchronization(with: featuresData)
+            try objectType.performAtlasSynchronization(with: featuresData)
             syncManager?.tracker.progressUpdate(adding: Double(featuresData.count))
             
             featuresData.removeAll()
@@ -66,21 +66,24 @@ public class AtlasSynchronizer {
     func createAtlasData(from objects: [AtlasSyncable]) throws -> [AtlasFeatureData] {
         var data = [AtlasFeatureData]()
         for object in objects {
-            guard let geometry = object.geometry else {
-                continue
-            }
-            var fields = [AtlasFieldData(name: "UNIQ_ID", value: object.guid.uuidString),
-                          AtlasFieldData(name: "OBJECT_TYPE", value: objectType.entityName)]
-            
-            for field in type(of: object).syncFields.filter({ $0.isReference == false }) {
-                fields.append(AtlasFieldData(name: field.layerFieldName, value: object.value(forKey: field.objectFieldName) ?? "")) //"_INVALID_FIELD_NAME_"
-            }
-            if let relationshipSyncFields = object.relationshipSyncFields {
-                fields.append(contentsOf: relationshipSyncFields)
-            }
-            let featureData = AtlasFeatureData(wkt: geometry, fields: fields)
+            guard let featureData = Self.createAtlasData(from: object) else { continue }
             data.append(featureData)
         }
         return data
+    }
+    
+    public static func createAtlasData(from object: AtlasSyncable) -> AtlasFeatureData? {
+        guard let geometry = object.geometry else { return nil }
+        
+        var fields = [AtlasFieldData(name: "UNIQ_ID", value: object.guid.uuidString),
+                      AtlasFieldData(name: "OBJECT_TYPE", value: type(of: object).entityName)]
+        
+        for field in type(of: object).syncFields.filter({ $0.isReference == false }) {
+            fields.append(AtlasFieldData(name: field.layerFieldName, value: object.value(forKey: field.objectFieldName) ?? ""))
+        }
+        if let relationshipSyncFields = object.relationshipSyncFields {
+            fields.append(contentsOf: relationshipSyncFields)
+        }
+        return AtlasFeatureData(wkt: geometry, fields: fields)
     }
 }

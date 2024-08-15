@@ -16,7 +16,7 @@ public protocol AtlasSyncable: AtlasObject, Importable {
    
     var relationshipSyncFields: [AtlasFieldData]? { get }
     
-    static func performAtlasSynchronization(with data: [AtlasFeatureData]) async throws
+    static func performAtlasSynchronization(with data: [AtlasFeatureData]) throws
     static func reloadOrCreateLayer() async throws
     static func clearCache() throws
     static func deleteLayer() throws
@@ -63,7 +63,7 @@ public extension AtlasSyncable {
 
 public extension AtlasSyncable {
     
-    static func performAtlasSynchronization(with data: [AtlasFeatureData], deleting: [UUID]) async throws {
+    static func performAtlasSynchronization(with data: [AtlasFeatureData], deleting: [UUID]) throws {
         fatalError(#function + " must be implemented in client.")
     }
     
