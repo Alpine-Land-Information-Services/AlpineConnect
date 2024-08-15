@@ -31,13 +31,13 @@ struct UserAppView<App: View>: View {
             ProgressView()
                 .scaleEffect(2)
                 .onAppear {
-                    CoreAppControl.shared.assignUser(users.first ?? assingUser(id: userID))
-                    Core.makeEvent("sign in successful", type: .system)
+                    Core.shared.assignUser(users.first ?? assingUser(id: userID))
+                    Core.logAtlasConnectEvent(.syncStatus, type: .system, parameters: ["status" : "successful"])
                 }
         }
         else {
             app
-                .environment(CoreAppControl.shared)
+                .environment(Core.shared)
                 .locationToggler
                 .networkTracker
         }

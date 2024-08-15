@@ -87,8 +87,8 @@ public class SyncManager {
             Core.makeSimpleAlert(title: "Already Syncing", message: "Please wait for the current sync to complete.")
             return
         }
-        
-        Core.makeEvent("initializing sync", type: .sync)
+
+        Core.logAtlasConnectEvent(.initializingSync, type: .sync)
         
         DispatchQueue.main.async { [weak self] in
             self?.tracker.isDoingSomeSync = true
@@ -173,7 +173,7 @@ public class SyncManager {
             clear()
         }
         
-        Core.makeEvent("syncing finished", type: .sync)
+        Core.logAtlasConnectEvent(.syncingFinished, type: .sync)
     }
     
     /// Handles a connection timeout during synchronization.
@@ -489,7 +489,7 @@ private extension SyncManager { //MARK: Import
         
         await withCheckedContinuation({ continuation in
             guard ConnectManager.shared.postgres?.pool != nil else {
-                Core.makeEvent("postgres.pool == nil", type: .sync)
+                Core.logAtlasConnectEvent(.postgresPoolNil, type: .sync)
                 self.tracker.updateStatus(.error)
                 continuation.resume()
                 return
@@ -498,7 +498,7 @@ private extension SyncManager { //MARK: Import
                 guard let self else { return }
                 switch response {
                 case .failure(let error):
-                    Core.makeEvent("pool.withConnection: .failure", type: .sync)
+                    Core.logAtlasConnectEvent(.poolConnectionFailure, type: .sync)
                     syncErrorsResolver.setError(error)
                     self.tracker.updateStatus(.error)
                     Core.makeError(error: error,
@@ -657,7 +657,7 @@ private extension SyncManager { //MARK: Export
         
         await withCheckedContinuation { continuation in
             guard ConnectManager.shared.postgres?.pool != nil else {
-                Core.makeEvent("postgres.pool == nil", type: .sync)
+                Core.logAtlasConnectEvent(.postgresPoolNil, type: .sync)
                 self.tracker.updateStatus(.error)
                 continuation.resume()
                 return
@@ -666,7 +666,7 @@ private extension SyncManager { //MARK: Export
                 guard let self else { return }
                 switch response {
                 case .failure(let error):
-                    Core.makeEvent("pool.withConnection: .failure", type: .sync)
+                    Core.logAtlasConnectEvent(.poolConnectionFailure, type: .sync)
                     syncErrorsResolver.setError(error)
                     self.tracker.updateStatus(.error)
                     Core.makeError(error: error,

@@ -48,7 +48,7 @@ public struct AppView<App: View>: View {
             .transition(.opacity)
             .onDisappear {
                 if !manager.isSignedIn {
-                    ConnectManager.signoutReset()
+                    ConnectManager.signingOutReset()
                 }
             }
         }

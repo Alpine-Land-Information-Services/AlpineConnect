@@ -157,7 +157,7 @@ extension SyncTracker {
     ///   - type: The type of the record.
     ///   - recordCount: The number of records to sync.
     func makeRecord(name: String, type: SyncTracker.SyncableRecord.RecordType, recordCount: Int) {
-        Core.makeEvent("\(type): \(recordCount) \(name)", type: .sync)
+        Core.logAtlasConnectEvent(.syncRecordInfo, type: .sync, parameters: ["type":"\(type)", "recordCount":"\(recordCount)", "name":"\(name)"])
         print(code: type == .import ? .yellow : type == .export ? .orange : .blue, "\(type)\t\(recordCount)\t\(name)")
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -215,7 +215,7 @@ public extension SyncTracker {
     ///   - message: An optional status message.
     func updateStatus(_ status: SyncStatus, message: String? = nil) {
         internalStatus = status
-        Core.makeEvent("sync status: \(status)", type: .sync)
+        Core.logAtlasConnectEvent(.syncStatus, type: .sync, parameters: ["status":"\(status)"])
         DispatchQueue.main.async { [weak self] in
             withAnimation {
                 self?.slowStatus = status

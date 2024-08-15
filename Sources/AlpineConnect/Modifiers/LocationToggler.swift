@@ -18,10 +18,10 @@ struct LocationToggler: ViewModifier {
                 switch newValue {
                 case .active:
                     LocationManager.shared.resume()
-                    Core.makeEvent("application in foreground", type: .userAction)
+                    Core.logAtlasConnectEvent(.applicationInForeground, type: .userAction)
                 default:
                     LocationManager.shared.stopIfNoUsers()
-                    Core.makeEvent("application in background", type: .userAction)
+                    Core.logAtlasConnectEvent(.applicationInBackground, type: .userAction)
                 }
             }
     }

@@ -321,7 +321,7 @@ extension ConnectManager {
 
 public extension ConnectManager {
     
-    static func signoutReset() {
+    static func signingOutReset() {
         ConnectManager.reset()
         CoreAppControl.reset()
     }
@@ -348,8 +348,7 @@ public extension ConnectManager {
         return try await ConnectManager.shared.requestNewToken(with: info, and: credentials)
     }
     
-    func signout() {
-        Core.makeEvent("signing out", type: .userAction)
+    func signingOut() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { [weak self] in
             self?.isSignedIn = false
             self?.core.defaults.backyardToken = nil
