@@ -24,7 +24,7 @@ public enum AtlasConnectEvent: String {
 extension CoreAppControl {
     /// Logs an event of type `AtlasConnectEvent` to Firebase Analytics.
     ///
-    /// This method uses `logAtlasCommonEvent` to send the event to Firebase Analytics. The event is specified
+    /// This method uses `logAtlasConnectEvent` to send the event to Firebase Analytics. The event is specified
     /// using the `AtlasConnectEvent` enumeration and can be accompanied by optional parameters.
     ///
     /// - Parameters:
@@ -38,19 +38,21 @@ extension CoreAppControl {
     ///
     /// - Example:
     ///   ```swift
-    ///   CoreAppControl.logAtlasCommonEvent(.createdSiteCalling, parameters: ["key": "value"])
+    ///   CoreAppControl.logAtlasConnectEvent(.createdSiteCalling, parameters: ["key": "value"])
     ///   ```
     ///
     /// - Note:
     ///   Ensure that the `AtlasConnectEvent` enumeration includes all possible events you want to log.
     public static func logAtlasConnectEvent(_ event: AtlasConnectEvent,
+                                            extendedEventName: String? = nil,
                                            type: AppEventType? = nil,
                                            fileInfo: String? = nil,
                                            parameters: [String: Any]? = nil,
                                            file: String = #file,
                                            function: String = #function,
                                            line: Int = #line) {
-        logEvent(event.rawValue, type: type?.rawValue, parameters: parameters, fileInfo: fileInfo, file: file, function: function, line: line)
+        let eventName = extendedEventName != nil ? "\(event.rawValue)_\(extendedEventName!.toSnakeCase())" : event.rawValue
+        logEvent(eventName, type: type?.rawValue, parameters: parameters, fileInfo: fileInfo, file: file, function: function, line: line)
     }
 }
 
