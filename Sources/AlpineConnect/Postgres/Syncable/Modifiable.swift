@@ -16,9 +16,15 @@ public protocol Modifiable: CDObject {
     func deleteObject(in context: NSManagedObjectContext?)
     func getAllDependentElements() -> [Any]
     func modifyRelation(with geometry: String?)
+    
+    var children: [Modifiable]? { get }
 }
 
 public extension Modifiable {
+    
+    var children: [Modifiable]? {
+        nil
+    }
     
     var wasDeleted: Bool {
         value(forKey: "a_deleted") as? Bool ?? true

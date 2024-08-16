@@ -65,10 +65,11 @@ public final class ApiLogin {
     func decodeToken(_ token: String) throws {
         let data = try decode(jwtToken: token)
         _ = ConnectManager.shared.createToken(from: data.SessionToken)
-
+        
         DispatchQueue.main.sync {
             ConnectManager.shared.user = ConnectUser(for: data, token: token)
             ConnectManager.shared.didSignInOnline = true
+            info.appTokenActions(data)
         }
     }
 }
@@ -108,14 +109,14 @@ extension ApiLogin {
     }
 }
 
-struct FMS_JWTData: Codable {
-    var Id: UUID
-    var Login: String
-    var FirstName: String?
-    var LastName: String?
+public struct FMS_JWTData: Codable {
+    public var Id: UUID
+    public var Login: String
+    public var FirstName: String?
+    public var LastName: String?
 //    var IsApplicationAdministrator: Bool
-//    var AllowResubmit: Bool
-    var UserName: String?
+    public var AllowResubmit: Bool
+    public var UserName: String?
 //    var IsActive: Bool
-    var SessionToken: String
+    public var SessionToken: String
 }
