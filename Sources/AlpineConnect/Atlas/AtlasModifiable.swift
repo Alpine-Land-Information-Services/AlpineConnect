@@ -30,9 +30,6 @@ public extension AtlasModifiable {
     var viewRepresentable: AtlasModifiable? {
         self
     }
-}
-
-public extension AtlasModifiable {
     
     var parent: AtlasModifiable? {
         nil

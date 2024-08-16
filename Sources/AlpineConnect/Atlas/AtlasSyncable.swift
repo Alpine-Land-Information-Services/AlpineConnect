@@ -78,4 +78,10 @@ public extension AtlasSyncable {
     }
     
     func deleteOnError() { }
+    
+    func createMapFeature() throws {
+        if let atlasData = AtlasSynchronizer.createAtlasData(from: self) {
+            try Swift.type(of: self).performAtlasSynchronization(with: [atlasData])
+        }
+    }
 }
