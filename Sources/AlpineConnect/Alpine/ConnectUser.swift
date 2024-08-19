@@ -8,11 +8,6 @@
 import Foundation
 import Observation
 
-public enum DatabaseType: String {
-    case production
-    case sandbox
-}
-
 @Observable
 public class ConnectUser {
     
@@ -29,10 +24,9 @@ public class ConnectUser {
         data["first_name"] = serverUser.firstName
         data["last_name"] = serverUser.lastName
         data["is_admin"] = serverUser.isAdmin
-        
     }
     
-    internal init(for tokenData: FMS_JWTData, token: String) {
+    internal init(for tokenData: HasSessionToken, token: String) {
         data = Dictionary.getFromDefaults(key: tokenData.Login) ?? Self.makeUser(for: tokenData)
         self.email = tokenData.Login
         self.jwtToken = token
@@ -177,7 +171,7 @@ private extension ConnectUser {
         return data
     }
     
-    static func makeUser(for jwtToken: FMS_JWTData) -> [String: Any] {
+    static func makeUser(for jwtToken: HasSessionToken) -> [String: Any] {
         var data = [String: Any]()
         data["email"] = jwtToken.Login
         data["first_name"] = jwtToken.FirstName

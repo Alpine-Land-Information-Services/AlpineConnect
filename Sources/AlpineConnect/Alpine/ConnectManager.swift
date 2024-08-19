@@ -137,8 +137,20 @@ extension ConnectManager {
         }
     }
     
+    public func refreshJWTTokenIfNeeded() async throws -> Token {
+        if let token = self.jwtToken, token.expirationDate >= Date() {
+            return token
+        }
+
+        let sessionToken = try await ApiLogin(loginInfo, data: loginData).refreshToken(tokenType: FMS_JWTData.self)
+
+        let newToken = createJWTToken(from: sessionToken)
+        self.jwtToken = newToken
+        return newToken
+    }
+    
     private func attemptApiOnlineLogin() async throws -> ConnectionResponse {
-        let response = try await ApiLogin(loginInfo, data: loginData).attemptLogin()
+        let response = try await ApiLogin(loginInfo, data: loginData).attemptLogin(tokenType: FMS_JWTData.self)
         guard let data = response.apiResponse else {
             return response
         }

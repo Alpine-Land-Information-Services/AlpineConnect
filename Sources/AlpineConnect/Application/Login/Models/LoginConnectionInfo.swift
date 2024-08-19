@@ -14,10 +14,12 @@ public struct LoginConnectionInfo {
     public var postgresInfo: PostgresInfo?
     public var trackingInfo: TrackingInfo
     
-    public var appTokenActions: (_: FMS_JWTData) -> Void
-    
-    public init(appInfo: AppInfo, loginPageInfo: LoginPageInfo, postgresInfo: PostgresInfo?, 
-                trackingInfo: TrackingInfo, _ appTokenActions: @escaping (_: FMS_JWTData) -> Void = {_ in }) {
+    public var appTokenActions: (_: HasSessionToken) -> Void
+
+    public init(appInfo: AppInfo,
+                loginPageInfo: LoginPageInfo,
+                postgresInfo: PostgresInfo?,
+                trackingInfo: TrackingInfo, _ appTokenActions: @escaping (_: HasSessionToken) -> Void = {_ in }) {
         self.appInfo = appInfo
         self.loginPageInfo = loginPageInfo
         self.postgresInfo = postgresInfo
