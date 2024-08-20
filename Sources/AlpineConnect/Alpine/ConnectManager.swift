@@ -142,7 +142,7 @@ extension ConnectManager {
             return token
         }
 
-        let sessionToken = try await ApiLogin(loginInfo, data: loginData).refreshToken(tokenType: FMS_JWTData.self)
+        let sessionToken = try await ApiLogin(loginInfo, data: loginData).refreshToken()
 
         let newToken = createJWTToken(from: sessionToken)
         self.jwtToken = newToken
@@ -150,7 +150,7 @@ extension ConnectManager {
     }
     
     private func attemptApiOnlineLogin() async throws -> ConnectionResponse {
-        let response = try await ApiLogin(loginInfo, data: loginData).attemptLogin(tokenType: FMS_JWTData.self)
+        let response = try await ApiLogin(loginInfo, data: loginData).attemptLogin()
         guard let data = response.apiResponse else {
             return response
         }

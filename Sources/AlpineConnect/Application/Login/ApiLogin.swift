@@ -10,7 +10,7 @@ import Foundation
 public final class ApiLogin {
     
     public struct Response: Decodable {
-        let sessionToken: String
+        public let sessionToken: String
     }
     
     var info: LoginConnectionInfo
@@ -25,31 +25,31 @@ public final class ApiLogin {
         self.data = data
     }
     
-    func attemptLogin<T: HasSessionToken & Decodable>(tokenType: T.Type) async throws -> ConnectionResponse {
-            let (data, httpResponse) = try await performRequest()
-            
-            switch httpResponse.statusCode {
-            case 200...299:
-                return try decodeLoginResponse(from: data, tokenType: tokenType)
-            case 400...599:
-                return makeConnectionProblem(with: httpResponse.statusCode)
-            default:
-                throw ConnectError("Unrecognized HTTP response code: \(httpResponse.statusCode)", type: .login)
-            }
-        }
+    func attemptLogin() async throws -> ConnectionResponse {
+        let (data, httpResponse) = try await performRequest()
         
-        func refreshToken<T: HasSessionToken & Decodable>(tokenType: T.Type) async throws -> String {
-            let (data, httpResponse) = try await performRequest()
-            
-            switch httpResponse.statusCode {
-            case 200...299:
-                return try decodeTokenResponse(from: data, tokenType: tokenType)
-            case 400...599:
-                throw ConnectError("Failed to refresh token. Status Code: \(httpResponse.statusCode)", type: .login)
-            default:
-                throw ConnectError("Unrecognized HTTP response code: \(httpResponse.statusCode)", type: .login)
-            }
+        switch httpResponse.statusCode {
+        case 200...299:
+            return try decodeLoginResponse(from: data)
+        case 400...599:
+            return makeConnectionProblem(with: httpResponse.statusCode)
+        default:
+            throw ConnectError("Unrecognized HTTP response code: \(httpResponse.statusCode)", type: .login)
         }
+    }
+    
+    func refreshToken() async throws -> String {
+        let (data, httpResponse) = try await performRequest()
+        
+        switch httpResponse.statusCode {
+        case 200...299:
+            return try decodeTokenResponse(from: data)
+        case 400...599:
+            throw ConnectError("Failed to refresh token. Status Code: \(httpResponse.statusCode)", type: .login)
+        default:
+            throw ConnectError("Unrecognized HTTP response code: \(httpResponse.statusCode)", type: .login)
+        }
+    }
     
     private func performRequest() async throws -> (Data, HTTPURLResponse) {
         guard let url = URL(string: appURL) else {
@@ -74,75 +74,30 @@ public final class ApiLogin {
         return ConnectionResponse(result: .fail, data: nil, problem: problem)
     }
     
-    private func decodeLoginResponse<T: HasSessionToken & Decodable>(from data: Data, tokenType: T.Type) throws -> ConnectionResponse {
+    private func decodeLoginResponse(from data: Data) throws -> ConnectionResponse {
         let response = try ConnectManager.decoder.decode(Response.self, from: data)
-        let decodedToken = try decode(jwtToken: response.sessionToken, as: tokenType)
+        let decodedToken = try decodeToken(jwtToken: response.sessionToken)
         try initializeUserWithToken(decodedToken)
         return ConnectionResponse(result: .success, data: response, problem: nil)
     }
     
-    private func decodeTokenResponse<T: HasSessionToken & Decodable>(from data: Data, tokenType: T.Type) throws -> String {
+    private func decodeTokenResponse(from data: Data) throws -> String {
         let response = try ConnectManager.decoder.decode(Response.self, from: data)
-        let decodedData = try decode(jwtToken: response.sessionToken, as: tokenType)
-        return decodedData.SessionToken
+        let decodedData = try decodeToken(jwtToken: response.sessionToken)
+        return decodedData.sessionToken
     }
     
-    func initializeUserWithToken<T: HasSessionToken>(_ tokenData: T) throws {
-        _ = ConnectManager.shared.createToken(from: tokenData.SessionToken)
+    private func initializeUserWithToken<T: JWTData>(_ tokenData: T) throws {
+        _ = ConnectManager.shared.createToken(from: tokenData.sessionToken)
         
         DispatchQueue.main.sync {
-            ConnectManager.shared.user = ConnectUser(for: tokenData, token: tokenData.SessionToken)
+            ConnectManager.shared.user = ConnectUser(for: tokenData, token: tokenData.sessionToken)
             ConnectManager.shared.didSignInOnline = true
-            info.appTokenActions(tokenData)
+            //            info.appTokenActions(tokenData)
         }
     }
     
-}
-
-extension ApiLogin {
-    
-    enum DecodeErrors: Error {
-        case badToken
-        case other
+    private func decodeToken(jwtToken jwt: String) throws -> JWTData {
+        return try info.appTokenActions(jwt)
     }
-    
-    func decode<T: HasSessionToken & Decodable>(jwtToken jwt: String, as type: T.Type) throws -> T {
-        let segments = jwt.components(separatedBy: ".")
-        guard segments.count > 1 else {
-            throw DecodeErrors.badToken
-        }
-        
-        return try decodeJWTPart(segments[1], as: type)
-    }
-    
-    private func base64Decode(_ base64: String) throws -> Data {
-        let base64 = base64
-            .replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
-        let padded = base64.padding(toLength: ((base64.count + 3) / 4) * 4, withPad: "=", startingAt: 0)
-        guard let decoded = Data(base64Encoded: padded) else {
-            throw DecodeErrors.badToken
-        }
-        return decoded
-    }
-    
-    private func decodeJWTPart<T: Decodable>(_ value: String, as type: T.Type) throws -> T {
-        let bodyData = try base64Decode(value)
-        let decoder = JSONDecoder()
-        return try decoder.decode(T.self, from: bodyData)
-    }
-}
-
-public struct FMS_JWTData: Codable, HasSessionToken{
-
-    public var Id: UUID
-    public var Login: String
-    public var FirstName: String?
-    public var LastName: String?
-    public var AllowResubmit: Bool?
-    public var UserName: String?
-    public var SessionToken: String
-    
-    public var IsApplicationAdministrator: Bool?
-    public var IsActive: Bool?
 }

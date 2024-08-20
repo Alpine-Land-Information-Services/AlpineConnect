@@ -26,9 +26,9 @@ public class ConnectUser {
         data["is_admin"] = serverUser.isAdmin
     }
     
-    internal init(for tokenData: HasSessionToken, token: String) {
-        data = Dictionary.getFromDefaults(key: tokenData.Login) ?? Self.makeUser(for: tokenData)
-        self.email = tokenData.Login
+    internal init(for tokenData: JWTData, token: String) {
+        data = Dictionary.getFromDefaults(key: tokenData.login) ?? Self.makeUser(for: tokenData)
+        self.email = tokenData.login
         self.jwtToken = token
     }
     
@@ -171,14 +171,14 @@ private extension ConnectUser {
         return data
     }
     
-    static func makeUser(for jwtToken: HasSessionToken) -> [String: Any] {
+    static func makeUser(for jwtToken: JWTData) -> [String: Any] {
         var data = [String: Any]()
-        data["email"] = jwtToken.Login
-        data["first_name"] = jwtToken.FirstName
-        data["last_name"] = jwtToken.LastName
+        data["email"] = jwtToken.login
+        data["first_name"] = jwtToken.firstName
+        data["last_name"] = jwtToken.lastName
 //        data["is_admin"] = serverUser.isAdmin
         
-        data.saveToDefaults(key: jwtToken.Login)
+        data.saveToDefaults(key: jwtToken.login)
         return data
     }
 }
