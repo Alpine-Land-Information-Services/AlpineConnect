@@ -11,9 +11,8 @@ import PopupKit
 
 struct ResetModifier: ViewModifier {
     
-    var currentCode: String
-    
     var core = CoreAppControl.shared
+    var currentCode: String
     
     func body(content: Content) -> some View {
         if core.defaults.resetCode != currentCode {
@@ -24,13 +23,12 @@ struct ResetModifier: ViewModifier {
                 .onAppear {
                     checkToResetData()
                 }
-        }
-        else {
+        } else {
             content
         }
     }
     
-    func checkToResetData() {
+    private func checkToResetData() {
         if FileManager.default.fileExists(atPath: FS.appDocumentsURL.appending(path: "Layers").path(percentEncoded: false)) {
             AppReset.forceReset(code: currentCode)
         }

@@ -68,7 +68,7 @@ struct LocationRequirementModifier: ViewModifier {
         .ignoresSafeArea()
     }
     
-    func openAppSettings() {
+    private func openAppSettings() {
         guard let settingsUrl = URL(string: UIApplication.openSettingsURLString), UIApplication.shared.canOpenURL(settingsUrl) else {
             return
         }

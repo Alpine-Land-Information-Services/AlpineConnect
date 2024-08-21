@@ -11,12 +11,12 @@ import AlpineCore
 
 struct AlpineLoginSheet: ViewModifier {
     
-    var info: LoginConnectionInfo
     @Binding var isPresented: Bool
     
-    var afterSignInAction: () async -> Void
-    
     @ObservedObject var manager = ConnectManager.shared
+    
+    var info: LoginConnectionInfo
+    var afterSignInAction: () async -> Void
 
     func body(content: Content) -> some View {
         content

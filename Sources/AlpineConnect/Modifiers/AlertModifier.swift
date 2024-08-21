@@ -9,8 +9,9 @@ import SwiftUI
 
 struct AlertModifier: ViewModifier {
     
-    var alert: ConnectAlert
     @Binding var isPresented: Bool
+    
+    var alert: ConnectAlert
     
     func body(content: Content) -> some View {
         content

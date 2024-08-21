@@ -10,16 +10,20 @@ import SwiftUI
 
 public extension View {
     
+    var locationToggler: some View {
+        modifier(LocationToggler())
+    }
+    
     var locationRequirementTracker: some View {
         modifier(LocationRequirementModifier())
     }
     
     func connectAlert(_ alert: ConnectAlert, isPresented: Binding<Bool>) -> some View {
-        modifier(AlertModifier(alert: alert, isPresented: isPresented))
+        modifier(AlertModifier(isPresented: isPresented, alert: alert))
     }
     
     func alpineLoginSheet(info: LoginConnectionInfo, isPresented: Binding<Bool>, afterSignInAction: @escaping () async -> Void) -> some View {
-        modifier(AlpineLoginSheet(info: info, isPresented: isPresented, afterSignInAction: afterSignInAction))
+        modifier(AlpineLoginSheet(isPresented: isPresented, info: info, afterSignInAction: afterSignInAction))
     }
     
     func appResetCheck(code: String) -> some View {

@@ -26,10 +26,3 @@ struct LocationToggler: ViewModifier {
             }
     }
 }
-
-public extension View {
-    
-    var locationToggler: some View {
-        modifier(LocationToggler())
-    }
-}
