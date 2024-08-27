@@ -116,8 +116,7 @@ struct AlpineLoginView: View {
                 Group {
                     if attemptingLogin {
                         ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    }
-                    else {
+                    } else {
                         Text("Sign In")
                     }
                 }
@@ -175,11 +174,11 @@ extension AlpineLoginView {
                     self.processLoginResponse(response)
                     attemptingLogin = false
                 }
-            }
-            catch {
+            } catch {
                 responseFailAlert(for: error)
             }
         }
+        Core.logUIEvent(.loginButton)
     }
     
     private func responseFailAlert(for error: Error) {
