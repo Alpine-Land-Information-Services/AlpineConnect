@@ -198,6 +198,8 @@ public class Login {
         TokenManager.saveLoginToken(backyardData.sessionToken)
         UserManager.shared.userName = backyardData.user.email
         UserManager.shared.fullName = "\(backyardData.user.firstName) \(backyardData.user.lastName)"
+        
+        CurrentUser.makeUserData(email: backyardData.user.email, name: "\(backyardData.user.firstName) \(backyardData.user.lastName)", id: UUID())
     }
     
     static private func loginUserOnlineA3T(info: UserLoginUpdate) async -> ConnectionResponse? {
