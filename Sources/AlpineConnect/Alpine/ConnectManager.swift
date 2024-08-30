@@ -36,6 +36,13 @@ public class ConnectManager: ObservableObject {
     public var token: Token?
     public var jwtToken: Token?
     public var didSignInOnline: Bool = false
+    public var core: CoreAppControl {
+        CoreAppControl.shared
+    }
+    public var userID: String {
+        guard let user else { return "_USER_NOT_SET_" }
+        return user.databaseType == .production ? loginData.email : "\(loginData.email)-Sandbox"
+    }
     
     private var loginData: CredentialsData!
     private var loginInfo: LoginConnectionInfo!
@@ -46,16 +53,6 @@ public class ConnectManager: ObservableObject {
     }
 
     var authManager: AuthManager = AuthManager()
-
-    public var core: CoreAppControl {
-        CoreAppControl.shared
-    }
-
-    public var userID: String {
-        guard let user else { return "_USER_NOT_SET_" }
-        return user.databaseType == .production ? loginData.email : "\(loginData.email)-Sandbox"
-    }
-
     var isConnected: Bool {
         NetworkTracker.shared.isConnected
     }
@@ -120,6 +117,18 @@ extension ConnectManager {
         return try await attemptA3TOnlineLogin()
     }
     
+    public func refreshJWTTokenIfNeeded() async throws -> Token {
+        if let token = self.jwtToken, token.expirationDate >= Date() {
+            return token
+        }
+        
+        let sessionToken = try await ApiLogin(loginInfo, data: loginData).refreshToken()
+        
+        let newToken = createJWTToken(from: sessionToken)
+        self.jwtToken = newToken
+        return newToken
+    }
+    
     private func hasValidLoginData() -> Bool {
         return loginData != nil && loginInfo != nil
     }
@@ -135,18 +144,6 @@ extension ConnectManager {
         case .api:
             return try await attemptApiOnlineLogin()
         }
-    }
-    
-    public func refreshJWTTokenIfNeeded() async throws -> Token {
-        if let token = self.jwtToken, token.expirationDate >= Date() {
-            return token
-        }
-
-        let sessionToken = try await ApiLogin(loginInfo, data: loginData).refreshToken()
-
-        let newToken = createJWTToken(from: sessionToken)
-        self.jwtToken = newToken
-        return newToken
     }
     
     private func attemptApiOnlineLogin() async throws -> ConnectionResponse {
@@ -213,9 +210,15 @@ extension ConnectManager {
             return .userRecordNotFound(lastLogin: lastLogin)
         }
         
+        guard let encodedTokenData = core.defaults.jwtToken,
+              let decodedJwtToken = try? JSONDecoder().decode(Token.self, from: encodedTokenData) else {
+            return .tokenMissingAlert()
+        }
+        
         DispatchQueue.main.sync { [weak self] in
             self?.user = user
             self?.inOfflineMode = true
+            self?.jwtToken = decodedJwtToken
         }
         
         return .success()

@@ -75,6 +75,18 @@ extension ConnectionResponse {
         return ConnectionResponse(result: .fail, problem: ConnectionProblem(customAlert: ConnectAlert(title: "Incorrect User", message: "Only \(lastLogin) is able to sign in while offline.")))
     }
     
+    static func tokenMissingAlert() -> ConnectionResponse {
+        return ConnectionResponse(
+            result: .fail,
+            problem: ConnectionProblem(
+                customAlert: ConnectAlert(
+                    title: "JWT Token Not Found",
+                    message: "Please try to connect online to obtain a valid token."
+                )
+            )
+        )
+    }
+              
     static func noStoredCredentials(lastLogin: String) -> ConnectionResponse {
         return ConnectionResponse(result: .fail, problem: ConnectionProblem(customAlert: ConnectAlert(title: "No Stored Credentials", message: "Unable verify \(lastLogin) sign in data.")))
     }

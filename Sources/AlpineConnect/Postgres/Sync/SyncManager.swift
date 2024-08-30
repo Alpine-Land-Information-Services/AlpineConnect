@@ -87,7 +87,7 @@ public class SyncManager {
             Core.makeSimpleAlert(title: "Already Syncing", message: "Please wait for the current sync to complete.")
             return
         }
-
+        
         Core.logAtlasConnectEvent(.initializingSync, type: .sync)
         
         DispatchQueue.main.async { [weak self] in
