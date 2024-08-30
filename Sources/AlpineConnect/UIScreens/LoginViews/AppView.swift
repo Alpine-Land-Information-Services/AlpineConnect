@@ -8,8 +8,6 @@
 import SwiftUI
 import SwiftData
 import TipKit
-
-import PopupKit
 import AlpineCore
 
 public struct AppView<App: View>: View {

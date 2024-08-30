@@ -7,7 +7,6 @@
 
 import SwiftUI
 import AlpineCore
-import PopupKit
 
 struct ResetModifier: ViewModifier {
     

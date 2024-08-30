@@ -8,7 +8,7 @@
 import CoreData
 import AlpineCore
 import PostgresClientKit
-import PopupKit
+import AlpineUI
 
 public class SyncManager {
     
