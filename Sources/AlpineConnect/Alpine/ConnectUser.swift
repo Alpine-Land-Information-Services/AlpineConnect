@@ -26,7 +26,7 @@ public class ConnectUser {
         data["is_admin"] = serverUser.isAdmin
     }
     
-    internal init(for tokenData: JWTData, token: String) {
+    public init(for tokenData: JWTData, token: String) {
         data = Dictionary.getFromDefaults(key: tokenData.login) ?? Self.makeUser(for: tokenData)
         self.email = tokenData.login
         self.jwtToken = token

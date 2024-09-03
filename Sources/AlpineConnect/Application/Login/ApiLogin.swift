@@ -30,7 +30,7 @@ public final class ApiLogin {
         
         switch httpResponse.statusCode {
         case 200...299:
-            return try decodeLoginResponse(from: data)
+            return try await decodeLoginResponse(from: data)
         case 400...599:
             return makeConnectionProblem(with: httpResponse.statusCode)
         default:
@@ -74,10 +74,10 @@ public final class ApiLogin {
         return ConnectionResponse(result: .fail, data: nil, problem: problem)
     }
     
-    private func decodeLoginResponse(from data: Data) throws -> ConnectionResponse {
+    private func decodeLoginResponse(from data: Data) async throws -> ConnectionResponse {
         let response = try ConnectManager.decoder.decode(Response.self, from: data)
         let decodedToken = try decodeToken(jwtToken: response.sessionToken)
-        try initializeUserWithToken(decodedToken)
+        try await initializeUserWithToken(decodedToken)
         return ConnectionResponse(result: .success, data: response, problem: nil)
     }
     
@@ -87,14 +87,11 @@ public final class ApiLogin {
         return decodedData.sessionToken
     }
     
-    private func initializeUserWithToken<T: JWTData>(_ tokenData: T) throws {
+    private func initializeUserWithToken<T: JWTData>(_ tokenData: T) async throws {
         _ = ConnectManager.shared.createToken(from: tokenData.sessionToken)
         
-        DispatchQueue.main.sync {
-            ConnectManager.shared.user = ConnectUser(for: tokenData, token: tokenData.sessionToken)
-            ConnectManager.shared.didSignInOnline = true
-            //            info.appTokenActions(tokenData)
-        }
+//        ConnectManager.shared.user = ConnectUser(for: tokenData, token: tokenData.sessionToken)
+        ConnectManager.shared.didSignInOnline = true
     }
     
     private func decodeToken(jwtToken jwt: String) throws -> JWTData {
