@@ -354,7 +354,8 @@ public extension ConnectManager {
         return try await fetchNewToken(with: info)
     }
     
-    static func fetchNewToken(with info: LoginConnectionInfo) async throws -> (TokenResponse, Token?) {
+    static func fetchNewToken(with info: LoginConnectionInfo?) async throws -> (TokenResponse, Token?) {
+        guard let info else { throw ConnectError("Cannot fetch token, connection info is nil.", type: .login)}
         guard let email = lastSavedLogin, let password = AuthManager.retrieveFromKeychain(account: email) else {
             return (TokenResponse.noStoredCredentials, nil)
         }

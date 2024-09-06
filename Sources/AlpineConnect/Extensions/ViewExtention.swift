@@ -22,7 +22,7 @@ public extension View {
         modifier(AlertModifier(isPresented: isPresented, alert: alert))
     }
     
-    func alpineLoginSheet(info: LoginConnectionInfo, isPresented: Binding<Bool>, afterSignInAction: @escaping () async -> Void) -> some View {
+    func alpineLoginSheet(info: LoginConnectionInfo?, isPresented: Binding<Bool>, afterSignInAction: @escaping () async -> Void) -> some View {
         modifier(AlpineLoginSheet(isPresented: isPresented, info: info, afterSignInAction: afterSignInAction))
     }
     
