@@ -210,15 +210,16 @@ extension ConnectManager {
             return .userRecordNotFound(lastLogin: lastLogin)
         }
         
-        guard let encodedTokenData = core.defaults.jwtToken,
-              let decodedJwtToken = try? JSONDecoder().decode(Token.self, from: encodedTokenData) else {
-            return .tokenMissingAlert()
-        }
         
+        var jwtToken: Token?
+        if let encodedTokenData = core.defaults.jwtToken {
+            jwtToken = try? JSONDecoder().decode(Token.self, from: encodedTokenData)
+        }
+            
         DispatchQueue.main.sync { [weak self] in
             self?.user = user
             self?.inOfflineMode = true
-            self?.jwtToken = decodedJwtToken
+            self?.jwtToken = jwtToken
         }
         
         return .success()
