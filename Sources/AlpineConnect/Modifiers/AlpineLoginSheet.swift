@@ -15,19 +15,24 @@ struct AlpineLoginSheet: ViewModifier {
     
     @ObservedObject var manager = ConnectManager.shared
     
-    var info: LoginConnectionInfo
+    var info: LoginConnectionInfo?
     var afterSignInAction: () async -> Void
 
     func body(content: Content) -> some View {
         content
             .sheet(isPresented: $isPresented) {
                 NavigationStack {
-                    AlpineLoginView(info: info)
-                        .toolbar {
-                            DismissButton(onEvent: { event, parameters in
-                                Core.logUIEvent(.dismissButton)
-                            })
-                        }
+                    if let info {
+                        AlpineLoginView(info: info)
+                            .toolbar {
+                                DismissButton(onEvent: { event, parameters in
+                                    Core.logUIEvent(.dismissButton)
+                                })
+                            }
+                    }
+                    else {
+                        ContentUnavailableView("No Connection Info", systemImage: "xmark", description: Text("Login sheet requires connectionInfo to be present."))
+                    }
                 }
                 .environmentObject(manager)
             }
