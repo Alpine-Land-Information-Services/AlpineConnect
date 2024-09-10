@@ -84,7 +84,7 @@ public final class ApiLogin {
     private func decodeTokenResponse(from data: Data) throws -> String {
         let response = try ConnectManager.decoder.decode(Response.self, from: data)
         let decodedData = try decodeToken(jwtToken: response.sessionToken)
-        return decodedData.sessionToken
+        return response.sessionToken
     }
     
     private func initializeUserWithToken<T: JWTData>(_ tokenData: T) async throws {
