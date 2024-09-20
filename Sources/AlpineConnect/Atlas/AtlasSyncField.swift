@@ -21,12 +21,12 @@ public struct AtlasSyncField {
         self.isReference = isReference
     }
     
-    public func convertToLayerType() -> Any.Type {
-        switch fieldType {
-        case is UUID.Type:
-            return String.self
-        default:
-            return fieldType
-        }
-    }
+//    public func convertToLayerType() -> Any.Type {
+//        switch fieldType {
+//        case is UUID.Type:
+//            return String.self
+//        default:
+//            return fieldType
+//        }
+//    }
 }

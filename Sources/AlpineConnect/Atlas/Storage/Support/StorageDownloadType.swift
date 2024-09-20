@@ -35,6 +35,19 @@ public enum ReferenceLocation: String {
         }
     }
     
+    public var icon: String {
+        switch self {
+        case .myFolder:
+            return "folder.badge.person.crop"
+        case .cloud:
+            return "cloud"
+        case .shared:
+            return "folder.badge.gearshape"
+        case .project:
+            return "folder"
+        }
+    }
+    
     static var groupURL: URL {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas")!
     }
