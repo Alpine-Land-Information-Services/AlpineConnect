@@ -55,7 +55,7 @@ public struct ConnectionResponse {
 }
 
 
-extension ConnectionResponse {
+public extension ConnectionResponse {
     static func success() -> ConnectionResponse {
         return ConnectionResponse(result: .success)
     }
