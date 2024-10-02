@@ -12,10 +12,11 @@ public enum ReferenceLocation: String {
     case cloud
     case shared
     case project
+    case community
     
     public var baseURL: URL {
         switch self {
-        case .myFolder, .cloud, .shared:
+        case .myFolder, .cloud, .shared, .community:
             Self.groupURL
         case .project:
             Self.documentsURL
@@ -32,6 +33,8 @@ public enum ReferenceLocation: String {
             "Shared With Me"
         case .project:
             "Project"
+        case .community:
+            "Community"
         }
     }
     
@@ -45,6 +48,8 @@ public enum ReferenceLocation: String {
             return "folder.badge.gearshape"
         case .project:
             return "folder"
+        case .community:
+            return "person.3"
         }
     }
     
