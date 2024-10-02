@@ -49,7 +49,7 @@ extension Ppi {
             return screen.scale == 2 ? 264 : 132
         }
         if screen.scale == 3 {
-            return screen.nativeScale == 3 ? 458 : 401
+            return screen.nativeScale == 3 ? 460 : 401
         }
         return 326
     }
@@ -66,6 +66,14 @@ extension Ppi {
         ),
         (
             [
+                // iPhone 16
+                "iPhone17,3",
+                // iPhone 16 Plus
+                "iPhone17,4",
+                // iPhone 16 Pro
+                "iPhone17,1",
+                // iPhone 16 Pro Max
+                "iPhone17,2",
                 // iPhone 15
                 "iPhone15,4",
                 // iPhone 15 Plus
@@ -131,7 +139,7 @@ extension Ppi {
                 "iPhone12,1",
                 // iPhone XR
                 "iPhone11,8",
-
+                
                 // iPhone SE (3rd generation)
                 "iPhone14,6",
                 // iPhone SE (2nd generation)
@@ -162,7 +170,7 @@ extension Ppi {
                 
                 // iPhone 4S
                 "iPhone4,1",
-
+                
                 // iPad mini (6th generation)
                 "iPad14,1", "iPad14,2",
                 // iPad mini (5th generation)
@@ -178,6 +186,16 @@ extension Ppi {
         ),
         (
             [
+                // iPad Air 11-inch (M2)
+                "iPad14,8", "iPad14,9",
+                // iPad Air 13-inch (M2)
+                "iPad14,10", "iPad14,11",
+                // iPad Pro 11-inch (M4)
+                "iPad16,3", "iPad16,4",
+                "iPad16,3-A", "iPad16,3-B", "iPad16,4-A", "iPad16,4-B",
+                // iPad Pro 13-inch (M4)
+                "iPad16,5", "iPad16,6",
+                "iPad16,5-A", "iPad16,5-B", "iPad16,6-A", "iPad16,6-B",
                 // iPad (10th generation)
                 "iPad13,18", "iPad13,19",
                 // iPad Pro (11″, 4th generation)
