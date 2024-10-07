@@ -12,6 +12,7 @@ public struct AppInfo {
     public enum LoginType {
         case a3t
         case api
+        case ursus
     }
     
     var loginType: LoginType

@@ -29,6 +29,7 @@ public struct ConnectionResponse {
     public var problem: ConnectionProblem?
     
     public var apiResponse: ApiLogin.Response?
+    public var ursusResponse: UrsusLogin.Response?
     
     var detail: ConnectionDetail?
     
@@ -50,6 +51,12 @@ public struct ConnectionResponse {
     public init(result: ConnectionResult, data: ApiLogin.Response? = nil, problem: ConnectionProblem? = nil) {
         self.result = result
         self.apiResponse = data
+        self.problem = problem
+    }
+    
+    public init(result: ConnectionResult, response: UrsusLogin.Response?, problem: ConnectionProblem? = nil) {
+        self.result = result
+        self.ursusResponse = response
         self.problem = problem
     }
 }

@@ -54,6 +54,36 @@ public class ConnectUser {
     }
 }
 
+public extension ConnectUser { //MARK: Ursus sync tokens.
+    
+    var accessToken: String? {
+        get {
+            value(for: "access_token") as? String
+        }
+        set {
+            setValue(newValue, for: "access_token")
+        }
+    }
+    
+    var refreshToken: String? {
+        get {
+            value(for: "refresh_token") as? String
+        }
+        set {
+            setValue(newValue, for: "refresh_token")
+        }
+    }
+    
+    var lastAccessTokenRefresh: Date? {
+        get {
+            value(for: "last_access_token_refresh") as? Date
+        }
+        set {
+            setValue(newValue, for: "last_access_token_refresh")
+        }
+    }
+}
+
 public extension ConnectUser {
     
     var isSandbox: Bool {

@@ -143,6 +143,8 @@ extension ConnectManager {
             return try await attemptA3TOnlineLogin()
         case .api:
             return try await attemptApiOnlineLogin()
+        case .ursus:
+            return try await attemptUrsusLogin()
         }
     }
     
@@ -153,6 +155,21 @@ extension ConnectManager {
         }
         
         return try await processApiData(data)
+    }
+    
+    private func attemptUrsusLogin() async throws -> ConnectionResponse {
+        let login = UrsusLogin(loginInfo)
+        let response = try await login.attemptLogin(with: loginData)
+        guard let data = response.ursusResponse else {
+            return response
+        }
+        
+        try await login.getUserClaims(with: data.accessToken)
+        
+        if let lastLogin = Connect.lastSavedLogin, lastLogin != loginData.email {
+            return .overrideKeychain()
+        }
+        return authManager.saveUser(with: loginData)
     }
     
     private func processApiData(_ data: ApiLogin.Response) async throws -> ConnectionResponse {
