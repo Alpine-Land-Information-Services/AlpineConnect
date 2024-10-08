@@ -20,4 +20,5 @@ public extension Notification.Name {
     static let AC_SyncComplete = Notification.Name("AC_SyncComplete")
     static let AC_MyFolderUpdate = Notification.Name("AC_MyFolderUpdate")
     static let AC_MyFolderSyncCountUpdate = Notification.Name("AC_MyFolderSyncCountUpdate")
+    static let AC_DownloadFailed = Notification.Name("AC_DownloadFailed")
 }
