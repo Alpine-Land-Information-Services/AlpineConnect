@@ -16,6 +16,7 @@ public class ConnectUser {
     public var email: String
     public var jwtToken: String?
     
+    /// Init for WBIS login type.
     internal init(for serverUser: ServerUserResponse) { // user is created on login and should not be initialized elsewhere.
         data = Dictionary.getFromDefaults(key: serverUser.email) ?? Self.makeUser(for: serverUser)
         self.email = serverUser.email
@@ -26,6 +27,14 @@ public class ConnectUser {
         data["is_admin"] = serverUser.isAdmin
     }
     
+    /// Init for Ursus login type.
+    public init(email: String) {
+        self.email = email
+        let data = Dictionary.getFromDefaults(key: email) ?? Self.makeUser(email: email)
+        self.data = data
+    }
+    
+    /// Init for FMS login type.
     public init(for tokenData: JWTData, token: String) {
         data = Dictionary.getFromDefaults(key: tokenData.login) ?? Self.makeUser(for: tokenData)
         self.email = tokenData.login
@@ -189,6 +198,14 @@ public extension ConnectUser {
 }
 
 private extension ConnectUser {
+    
+    static func makeUser(email: String) -> [String: Any] {
+        var data = [String: Any]()
+        data["email"] = email
+        
+        data.saveToDefaults(key: email)
+        return data
+    }
     
     static func makeUser(for serverUser: ServerUserResponse) -> [String: Any] {
         var data = [String: Any]()

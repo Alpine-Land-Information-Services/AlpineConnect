@@ -41,17 +41,17 @@ public final class UrsusLogin {
         self.info = info
     }
     
-    func attemptLogin(with data: CredentialsData) async throws -> ConnectionResponse {
+    func attemptLogin(with credentials: CredentialsData) async throws -> ConnectionResponse {
         guard let url = URL(string: appURL) else {
             throw ConnectError("Could not create application url.", type: .login)
         }
         
-        let encodedData = try JSONEncoder().encode(data)
+        let encodedData = try JSONEncoder().encode(credentials)
         let (data, httpResponse) = try await performRequest(with: url, for: encodedData)
         
         switch httpResponse.statusCode {
         case 200...299:
-            return try await decodeTokenResponse(from: data)
+            return try await decodeTokenResponse(from: data, for: credentials.email)
         case 400...599:
             return makeConnectionProblem(with: httpResponse.statusCode)
         default:
@@ -87,17 +87,16 @@ public final class UrsusLogin {
     
     private func fillUserDetails(from data: Data) async throws {
         let result = try JSONDecoder().decode(UserIdentity.self, from: data)
-        
         await MainActor.run {
             for claim in result.claims {
                 if let key = Self.claimKeys[claim.type] {
-                    Connect.user?.setValue(key, for: claim.value)
+                    Connect.user?.setValue(claim.value, for: key)
                 }
             }
         }
     }
     
-    func refreshToken() async throws {
+    func refreshToken(for email: String) async throws {
         guard let user = Connect.user else {
             throw ConnectError("Cannot refresh user access token, user is missing.", type: .login)
         }
@@ -114,7 +113,7 @@ public final class UrsusLogin {
         
         switch httpResponse.statusCode {
         case 200...299:
-            try await decodeTokenResponse(from: data)
+            try await decodeTokenResponse(from: data, for: email)
         case 400...599:
             throw ConnectError("Failed to refresh token. Status Code: \(httpResponse.statusCode)", type: .login)
         default:
@@ -123,9 +122,14 @@ public final class UrsusLogin {
     }
     
     @discardableResult
-    private func decodeTokenResponse(from data: Data) async throws -> ConnectionResponse {
+    private func decodeTokenResponse(from data: Data, for email: String) async throws -> ConnectionResponse {
         let response = try ConnectManager.decoder.decode(Response.self, from: data)
         await MainActor.run {
+            if Connect.user == nil {
+                ConnectManager.shared.user = ConnectUser(email: email)
+                ConnectManager.shared.didSignInOnline = true
+            }
+            
             Connect.user?.accessToken = response.accessToken
             Connect.user?.refreshToken = response.refreshToken
             Connect.user?.lastAccessTokenRefresh = Date()

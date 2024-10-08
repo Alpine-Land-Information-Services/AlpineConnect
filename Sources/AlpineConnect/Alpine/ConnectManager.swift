@@ -163,7 +163,6 @@ extension ConnectManager {
         guard let data = response.ursusResponse else {
             return response
         }
-        
         try await login.getUserClaims(with: data.accessToken)
         
         if let lastLogin = Connect.lastSavedLogin, lastLogin != loginData.email {

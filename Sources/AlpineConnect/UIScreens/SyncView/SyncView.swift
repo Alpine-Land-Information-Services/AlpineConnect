@@ -16,6 +16,7 @@ public struct SyncView: View {
     
     @Environment(\.dismiss) var dismiss
     
+    
     public init(for sync: SyncManager) {
         self._tracker = ObservedObject(wrappedValue: sync.tracker)
         self._viewModel = StateObject(wrappedValue: SyncViewModel(sync: sync))
