@@ -61,6 +61,19 @@ public class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObj
         manager.startUpdatingHeading()
     }
     
+    public func requestLocation(completion: @escaping (CLLocation?) -> Void) {
+        guard autorizationStatus == .authorizedWhenInUse || autorizationStatus == .authorizedAlways else {
+            requestAuthorization()
+            return
+        }
+        
+        if let location = lastLocation {
+            completion(location)
+        } else {
+            manager.requestLocation()
+        }
+    }
+    
     public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         withAnimation {
             autorizationStatus = manager.authorizationStatus
