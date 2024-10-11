@@ -59,13 +59,26 @@ struct LaunchSettingsView: View {
     }
     
     private func questionAlert() {
-        let cancel = ConnectAlertButton(label: "Cancel", role: .cancel, action: {})
+        let cancel = ConnectAlertButton(label: "Cancel", role: .cancel, action: {  showAlert.toggle() })
         let deleteButton = ConnectAlertButton(label: "Delete", role: .destructive) {
-            //TODO: -Check password
-            print("Password entered: \(password)")
-            self.deleteContainer(targetFileName: "Atlas User Data")
+            
+            if password == checkPassword() {
+                print("Password entered: \(password)")
+                self.deleteContainer(targetFileName: "Atlas User Data")
+                self.password = ""
+            }
+
+            showAlert.toggle()
         }
-        currentAlert = ConnectAlert(title: "Are you sure you want to delete the container?", message: "To confirm, please enter your password.", buttons: [deleteButton], dismissButton: cancel, textFieldBinding: $password, textFieldPlaceholder: "Password")
+        currentAlert = ConnectAlert(title: "Are you sure you want to delete the container?", message: "To confirm, please enter your password.", buttons: [deleteButton], dismissButton: cancel, textFieldBinding: $password, textFieldPlaceholder: "Password", isSecureField: true)
+    }
+    
+    private func checkPassword() -> String?  {
+        guard let email = ConnectManager.lastSavedLogin,
+                let password = AuthManager.retrieveFromKeychain(account: email)
+        else { return  nil }
+        
+       return password
     }
 }
 

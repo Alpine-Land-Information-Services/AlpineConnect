@@ -17,7 +17,11 @@ struct AlertModifier: ViewModifier {
         content
             .alert(alert.title, isPresented: $isPresented, actions: {
                 if let textFieldBinding = alert.textFieldBinding {
-                    TextField(alert.textFieldPlaceholder ?? "", text: textFieldBinding)
+                    if alert.isSecureField {
+                        SecureField(alert.textFieldPlaceholder ?? "", text: textFieldBinding)
+                    } else {
+                        TextField(alert.textFieldPlaceholder ?? "", text: textFieldBinding)
+                    }
                 }
                 if let buttons = alert.buttons {
                     ForEach(buttons, id: \.label) { button in
