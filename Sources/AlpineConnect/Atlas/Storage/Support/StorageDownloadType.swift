@@ -49,7 +49,7 @@ public enum ReferenceLocation: String {
         case .project:
             return "folder"
         case .community:
-            return "person.3"
+            return "figure.2"
         }
     }
     
