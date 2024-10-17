@@ -53,6 +53,21 @@ public enum ReferenceLocation: String {
         }
     }
     
+//    public var treeicon: String {
+//        switch self {
+//        case .myFolder:
+//            return "folder.badge.person.crop"
+//        case .cloud:
+//            return "cloud"
+//        case .shared:
+//            return "folder.badge.gearshape"
+//        case .project:
+//            return "folder"
+//        case .community:
+//            return "figure.2"
+//        }
+//    }
+    
     static var groupURL: URL {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas")!
     }
