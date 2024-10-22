@@ -7,7 +7,8 @@ let package = Package(
     name: "AlpineConnect",
     platforms: [
         .iOS(.v17)
-    ], products: [
+    ],
+    products: [
         .library(
             name: "AlpineConnect",
             targets: ["AlpineConnect"]),
