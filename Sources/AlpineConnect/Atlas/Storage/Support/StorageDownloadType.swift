@@ -59,4 +59,20 @@ public enum ReferenceLocation: String {
     static var documentsURL: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
+    
+    /// Used to determine file location based on soley its connectionString
+    public var textualFolderRepresentation: String {
+        switch self {
+        case .myFolder:
+            "Users"
+        case .cloud:
+            "Alpine Cloud"
+        case .shared:
+            "Shared"
+        case .project:
+            "Layers"
+        case .community:
+            "Alpine Cloud/Community"
+        }
+    }
 }
