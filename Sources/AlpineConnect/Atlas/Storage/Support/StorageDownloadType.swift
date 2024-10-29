@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AlpineCore
 
 public enum ReferenceLocation: String {
     case myFolder
@@ -54,10 +55,10 @@ public enum ReferenceLocation: String {
     }
     
     static var groupURL: URL {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas")!
+        FS.atlasGroupURL
     }
     static var documentsURL: URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        FS.appDocumentsURL
     }
     
     /// Used to determine file location based on soley its connectionString
@@ -75,23 +76,35 @@ public enum ReferenceLocation: String {
             "Alpine Cloud/Community"
         }
     }
-    
-    func basePath(userID: String, projectID: String) -> String {
+        
+    public func getBasePath(projectID: String? = nil, sharedUserID: String? = nil) throws -> String {
+        let userID = ConnectManager.shared.userID
+        
         switch self {
         case .myFolder:
-            "Users/\(userID)/"
+            return "Users/\(userID)/"
         case .shared:
-            "Shared/\(userID)/"
+            guard let sharedUserID = sharedUserID else {
+                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing sharedUserID in shared location"])
+            }
+            return "Shared/\(userID)/\(sharedUserID)/"
+            
         case .project:
-            "Atlas/\(userID)/\(projectID)/Layers/"
+            guard let finalProjectID = projectID else {
+                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing projectID for project"])
+            }
+            return "Atlas/\(userID)/\(finalProjectID)/Layers/"
+            
         case .community:
-            "Alpine Cloud/Community/"
+            return "Alpine Cloud/Community/"
+            
         case .cloud:
-            "Alpine Cloud/"
+            return "Alpine Cloud/"
         }
     }
     
-    func baseURL(userID: String, projectID: String) -> URL {
-        coreURL.appending(path: basePath(userID: userID, projectID: projectID))
+    
+    public func baseURL(projectID: String, sharedUserID: String) throws -> URL {
+        coreURL.appending(path: try getBasePath(projectID: projectID, sharedUserID: sharedUserID))
     }
 }

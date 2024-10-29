@@ -114,7 +114,7 @@ private extension AppReset {
             let url = try? FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
             urls.append(url)
         case .g:
-            urls.append(FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas"))
+            urls.append(FS.atlasGroupURL)
         }
         
         for url in urls {

@@ -22,7 +22,7 @@ public struct AppView<App: View>: View {
         self.app = app
 
         print(code: .info, try! FileManager.default.url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: false))
-        print(code: .info, FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.alpinelis.atlas")!.absoluteString)
+        print(code: .info, FS.atlasGroupURL.absoluteString)
         
 //        try? Tips.resetDatastore()
         try? Tips.configure([.datastoreLocation(.applicationDefault), .displayFrequency(.immediate)])
