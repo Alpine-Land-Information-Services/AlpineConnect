@@ -14,7 +14,7 @@ public enum ReferenceLocation: String {
     case project
     case community
     
-    public var baseURL: URL {
+    public var coreURL: URL {
         switch self {
         case .myFolder, .cloud, .shared, .community:
             Self.groupURL
@@ -74,5 +74,24 @@ public enum ReferenceLocation: String {
         case .community:
             "Alpine Cloud/Community"
         }
+    }
+    
+    func basePath(userID: String, projectID: String) -> String {
+        switch self {
+        case .myFolder:
+            "Users/\(userID)/"
+        case .shared:
+            "Shared/\(userID)/"
+        case .project:
+            "Atlas/\(userID)/\(projectID)/Layers/"
+        case .community:
+            "Alpine Cloud/Community/"
+        case .cloud:
+            "Alpine Cloud/"
+        }
+    }
+    
+    func baseURL(userID: String, projectID: String) -> URL {
+        coreURL.appending(path: basePath(userID: userID, projectID: projectID))
     }
 }
