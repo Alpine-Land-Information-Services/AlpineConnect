@@ -85,13 +85,13 @@ public enum ReferenceLocation: String {
             return "Users/\(userID)/"
         case .shared:
             guard let sharedUserID = sharedUserID else {
-                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing sharedUserID in shared location"])
+                throw ConnectError("Missing sharedUserID in shared location", type: .missingParameter)
             }
             return "Shared/\(userID)/\(sharedUserID)/"
             
         case .project:
             guard let finalProjectID = projectID else {
-                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing projectID for project"])
+                throw ConnectError("Missing projectID for project", type: .missingParameter)
             }
             return "Atlas/\(userID)/\(finalProjectID)/Layers/"
             
