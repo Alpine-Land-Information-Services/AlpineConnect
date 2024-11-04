@@ -7,6 +7,8 @@
 
 import Foundation
 import PostgresClientKit
+import NIO
+import NIOSSL
 
 public class PostgresManager {
     
@@ -23,13 +25,26 @@ public class PostgresManager {
         connectionPoolConfiguration.metricsResetWhenLogged = false
         connectionPoolConfiguration.metricsLoggingInterval = nil
 
-        var configuration = PostgresClientKit.ConnectionConfiguration()
-        configuration.host = info.host
-        configuration.database = info.databaseName
-        configuration.user = credentials.email
-        configuration.credential = .scramSHA256(password: credentials.password)
-        configuration.applicationName = info.databaseName
+        let sslContext = try! NIOSSLContext(
+            configuration: .makeClientConfiguration(certificateVerification: .none))
         
-        pool = ConnectionPool(connectionPoolConfiguration: connectionPoolConfiguration, connectionConfiguration: configuration)
+        let factory = try! DefaultConnectionFactory(eventLoopGroup: MultiThreadedEventLoopGroup(numberOfThreads: 1))
+        factory.host = info.host
+        factory.port = info.port
+        factory.ssl = false
+        factory.database = info.databaseName
+        factory.sslContext = sslContext
+        factory.sslServerName = info.postgresSSLServerName
+        
+        
+        pool = ConnectionPool(
+            connectionPoolConfiguration: connectionPoolConfiguration,
+            connectionFactory: factory,
+            user: credentials.email,
+            credential: .md5Password(password: credentials.password),
+            connectionDelegate: nil
+        )
     }
+    
+    
 }

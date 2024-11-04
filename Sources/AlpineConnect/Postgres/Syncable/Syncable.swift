@@ -7,7 +7,6 @@
 
 import CoreData
 import AlpineCore
-import PostgresClientKit
 
 public protocol Syncable: CDObject {
  

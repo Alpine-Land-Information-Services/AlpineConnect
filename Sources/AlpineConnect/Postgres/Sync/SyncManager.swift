@@ -510,7 +510,11 @@ private extension SyncManager { //MARK: Import
                     do {
                         //                        throw AlpineError("_test_connectionClosed_", file: "", function: "", line: 0)
                         self.activeConnection = connection
-                        defer { connection.close() }
+                        defer {
+                            Task {
+                                await connection.close()
+                            }
+                        }
                         try context.performAndWait {
                             for helper in helpers {
                                 guard !self.isSyncCanceled else {
@@ -677,7 +681,11 @@ private extension SyncManager { //MARK: Export
                 case .success(let connection):
                     do {
                         self.activeConnection = connection
-                        defer { connection.close() }
+                        defer {
+                            Task {
+                                await connection.close()
+                            }
+                        }
                         
                         try context.performAndWait {
                             for helper in helpers {

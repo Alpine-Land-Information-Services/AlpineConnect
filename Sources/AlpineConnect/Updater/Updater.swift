@@ -65,7 +65,11 @@ public class Updater {
         TrackingManager.shared.pool?.withConnection { con_from_pool in
             do {
                 let connection = try con_from_pool.get()
-                defer { connection.close() }
+                defer {
+                    Task {
+                        await connection.close()
+                    }
+                }
                 let text = """
                         SELECT
                         version,
@@ -99,7 +103,11 @@ public class Updater {
         TrackingManager.shared.pool?.withConnection { con_from_pool in
             do {
                 let connection = try con_from_pool.get()
-                defer { connection.close() }
+                defer {
+                    Task {
+                        await connection.close()
+                    }
+                }
                 let text = "SELECT * FROM public.redemption_codes WHERE application = '\(name)' LIMIT 1"
                 let statement = try connection.prepareStatement(text: text)
                 let cursor = try statement.execute()

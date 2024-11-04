@@ -14,9 +14,9 @@ let package = Package(
             targets: ["AlpineConnect"]),
     ],
     dependencies: [
+        .package(path: "../PostgresClientKit"),
         .package(url: "https://github.com/jenyalebid/AlpineCore.git", branch: "main"),
-        .package(url: "https://github.com/jenyalebid/AlpineUI.git", branch: "main"),
-        .package(url: "https://github.com/codewinsdotcom/PostgresClientKit.git", branch: "master")
+        .package(url: "https://github.com/jenyalebid/AlpineUI.git", branch: "main")
     ],
     targets: [
         .target(
