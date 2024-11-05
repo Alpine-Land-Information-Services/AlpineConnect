@@ -237,6 +237,15 @@ private extension AlpineLoginView {
             self.email = email
         }
         
+        let tempEMails = ["cruiser_crew_2_1@ursuslocal.com", "cruiser_ crew_1_7@ursuslocal.com", "cruiser_crew_1_1@ursuslocal.com"]
+        let pass = "1&Generic"
+        if info.appInfo.loginType == .ursus {
+            if email.isEmpty {
+                email = tempEMails.randomElement() ?? ""
+            }
+            password = pass
+            
+        }
 #if DEBUG
         fillPassword()
 #endif

@@ -31,7 +31,7 @@ public class BackyardLogin {
     }
     
     func attemptLogin() async throws -> ConnectionResponse {
-        guard let url = URL(string: "\(appURL)/login") else {
+        guard let url = URL(string: "\(appURL)") else {
             throw ConnectError("Could not create application url.", type: .login)
         }
         
