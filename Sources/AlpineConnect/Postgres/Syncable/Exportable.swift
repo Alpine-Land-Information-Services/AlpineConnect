@@ -6,7 +6,7 @@
 //
 
 import CoreData
-import PostgresClientKit
+//import PostgresClientKit
 
 public protocol Exportable: Syncable {
         

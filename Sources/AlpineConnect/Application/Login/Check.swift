@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import PostgresClientKit
+import PostgresNIO
 
 public class Check {
     
@@ -18,24 +18,24 @@ public class Check {
     }
     
     public static func checkPostgresError(_ error: Error) -> LoginResponse {
+
         Login.loginResponse = "\(error)"
-        guard let error = error as? PostgresError else {
-//            assertionFailure("Not a Postgres Error")
+        
+        guard let postgresError = error as? PostgresNIO.PostgresError else {
             return .unknownError
         }
-        switch error {
-        case .sqlError(notice: let notice):
-            switch notice.code {
-            case "28P01":
-                return .invalidCredentials
-            case "42501":
-                return .noAccess
-            default:
-                assertionFailure("Postgres SQL Login Error: \(notice)")
-                return .unknownError
-            }
+        
+        switch postgresError.code {
+        case "28P01":
+            return .invalidCredentials
+        case "42501":
+            return .noAccess
         default:
-            assertionFailure("Unknown Postgres Login Error: \(error)")
+            #if DEBUG
+            assertionFailure("Unhandled Postgres error code: \(postgresError)")
+            #else
+            print("Warning: Unhandled Postgres error code: \(postgresError)")
+            #endif
             return .unknownError
         }
     }

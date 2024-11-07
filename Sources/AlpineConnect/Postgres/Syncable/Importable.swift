@@ -4,10 +4,9 @@
 //
 //  Created by Jenya Lebid on 2/17/23.
 //
-
 import CoreData
 import AlpineCore
-import PostgresClientKit
+import PostgresNIO
 
 public protocol Importable: Syncable {
     
@@ -16,7 +15,7 @@ public protocol Importable: Syncable {
     static var shallCountRecords: Bool { get }
     
     static func needUpdate(in context: NSManagedObjectContext) -> Bool
-    static func processPGResult(cursor: Cursor, in context: NSManagedObjectContext) throws
+    static func processPGResult(rows: PostgresRowSequence, in context: NSManagedObjectContext) async throws
     static func cleanObsoleteData(in context: NSManagedObjectContext) -> Bool
 }
 
@@ -41,53 +40,42 @@ public extension Importable {
 
 public extension Importable {
     
-    static func sync(with connection: Connection, in context: NSManagedObjectContext) throws {
+    static func sync(using postgresManager: PostgresManager, in context: NSManagedObjectContext) async throws {
         guard Self.needUpdate(in: context) else {
             syncManager.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: 0)
             return
         }
 
         let text = Self.selectQuery
-        
-//        defer { syncManager.currentQuery = "" }
-        
         syncManager.currentQuery = text
+
         if shallCountRecords {
-            let recCount = try getRecordsCount(query: text, connection: connection)
+            let recCount = try await getRecordsCount(query: text, using: postgresManager)
             syncManager.tracker.makeRecord(name: Self.displayName, type: .import, recordCount: recCount)
             guard recCount != 0 else { return }
-        }
-        else {
+        } else {
             print("-- import  >>>  \(Self.entityName)")
         }
-        
-        let statement = try connection.prepareStatement(text: text)
-        defer { statement.close() }
-        let cursor = try statement.execute()
-        defer { cursor.close() }
-        
-        try Self.processPGResult(cursor: cursor, in: context)
+
+        let rows = try await postgresManager.querySequence(text)
+        try await Self.processPGResult(rows: rows, in: context)
         try context.persistentSave()
         
         syncManager.tracker.endRecordSync()
     }
     
-    static func getRecordsCount(query: String, connection: Connection) throws -> Int {
-        let c_text = "select count(*) from (\(query)) as temp"
-        let c_statement = try connection.prepareStatement(text: c_text)
-        defer { c_statement.close() }
-        let c_cursor = try c_statement.execute()
-        defer { c_cursor.close() }
-        var recCount: Int = 0
-        for row in c_cursor {
-            recCount = try row.get().columns[0].int()
+    static func getRecordsCount(query: String, using postgresManager: PostgresManager) async throws -> Int {
+        let countQuery = "SELECT count(*) FROM (\(query)) as temp"
+        let rows = try await postgresManager.querySequence(countQuery)
+        
+        if let firstRow = try await rows.first(where: { _ in true }) {
+            return try firstRow.decode(Int.self)
         }
-//        print("---------------->>> \(Self.entityName): \(recCount)")
-        return recCount
+        return 0
     }
     
-    static func loop(with cursor: Cursor, actions: (_ row: Result<Row, Error>) throws -> ()) throws {
-        for row in cursor {
+    static func loop(rows: [PostgresRow], actions: (_ row: PostgresRow) throws -> ()) throws {
+        for row in rows {
             syncManager.tracker.progressUpdate()
             try actions(row)
         }

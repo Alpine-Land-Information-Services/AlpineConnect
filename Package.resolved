@@ -1,52 +1,149 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "AlpineUI",
-        "repositoryURL": "https://github.com/jenyalebid/AlpineUI.git",
-        "state": {
-          "branch": "main",
-          "revision": "f5193a55fc5fad25637434fa557e4d64f9348ab8",
-          "version": null
-        }
-      },
-      {
-        "package": "Socket",
-        "repositoryURL": "https://github.com/Kitura/BlueSocket.git",
-        "state": {
-          "branch": null,
-          "revision": "7b23a867008e0027bfd6f4d398d44720707bc8ca",
-          "version": "2.0.4"
-        }
-      },
-      {
-        "package": "SSLService",
-        "repositoryURL": "https://github.com/Kitura/BlueSSLService",
-        "state": {
-          "branch": null,
-          "revision": "b27a94d063962dfa1bba9f79814c4ef202cf33a4",
-          "version": "2.0.2"
-        }
-      },
-      {
-        "package": "PostgresClientKit",
-        "repositoryURL": "https://github.com/codewinsdotcom/PostgresClientKit.git",
-        "state": {
-          "branch": null,
-          "revision": "356ffe0c43722f192d796300557b3b530a0baebc",
-          "version": "1.5.0"
-        }
-      },
-      {
-        "package": "Zip",
-        "repositoryURL": "https://github.com/marmelroy/Zip.git",
-        "state": {
-          "branch": null,
-          "revision": "67fa55813b9e7b3b9acee9c0ae501def28746d76",
-          "version": "2.1.2"
-        }
+  "pins" : [
+    {
+      "identity" : "alpinecore",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jenyalebid/AlpineCore.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "a182161102bf58d78dbc94739f3c84eb21892b3c"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "alpineui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jenyalebid/AlpineUI.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "ae0d5dc8169ce08b0c98495f4ee9583080115da6"
+      }
+    },
+    {
+      "identity" : "postgres-nio",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/vapor/postgres-nio.git",
+      "state" : {
+        "revision" : "cd5318a01a1efcb1e0b3c82a0ce5c9fefaf1cb2d",
+        "version" : "1.22.1"
+      }
+    },
+    {
+      "identity" : "swift-asn1",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-asn1.git",
+      "state" : {
+        "revision" : "7faebca1ea4f9aaf0cda1cef7c43aecd2311ddf6",
+        "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "swift-async-algorithms",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-async-algorithms.git",
+      "state" : {
+        "revision" : "5c8bd186f48c16af0775972700626f0b74588278",
+        "version" : "1.0.2"
+      }
+    },
+    {
+      "identity" : "swift-atomics",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-atomics.git",
+      "state" : {
+        "revision" : "cd142fd2f64be2100422d658e7411e39489da985",
+        "version" : "1.2.0"
+      }
+    },
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections.git",
+      "state" : {
+        "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
+        "version" : "1.1.4"
+      }
+    },
+    {
+      "identity" : "swift-crypto",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-crypto.git",
+      "state" : {
+        "revision" : "06dc63c6d8da54ee11ceb268cde1fa68161afc96",
+        "version" : "3.9.1"
+      }
+    },
+    {
+      "identity" : "swift-log",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-log.git",
+      "state" : {
+        "revision" : "9cb486020ebf03bfa5b5df985387a14a98744537",
+        "version" : "1.6.1"
+      }
+    },
+    {
+      "identity" : "swift-metrics",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-metrics.git",
+      "state" : {
+        "revision" : "e0165b53d49b413dd987526b641e05e246782685",
+        "version" : "2.5.0"
+      }
+    },
+    {
+      "identity" : "swift-nio",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-nio.git",
+      "state" : {
+        "revision" : "914081701062b11e3bb9e21accc379822621995e",
+        "version" : "2.76.1"
+      }
+    },
+    {
+      "identity" : "swift-nio-ssl",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-nio-ssl.git",
+      "state" : {
+        "revision" : "c7e95421334b1068490b5d41314a50e70bab23d1",
+        "version" : "2.29.0"
+      }
+    },
+    {
+      "identity" : "swift-nio-transport-services",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-nio-transport-services.git",
+      "state" : {
+        "revision" : "bbd5e63cf949b7db0c9edaf7a21e141c52afe214",
+        "version" : "1.23.0"
+      }
+    },
+    {
+      "identity" : "swift-service-lifecycle",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swift-server/swift-service-lifecycle.git",
+      "state" : {
+        "revision" : "f70b838872863396a25694d8b19fe58bcd0b7903",
+        "version" : "2.6.2"
+      }
+    },
+    {
+      "identity" : "swift-system",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-system.git",
+      "state" : {
+        "revision" : "c8a44d836fe7913603e246acab7c528c2e780168",
+        "version" : "1.4.0"
+      }
+    },
+    {
+      "identity" : "zip",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/marmelroy/Zip.git",
+      "state" : {
+        "revision" : "67fa55813b9e7b3b9acee9c0ae501def28746d76",
+        "version" : "2.1.2"
+      }
+    }
+  ],
+  "version" : 2
 }

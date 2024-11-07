@@ -7,7 +7,8 @@
 
 import CoreData
 import AlpineCore
-import PostgresClientKit
+//import PostgresClientKit
+import PostgresNIO
 import AlpineUI
 
 public class SyncManager {
@@ -42,8 +43,8 @@ public class SyncManager {
     /// Indicates whether an Atlas synchronization should be performed.
     private var doAtlasSync: Bool
     
-    /// The active connection used for synchronization with PostgresClientKit
-    private var activeConnection: Connection?
+//    /// The active connection used for synchronization with PostgresClientKit
+//    private var activeConnection: Connection?
     
     /// The resolver for handling sync errors.
     private var syncErrorsResolver = SyncErrorsResolver()
@@ -151,7 +152,7 @@ public class SyncManager {
     private func finalizeSync() {
         currentQuery = ""
         timer?.invalidate()
-        activeConnection = nil
+//        activeConnection = nil
         
         DispatchQueue.main.async { [weak self] in
             self?.tracker.isDoingSomeSync = false
@@ -187,10 +188,11 @@ public class SyncManager {
     /// Fired when the timer for synchronization timeout is triggered.
     @objc
     private func timerFired() {
-        guard activeConnection != nil else {
+        guard tracker.status != .none && tracker.status != .canceled else {
             timer?.invalidate()
             return
         }
+        
         promptForCancel()
     }
     
@@ -353,14 +355,14 @@ private extension SyncManager { //MARK: Cancel
     
     /// Cancels the current synchronization process.
     func cancelSync() {
-        guard let activeConnection else {
-            return
-        }
+//        guard let activeConnection else {
+//            return
+//        }
         
         timer?.invalidate()
         tracker.updateStatus(.canceled)
-        activeConnection.closeAbruptly()
-        self.activeConnection = nil
+//        activeConnection.closeAbruptly()
+//        self.activeConnection = nil
     }
     
     /// Performs a non-cancel action if synchronization is not canceled.
@@ -374,7 +376,7 @@ private extension SyncManager { //MARK: Cancel
     
     /// Prompts the user with an alert to cancel the current synchronization.
     func userSyncCancelAlert() {
-        guard activeConnection != nil else {
+        guard tracker.status == .importing || tracker.status == .exporting else {
             Core.makeSimpleAlert(title: "Not Syncing", message: "Cannot cancel as there is no sync in progress.")
             return
         }
@@ -477,76 +479,139 @@ private extension SyncManager { //MARK: Import
         
         try? await Task.sleep(nanoseconds: UInt64(2 * 1_000_000_000))
     }
-    
-    /// Performs the import process for the specified objects.
-    ///
-    /// - Parameters:
-    ///   - context: The Core Data context.
-    ///   - objects: The objects to import.
-    ///   - helpers: The helper objects for execution.
     func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
         tracker.updateStatus(.importing, message: "Importing")
-        
-        await withCheckedContinuation({ continuation in
-            guard ConnectManager.shared.postgres?.pool != nil else {
-                Core.logAtlasConnectEvent(.postgresPoolNil, type: .sync)
-                self.tracker.updateStatus(.error)
-                continuation.resume()
-                return
+        guard let postgresManager = ConnectManager.shared.postgres else { return }
+        do {
+            // Выполнение вспомогательных задач через PostgresManager
+            for helper in helpers {
+                guard !isSyncCanceled else { return }
+                try await helper.performWork(with: postgresManager, in: context)
             }
-            ConnectManager.shared.postgres?.pool?.withConnection { [weak self] response in
-                guard let self else { return }
-                switch response {
-                case .failure(let error):
-                    Core.logAtlasConnectEvent(.poolConnectionFailure, type: .sync)
-                    syncErrorsResolver.setError(error)
-                    self.tracker.updateStatus(.error)
-                    Core.makeError(error: error,
-                                   additionalInfo: currentQuery,
-                                   showToUser: syncErrorsResolver.shouldShowToUser(isForeground))
-                    continuation.resume()
-                    return
-                case .success(let connection):
-                    do {
-                        //                        throw AlpineError("_test_connectionClosed_", file: "", function: "", line: 0)
-                        self.activeConnection = connection
-                        defer { connection.close() }
-                        try context.performAndWait {
-                            for helper in helpers {
-                                guard !self.isSyncCanceled else {
-                                    continuation.resume()
-                                    return
-                                }
-                                try helper.performWork(with: connection, in: context)
-                            }
-                            
-                            for object in objects {
-                                guard !self.isSyncCanceled else {
-                                    continuation.resume()
-                                    return
-                                }
-                                // MARK: main func is HERE:
-                                try object.sync(with: connection, in: context)
-                            }
-                            
-                            self.tracker.updateStatus(.importDone)
-                            continuation.resume()
-                        }
-                    }
-                    catch {
-                        self.syncErrorsResolver.setError(error)
-                        self.nonCancelAction {
-                            self.tracker.updateStatus(.error)
-                            Core.makeError(error: error,
-                                           additionalInfo: self.currentQuery,
-                                           showToUser: self.syncErrorsResolver.shouldShowToUser(self.isForeground))
-                        }
-                        continuation.resume()
-                    }
-                }
+
+            for object in objects {
+                guard !isSyncCanceled else { return }
+                try await object.sync(using: postgresManager, in: context)
             }
-        })
+            
+            tracker.updateStatus(.importDone)
+        } catch {
+            tracker.updateStatus(.error)
+            Core.makeError(error: error, additionalInfo: "Error during import", showToUser: isForeground)
+        }
     }
+    
+    func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
+        tracker.updateStatus(.exporting, message: "Exporting")
+        guard let postgresManager = ConnectManager.shared.postgres else { return }
+
+        do {
+            for helper in helpers {
+                guard !isSyncCanceled else { return }
+                try await helper.performWork(with: postgresManager, in: context)
+            }
+
+            for object in objects {
+                guard !isSyncCanceled else { return }
+                try await Exporter(for: object, using: self).export(using: postgresManager, in: context)
+            }
+
+            tracker.updateStatus(.exportDone)
+        } catch {
+            tracker.updateStatus(.error)
+            Core.makeError(error: error, additionalInfo: "Error during export", showToUser: isForeground)
+        }
+    }
+    
+    func exportFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
+        tracker.updateStatus(.exportReady)
+        await executeExport(exportable: exportable)
+
+        guard tracker.status == .exportDone else {
+            return
+        }
+
+        inBetweenActions(for: doInBetween)
+        guard !isSyncCanceled else { return }
+
+        tracker.updateStatus(.importReady)
+        await executeImport(importable: importable)
+
+        if tracker.status == .importDone {
+            Connect.user?.requiresSync = false
+        }
+    }
+    
+//    /// Performs the import process for the specified objects.
+//    ///
+//    /// - Parameters:
+//    ///   - context: The Core Data context.
+//    ///   - objects: The objects to import.
+//    ///   - helpers: The helper objects for execution.
+//    func doImport(in context: NSManagedObjectContext, objects: [Importable.Type], helpers: [ExecutionHelper.Type] = []) async {
+//        tracker.updateStatus(.importing, message: "Importing")
+//        
+//        await withCheckedContinuation({ continuation in
+//            guard ConnectManager.shared.postgres?.pool != nil else {
+//                Core.logAtlasConnectEvent(.postgresPoolNil, type: .sync)
+//                self.tracker.updateStatus(.error)
+//                continuation.resume()
+//                return
+//            }
+//            ConnectManager.shared.postgres?.pool?.withConnection { [weak self] response in
+//                guard let self else { return }
+//                switch response {
+//                case .failure(let error):
+//                    Core.logAtlasConnectEvent(.poolConnectionFailure, type: .sync)
+//                    syncErrorsResolver.setError(error)
+//                    self.tracker.updateStatus(.error)
+//                    Core.makeError(error: error,
+//                                   additionalInfo: currentQuery,
+//                                   showToUser: syncErrorsResolver.shouldShowToUser(isForeground))
+//                    continuation.resume()
+//                    return
+//                case .success(let connection):
+//                    do {
+//                        //                        throw AlpineError("_test_connectionClosed_", file: "", function: "", line: 0)
+//                        self.activeConnection = connection
+//                        defer { connection.close() }
+//                        try context.performAndWait {
+//                            for helper in helpers {
+//                                guard !self.isSyncCanceled else {
+//                                    continuation.resume()
+//                                    return
+//                                }
+//                                try helper.performWork(with: connection, in: context)
+//                            }
+//                            
+//                            for object in objects {
+//                                guard !self.isSyncCanceled else {
+//                                    continuation.resume()
+//                                    return
+//                                }
+//                                // MARK: main func is HERE:
+//                                try object.sync(with: connection, in: context)
+//                            }
+//                            
+//                            self.tracker.updateStatus(.importDone)
+//                            continuation.resume()
+//                        }
+//                    }
+//                    catch {
+//                        self.syncErrorsResolver.setError(error)
+//                        self.nonCancelAction {
+//                            self.tracker.updateStatus(.error)
+//                            Core.makeError(error: error,
+//                                           additionalInfo: self.currentQuery,
+//                                           showToUser: self.syncErrorsResolver.shouldShowToUser(self.isForeground))
+//                        }
+//                        continuation.resume()
+//                    }
+//                }
+//            }
+//        })
+//    }
+
     
     /// Cleans obsolete data after the import process.
     ///
@@ -579,30 +644,30 @@ private extension SyncManager { //MARK: Export
     }
     
     
-    /// Performs the export-first synchronization.
-    ///
-    /// - Parameters:
-    ///   - doInBetween: The closure to execute between import and export phases.
-    ///   - importable: The importable objects.
-    ///   - exportable: The exportable objects.
-    func exportFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
-        tracker.updateStatus(.exportReady)
-        await executeExport(exportable: exportable)
-        
-        guard tracker.status == .exportDone else {
-            return
-        }
-        
-        inBetweenActions(for: doInBetween)
-        guard !isSyncCanceled else { return }
-        
-        tracker.updateStatus(.importReady)
-        await executeImport(importable: importable)
-        
-        if tracker.status == .importDone {
-            Connect.user?.requiresSync = false
-        }
-    }
+//    /// Performs the export-first synchronization.
+//    ///
+//    /// - Parameters:
+//    ///   - doInBetween: The closure to execute between import and export phases.
+//    ///   - importable: The importable objects.
+//    ///   - exportable: The exportable objects.
+//    func exportFirst(doInBetween: ((_ context: NSManagedObjectContext) throws -> ()), importable: [Importable.Type], exportable: [Exportable.Type]) async {
+//        tracker.updateStatus(.exportReady)
+//        await executeExport(exportable: exportable)
+//        
+//        guard tracker.status == .exportDone else {
+//            return
+//        }
+//        
+//        inBetweenActions(for: doInBetween)
+//        guard !isSyncCanceled else { return }
+//        
+//        tracker.updateStatus(.importReady)
+//        await executeImport(importable: importable)
+//        
+//        if tracker.status == .importDone {
+//            Connect.user?.requiresSync = false
+//        }
+//    }
     
     /// Executes the export process for the specified objects.
     ///
@@ -646,77 +711,77 @@ private extension SyncManager { //MARK: Export
     }
     
     
-    /// Performs the export process for the specified objects.
-    ///
-    /// - Parameters:
-    ///   - context: The Core Data context.
-    ///   - objects: The objects to export.
-    ///   - helpers: The helper objects for execution.
-    func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
-        tracker.updateStatus(.exporting, message: "Exporting")
-        
-        await withCheckedContinuation { continuation in
-            guard ConnectManager.shared.postgres?.pool != nil else {
-                Core.logAtlasConnectEvent(.postgresPoolNil, type: .sync)
-                self.tracker.updateStatus(.error)
-                continuation.resume()
-                return
-            }
-            ConnectManager.shared.postgres?.pool?.withConnection { [weak self] response in
-                guard let self else { return }
-                switch response {
-                case .failure(let error):
-                    Core.logAtlasConnectEvent(.poolConnectionFailure, type: .sync)
-                    syncErrorsResolver.setError(error)
-                    self.tracker.updateStatus(.error)
-                    Core.makeError(error: error,
-                                   additionalInfo: currentQuery,
-                                   showToUser: syncErrorsResolver.shouldShowToUser(isForeground))
-                    continuation.resume()
-                    return
-                case .success(let connection):
-                    do {
-                        self.activeConnection = connection
-                        defer { connection.close() }
-                        
-                        try context.performAndWait {
-                            for helper in helpers {
-                                guard !self.isSyncCanceled else {
-                                    continuation.resume()
-                                    return
-                                }
-                                try helper.performWork(with: connection, in: context)
-                            }
-                        }
-                        
-                        for object in objects {
-                            guard !self.isSyncCanceled else {
-                                continuation.resume()
-                                return
-                            }
-                            // MARK: main func is HERE:
-                            try Exporter(for: object, using: self).export(with: connection, in: context)
-                        }
-                        
-                        self.tracker.updateStatus(.exportDone)
-                        continuation.resume()
-                    } catch {
-                        self.syncErrorsResolver.setError(error)
-                        self.nonCancelAction {
-                            self.tracker.updateStatus(.error)
-                            Core.makeError(error: error,
-                                           additionalInfo: self.currentQuery,
-                                           showToUser: self.syncErrorsResolver.shouldShowToUser(self.isForeground))
-                        }
-                        context.performAndWait {
-                            context.rollback()
-                        }
-                        continuation.resume()
-                    }
-                }
-            }
-        }
-    }
+//    /// Performs the export process for the specified objects.
+//    ///
+//    /// - Parameters:
+//    ///   - context: The Core Data context.
+//    ///   - objects: The objects to export.
+//    ///   - helpers: The helper objects for execution.
+//    func doExport(in context: NSManagedObjectContext, objects: [any Exportable.Type], helpers: [ExecutionHelper.Type] = []) async {
+//        tracker.updateStatus(.exporting, message: "Exporting")
+//        
+//        await withCheckedContinuation { continuation in
+//            guard ConnectManager.shared.postgres?.pool != nil else {
+//                Core.logAtlasConnectEvent(.postgresPoolNil, type: .sync)
+//                self.tracker.updateStatus(.error)
+//                continuation.resume()
+//                return
+//            }
+//            ConnectManager.shared.postgres?.pool?.withConnection { [weak self] response in
+//                guard let self else { return }
+//                switch response {
+//                case .failure(let error):
+//                    Core.logAtlasConnectEvent(.poolConnectionFailure, type: .sync)
+//                    syncErrorsResolver.setError(error)
+//                    self.tracker.updateStatus(.error)
+//                    Core.makeError(error: error,
+//                                   additionalInfo: currentQuery,
+//                                   showToUser: syncErrorsResolver.shouldShowToUser(isForeground))
+//                    continuation.resume()
+//                    return
+//                case .success(let connection):
+//                    do {
+//                        self.activeConnection = connection
+//                        defer { connection.close() }
+//                        
+//                        try context.performAndWait {
+//                            for helper in helpers {
+//                                guard !self.isSyncCanceled else {
+//                                    continuation.resume()
+//                                    return
+//                                }
+//                                try helper.performWork(with: connection, in: context)
+//                            }
+//                        }
+//                        
+//                        for object in objects {
+//                            guard !self.isSyncCanceled else {
+//                                continuation.resume()
+//                                return
+//                            }
+//                            // MARK: main func is HERE:
+//                            try Exporter(for: object, using: self).export(with: connection, in: context)
+//                        }
+//                        
+//                        self.tracker.updateStatus(.exportDone)
+//                        continuation.resume()
+//                    } catch {
+//                        self.syncErrorsResolver.setError(error)
+//                        self.nonCancelAction {
+//                            self.tracker.updateStatus(.error)
+//                            Core.makeError(error: error,
+//                                           additionalInfo: self.currentQuery,
+//                                           showToUser: self.syncErrorsResolver.shouldShowToUser(self.isForeground))
+//                        }
+//                        context.performAndWait {
+//                            context.rollback()
+//                        }
+//                        continuation.resume()
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
 
 extension SyncManager {

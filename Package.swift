@@ -16,12 +16,13 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/jenyalebid/AlpineCore.git", branch: "main"),
         .package(url: "https://github.com/jenyalebid/AlpineUI.git", branch: "main"),
-        .package(url: "https://github.com/codewinsdotcom/PostgresClientKit.git", branch: "master")
+        .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.21.0")
     ],
     targets: [
         .target(
             name: "AlpineConnect",
-            dependencies: ["AlpineCore", "AlpineUI", "PostgresClientKit"],
+            dependencies: ["AlpineCore", "AlpineUI",
+                           .product(name: "PostgresNIO", package: "postgres-nio")],
             resources: [.process("Resources")]),
         .testTarget(
             name: "AlpineConnectTests",

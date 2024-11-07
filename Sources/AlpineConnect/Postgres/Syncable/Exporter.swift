@@ -7,7 +7,7 @@
 
 import CoreData
 import AlpineCore
-import PostgresClientKit
+import PostgresNIO
 
 class Exporter {
 
@@ -19,32 +19,36 @@ class Exporter {
         self.syncManager = syncManager
     }
     
-    func export(with connection: Connection, in context: NSManagedObjectContext) throws {
+    func export(using postgresManager: PostgresManager, in context: NSManagedObjectContext) async throws {
         guard let syncManager = syncManager else { return }
-        let context: NSManagedObjectContext = objectType.isSavedIndependently ? (syncManager.database?.type.newBackground ?? context) : context
+        
+        let exportContext: NSManagedObjectContext = objectType.isSavedIndependently ? (syncManager.database?.type.newBackground ?? context) : context
         
         var totalObjectsCount = 0
-        try context.performAndWait {
-            try objectType.deleteAllLocal(in: context)
-            totalObjectsCount = try objectType.getCount(using: objectType.exportPredicate, in: context)
+        try exportContext.performAndWait {
+            try objectType.deleteAllLocal(in: exportContext)
+            totalObjectsCount = try objectType.getCount(using: objectType.exportPredicate, in: exportContext)
         }
+        
         syncManager.tracker.makeRecord(name: objectType.displayName, type: .export, recordCount: totalObjectsCount)
-
         guard totalObjectsCount > 0 else { return }
 
-//        defer { syncManager.currentQuery = "" }
-
         let batchFetcher = CDBatchFetcher(for: objectType.entityName, using: objectType.exportPredicate, sortDescriptors: nil, with: objectType.exportBatchSize, isModifying: true)
+        
         var objects: [any Exportable]? = []
 
         repeat {
-            try context.performAndWait {
-                objects = try batchFetcher.fetchObjectBatch(in: context) as? [any Exportable]
-//                objects?.forEach { $0.observeDeallocation() }
-                if let objects = objects {
-                    try export(objects, with: connection)
-                    if objectType.isSavedIndependently  {
-                        try context.persistentSave()
+            // Получаем объекты синхронно
+            try exportContext.performAndWait {
+                objects = try batchFetcher.fetchObjectBatch(in: exportContext) as? [any Exportable]
+            }
+            
+            // Обрабатываем объекты асинхронно
+            if let objects = objects {
+                try await export(objects, using: postgresManager)
+                if objectType.isSavedIndependently {
+                    try exportContext.performAndWait {
+                        try exportContext.persistentSave()
                     }
                 }
             }
@@ -57,20 +61,18 @@ class Exporter {
 
 private extension Exporter {
 
-    func export(_ objects: [any Exportable], with connection: Connection) throws {
-        for query in objectType.getInsertQueries(for: objects) {
-            try execute(query, with: connection)
+    func export(_ objects: [any Exportable], using postgresManager: PostgresManager) async throws {
+        let queries = objectType.getInsertQueries(for: objects)
+        for query in queries {
+            try await execute(query, using: postgresManager)
         }
         objectType.modifyAfterExport(objects)
         syncManager?.tracker.progressUpdate(adding: Double(objects.count))
     }
 
-    func execute(_ query: String, with connection: Connection) throws {
+    func execute(_ query: String, using postgresManager: PostgresManager) async throws {
         guard !query.isEmpty else { return }
         syncManager?.currentQuery = query
-        let statement = try connection.prepareStatement(text: query)
-        defer { statement.close() }
-        try statement.execute()
-        try connection.commitTransaction()
+        try await postgresManager.queryRows(query)
     }
 }

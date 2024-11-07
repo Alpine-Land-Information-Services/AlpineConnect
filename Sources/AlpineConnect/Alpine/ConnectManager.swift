@@ -242,7 +242,7 @@ extension ConnectManager {
     }
     
     private func attemptPostgresLogin(with info: PostgresInfo) async throws -> ConnectionResponse {
-        postgres = PostgresManager(info, credentials: loginData)
+        postgres = try await PostgresManager(info, credentials: loginData)
         return await loginInfo.appInfo.userTableConnect()
     }
     

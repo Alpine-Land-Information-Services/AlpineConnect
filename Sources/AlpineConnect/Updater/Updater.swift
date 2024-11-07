@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import PostgresClientKit
+//import PostgresClientKit
 
 public class Updater {
     
@@ -21,6 +21,18 @@ public class Updater {
     }
     
     public var updateStatus = UpdateStatus.error
+    
+    private var trackingManager: TrackingManager?
+    
+    init() {
+        Task {
+           try await initializeTrackingManager()
+        }
+    }
+    
+     func initializeTrackingManager() async throws {
+        trackingManager = try await TrackingManager.createInstance()
+    }
     
     func checkVersion(name: String, automatic: Bool, showMessage: @escaping ((Bool, Bool) -> Void)) {
         if let currentVersion = AppInformation.getBundle(key: "CFBundleShortVersionString") {
@@ -62,32 +74,28 @@ public class Updater {
     }
     
     private func getAppInfo(name: String, completion: @escaping ([String?]?, Error?) -> Void) {
-        TrackingManager.shared.pool?.withConnection { con_from_pool in
+        guard let trackingManager = trackingManager else {
+            completion(nil, NSError(domain: "TrackingManager is not initialized", code: 0, userInfo: nil))
+            return
+        }
+        
+        Task {
             do {
-                let connection = try con_from_pool.get()
-                defer { connection.close() }
                 let text = """
-                        SELECT
-                        version,
-                        minimum_version
-                        FROM public.applications
-                        WHERE name = '\(name)'
-                        """
+                    SELECT
+                    version,
+                    minimum_version
+                    FROM public.applications
+                    WHERE name = '\(name)'
+                    """
                 print("---------------->>>Alpine Updater Running<<<----------------")
-                let statement = try connection.prepareStatement(text: text)
-                defer { statement.close() }
-                var info: [String?] = []
-                let cursor = try statement.execute()
-                defer { cursor.close() }
-                do {
-                    for row in cursor {
-                        let columns = try row.get().columns
-                        info.append(try columns[0].string())
-                        info.append(try columns[1].optionalString())
-                    }
-                } catch {
-                    completion(nil, error)
+                
+                let rows = try await trackingManager.queryRows(text)
+                let info = rows.map { row -> String? in
+                    let randomAccessRow = row.makeRandomAccess()
+                    return randomAccessRow[data: "version"].string
                 }
+                
                 completion(info, nil)
             } catch {
                 completion(nil, error)
@@ -95,48 +103,44 @@ public class Updater {
         }
     }
     
+
     func callUpdate(name: String, result: @escaping ((Bool, URL?) -> Void)) {
-        TrackingManager.shared.pool?.withConnection { con_from_pool in
+        // Ensure trackingManager is available
+        guard let trackingManager = trackingManager else {
+            result(false, nil)
+            return
+        }
+
+        Task {
             do {
-                let connection = try con_from_pool.get()
-                defer { connection.close() }
                 let text = "SELECT * FROM public.redemption_codes WHERE application = '\(name)' LIMIT 1"
-                let statement = try connection.prepareStatement(text: text)
-                let cursor = try statement.execute()
+                let rows = try await trackingManager.queryRows(text)
                 
-                var id: UUID!
-                var path: String!
-                
-                for row in cursor {
-                    let columns = try row.get().columns
-                    id = try UUID(uuidString: columns[0].string())
-                    path = try columns[3].string()
+                // Parse results
+                var id: UUID?
+                var path: String?
+                for row in rows {
+                    let randomAccessRow = row.makeRandomAccess()
+                    id = UUID(uuidString: randomAccessRow[data: "id"].string ?? "")
+                    path = randomAccessRow[data: "path"].string
                 }
-                cursor.close()
-                statement.close()
-                self.reedemCode(id, connection)
-                if let url = URL(string: path) {
+                
+                if let id = id, let url = URL(string: path ?? "") {
+                    try await redeemCode(id, using: trackingManager)  // Redeem code
                     result(true, url)
+                } else {
+                    result(false, nil)
                 }
-            }
-            catch {
+            } catch {
                 result(false, nil)
-                assertionFailure("\(error)")
+                print("Error in callUpdate: \(error)")
             }
         }
     }
     
-    private func reedemCode(_ id: UUID, _ connection: Connection) {
-        do {
-            let text = "DELETE FROM public.redemption_codes WHERE id = '\(id)'"
-            let statement = try connection.prepareStatement(text: text)
-            defer { statement.close() }
-            let cursor = try statement.execute()
-            cursor.close()
-        }
-        catch {
-            assertionFailure("\(error)")
-        }
+    private func redeemCode(_ id: UUID, using trackingManager: TrackingManager) async throws {
+        let text = "DELETE FROM public.redemption_codes WHERE id = '\(id)'"
+        _ = try await trackingManager.querySequence(text)
     }
 }
 

@@ -6,11 +6,11 @@
 //
 
 import CoreData
-import PostgresClientKit
+//import PostgresClientKit
 
 public protocol ExecutionHelper {
     
     static var syncManager: SyncManager { get }
     
-    static func performWork(with connection: Connection, in context: NSManagedObjectContext) throws
+    static func performWork(with postgresManager: PostgresManager, in context: NSManagedObjectContext) async throws
 }

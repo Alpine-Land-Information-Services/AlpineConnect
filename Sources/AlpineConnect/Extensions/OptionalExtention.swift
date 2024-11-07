@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import PostgresClientKit
+//import PostgresClientKit
 import AlpineCore
 
 public extension Optional where Wrapped == UUID {
@@ -42,8 +42,8 @@ public extension Optional where Wrapped == Date {
     }
 }
 
-public extension Optional where Wrapped == Data {
-    func toPostgres() -> String {
-        self != nil ? "'\(PostgresByteA(data: self!).postgresValue)'" : "NULL"
-    }
-}
+//public extension Optional where Wrapped == Data {
+//    func toPostgres() -> String {
+//        self != nil ? "'\(PostgresByteA(data: self!).postgresValue)'" : "NULL"
+//    }
+//}
